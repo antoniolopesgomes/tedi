@@ -1,0 +1,18 @@
+{
+  "name": "fullstack-ts-seed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "António Gomes",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
+  },
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
