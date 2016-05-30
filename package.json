@@ -9,10 +9,14 @@
   "author": "António Gomes",
   "license": "ISC",
   "devDependencies": {
+    "inversify-dts": "^1.0.1",
     "typescript": "^1.8.10",
     "typings": "^1.0.4"
   },
   "dependencies": {
-    "express": "^4.13.4"
+    "bluebird": "^3.4.0",
+    "express": "^4.13.4",
+    "inversify": "^2.0.0-beta.6",
+    "lodash": "^4.13.1"
   }
 }

@@ -1,0 +1,16 @@
+{
+    "/": {
+        "/auth": {
+            "/login": { "get": ["AuthController", "login"] }  
+        },
+        "/resources": {
+            "filters": ["AuthenticationFilter", "UrlQueryFilter"],
+            "/user": {
+                "get":    ["User", "read"],
+                "post":   ["User", "create"],
+                "delete": ["User", "delete"],
+                "put":    ["User", "update"]
+            }
+        }
+    }
+}

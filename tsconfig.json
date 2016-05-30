@@ -1,12 +1,16 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es5",
+        "target": "es6",
         "moduleResolution": "node",
         "noImplicitAny": false,
-        "sourceMap": false
+        "sourceMap": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "outDir": "./dist"
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "typings"
     ]
 }
