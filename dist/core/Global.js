@@ -1,4 +1,5 @@
 "use strict";
+require('reflect-metadata');
 const inversify = require('inversify');
 const filters_1 = require('./filters');
 let ioc = new inversify.Kernel();

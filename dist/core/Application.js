@@ -2,9 +2,9 @@
 const express = require('express');
 const Promise = require('bluebird');
 class ExpressApplication {
-    constructor(_config, _routeManager) {
+    constructor(_config, _router) {
         this._config = _config;
-        this._routeManager = _routeManager;
+        this._router = _router;
         if (!this._config) {
             throw new Error('Application: No config was found.');
         }
@@ -57,7 +57,7 @@ function addRoute(app, routeConfig) {
     }
     //put
     if (routeConfig.put) {
-        addAction(router, routeConfig, 'putget');
+        addAction(router, routeConfig, 'put');
     }
     //delete
     if (routeConfig.delete) {

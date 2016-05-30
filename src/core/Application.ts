@@ -3,8 +3,7 @@ import * as express from 'express';
 import * as ioc from 'inversify';
 import * as Promise from 'bluebird';
 import * as http from 'http';
-import {Config} from '../core';
-import {RouteManager, Route, RouteConfig, RouteActionConfig} from './routes';
+import {Config, RouteConfig, CoreRouter, RouteActionConfig} from '../core';
 
 export interface Application {
     listen(): Promise<any>;
@@ -18,7 +17,7 @@ class ExpressApplication implements Application {
 
     constructor(
         private _config: Config,
-        private _routeManager: RouteManager
+        private _router: CoreRouter
     ) {
         if (!this._config) {
             throw new Error('Application: No config was found.');
@@ -79,7 +78,7 @@ function addRoute(app: express.Application, routeConfig: RouteConfig): express.R
     }
     //put
     if (routeConfig.put) {
-        addAction(router, routeConfig, 'putget');
+        addAction(router, routeConfig, 'put');
     }
     //delete
     if (routeConfig.delete) {

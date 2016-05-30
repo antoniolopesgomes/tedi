@@ -1,28 +1,12 @@
 import * as _ from 'lodash';
-import {Route} from './Route';
-import {RoutePath} from './Path';
+import {RouteConfig, RouteActionConfig} from './Routes';
 import {Global} from '../Global';
 
-export interface RouteManager {
+export interface Router {
     getRoutesConfiguration(routes: any): RouteConfig;
 }
 
-export interface RouteActionConfig {
-    controller: Object,
-    controllerMethod: string;
-}
-
-export interface RouteConfig {
-    path: string;
-    filters: string[],
-    get: RouteActionConfig,
-    post: RouteActionConfig,
-    delete: RouteActionConfig,
-    put: RouteActionConfig,
-    children: RouteConfig[];
-}
-
-export class CoreRouteManager implements RouteManager {
+export class CoreRouter implements Router {
     
     getRoutesConfiguration(routes: any): RouteConfig {
         let root = <RouteConfig> { path: 'ROOT' };

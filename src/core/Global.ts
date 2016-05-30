@@ -1,5 +1,5 @@
+import 'reflect-metadata';
 import * as inversify from 'inversify';
-import {CoreRouteManager} from './routes';
 import {FilterManager, CoreFilterManager} from './filters';
 
 let ioc = new inversify.Kernel();
