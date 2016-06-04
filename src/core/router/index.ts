@@ -1,2 +1,38 @@
 export {CoreRouter} from './CoreRouter';
-export {RouteActionConfig, RouteConfig} from './Routes';
+
+export interface RouteAction {
+    controller: Object,
+    controllerMethod: string;
+}
+
+export class Route {
+    path: string;
+    filters: string[];
+    errorHandlers: string[];
+    children: Route[];
+    //actions
+    get: RouteAction;
+    post: RouteAction;
+    delete: RouteAction;
+    put: RouteAction;
+    
+    constructor(path: string) {
+        this.path = path;
+        this.filters = [];
+        this.errorHandlers = [];
+        this.children = [];
+    }
+}
+
+export interface Router {
+    getRoutesConfiguration(): Route;
+}
+
+export interface RoutesDefinition {
+    
+}
+
+export const ROUTE_KEYS: any = {
+    'FILTERS': '$filters',
+    'ERROR_HANDLERS': '$errorHandlers' 
+}

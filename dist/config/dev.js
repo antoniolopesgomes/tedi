@@ -1,2 +1,1 @@
-"use strict";
-exports.config = {};
+//# sourceMappingURL=dev.js.map

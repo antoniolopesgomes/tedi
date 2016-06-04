@@ -1,19 +1,15 @@
 import * as express from 'express';
 import * as Promise from 'bluebird';
-import {injectable} from 'inversify';
-import {Application} from './Application';
 import * as http from 'http';
-
-export interface Server {
-    
-}
+import {App} from '../app';
+import {Server} from './index';
 
 export class CoreServer implements Server {
     
-    private _app: Application;
+    private _app: App;
     private _server: http.Server;
     
-    constructor(app: Application) {
+    constructor(app: App) {
         this._app = app;
         if (!this._app) {
             throw new Error('Server: Expected application');

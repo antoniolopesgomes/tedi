@@ -1,1 +1,0 @@
-export {FilterManager, CoreFilterManager} from './FilterManager';

@@ -1,5 +1,4 @@
-import {Global} from '../core';
-import {inject, injectable} from 'inversify';
+import {Global, injectable} from '../core';
 
 describe('Global', () => {
 
@@ -10,9 +9,17 @@ describe('Global', () => {
         id: string = 'mockController';
     }
     
+    beforeAll(() => {
+        Global.snapshot().clear();
+    })
+    
+    afterAll(() => {
+        Global.restore();
+    })
+    
     describe('when I try to register a controller', () => {
-        Global.registerController(abstraction, MockController);
         it('should get the registered controller', () => {
+            Global.registerController(abstraction, MockController);
             let controller = Global.getController<MockController>('MockController');
             expect(controller).toEqual(jasmine.any(MockController));
             expect(controller.id).toEqual('mockController');
