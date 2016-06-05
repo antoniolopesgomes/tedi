@@ -15,12 +15,15 @@ export class Route {
     post: RouteAction;
     delete: RouteAction;
     put: RouteAction;
+    //data
+    data: any;
     
     constructor(path: string) {
         this.path = path;
         this.filters = [];
         this.errorHandlers = [];
         this.children = [];
+        this.data = {};
     }
 }
 

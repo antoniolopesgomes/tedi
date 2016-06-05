@@ -13,12 +13,12 @@ export class CoreRouter implements Router {
     }
     
     getRoutesConfiguration(): Route {
-        //create root
+        //create and setup root (add filters and errorHandlers)
         let root = new Route('/');
-        //add filters if they existt
-        root.filters = getFilters(this._routesDefinition.filters);
+        root.filters = getFilters(this._routesDefinition[ROUTE_KEYS.FILTERS]);
+        root.errorHandlers = getErrorHandlers(this._routesDefinition[ROUTE_KEYS.ERROR_HANDLERS])
         //build routing tree
-        buildRouteConfig(this._routesDefinition, root);
+        buildRouteConfig(root, this._routesDefinition);
         return root;
     }
     
@@ -26,13 +26,13 @@ export class CoreRouter implements Router {
 
 //HELPERS
 
-function buildRouteConfig(routes: any, routeConfig: Route): void {
+function buildRouteConfig(routeConfig: Route, routes: any): void {
     Object.keys(routes).forEach((key: string) => {
         if (key.startsWith('/')) {
             let childRouteConfig = new Route(key);
             routeConfig.children.push(childRouteConfig);
             fillRoute(routes[key], childRouteConfig);
-            buildRouteConfig(routes[key], childRouteConfig);
+            buildRouteConfig(childRouteConfig, routes[key]);
         }
     })
 }
@@ -117,5 +117,5 @@ function getErrorHandlers(errorHandlersNames: string[]): any[] {
 }
 
 function throwError(msg: string): void {
-    throw new Error(msg)
+    throw new Error(`CoreRouter: ${msg}`);
 }

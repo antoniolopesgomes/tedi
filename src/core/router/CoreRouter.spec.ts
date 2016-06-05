@@ -120,7 +120,7 @@ describe('CoreRouter', () => {
             
             it('should throw an error', () => {
                 expect(() => { coreCouter.getRoutesConfiguration() })
-                    .toThrowError(`'InvalidFilter' must extend from 'Filter'`);
+                    .toThrowError(`CoreRouter: 'InvalidFilter' must extend from 'Filter'`);
             })
             
         })
@@ -144,7 +144,7 @@ describe('CoreRouter', () => {
             
             it('should throw an error', () => {
                 expect(() => { coreCouter.getRoutesConfiguration() })
-                    .toThrowError(`'InvalidErrorHandler' must extend from 'ErrorHandler'`);
+                    .toThrowError(`CoreRouter: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
             })
             
         })
