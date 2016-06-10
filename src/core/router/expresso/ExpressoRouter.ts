@@ -1,14 +1,15 @@
 import * as _ from 'lodash';
-import {Router, Route, RouteAction, ROUTE_KEYS} from './index';
-import {Global, injectable, inject} from '../Global';
-import {Filter, ErrorHandler} from '../../core';
+import {Router, Route, RouteAction, ROUTE_KEYS} from '../core';
+import {Global, injectable, inject} from '../../Global';
+import {Filter, ErrorHandler} from '../../../core';
 
 @injectable()
-export class CoreRouter implements Router {
+export class ExpressoRouter extends Router {
     
     private _routesDefinition: any;
     
     constructor(@inject('RoutesDefinition') routesDefinition: any) {
+        super();
         this._routesDefinition = routesDefinition;
     }
     
@@ -59,7 +60,7 @@ function getRouteAction(routeAction: string[]): RouteAction {
     let controllerName = routeAction[0];
     let methodName = routeAction[1];
     
-    let controller: any = Global.getController(controllerName);
+    let controller: any = Global.controller(controllerName);
     if (!_.isFunction(controller[methodName])) {
         throwError(`invalid controller[${controllerName}] method[${methodName}]`);
     }
@@ -85,7 +86,7 @@ function getFilters(filterNames: string[]): any[] {
     }
     
     filters = filterNames.map((name: string) => {
-        let filter = Global.getFilter(name);
+        let filter = Global.filter(name);
         validateFilter(name, filter);
         return filter;
     });
@@ -108,7 +109,7 @@ function getErrorHandlers(errorHandlersNames: string[]): any[] {
     }
     
     errorHandlers = errorHandlersNames.map((name: string) => {
-        let errorHandler = Global.getErrorHandler(name);
+        let errorHandler = Global.errorHandler(name);
         validateErrorHandler(name, errorHandler);
         return errorHandler;
     });

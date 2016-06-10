@@ -6,6 +6,7 @@ require('reflect-metadata');
 const inversify = require('inversify');
 const router_1 = require('./router');
 const app_1 = require('./app');
+const logging_1 = require('./logging');
 let coreKernel = new inversify.Kernel();
 let appKernel = new inversify.Kernel();
 (function (BindingContext) {
@@ -15,15 +16,15 @@ let appKernel = new inversify.Kernel();
 })(exports.BindingContext || (exports.BindingContext = {}));
 var BindingContext = exports.BindingContext;
 class GlobalRegister {
-    registerController(abstraction, concretion, options) {
+    addController(abstraction, concretion, options) {
         bindToKernel(appKernel, abstraction, concretion, options);
         return this;
     }
-    registerFilter(abstraction, concretion, options) {
+    addFilter(abstraction, concretion, options) {
         bindToKernel(appKernel, abstraction, concretion, options);
         return this;
     }
-    registerErrorHandler(abstraction, concretion, options) {
+    addErrorHandler(abstraction, concretion, options) {
         bindToKernel(appKernel, abstraction, concretion, options);
         return this;
     }
@@ -31,13 +32,13 @@ class GlobalRegister {
         bindToKernel(coreKernel, abstraction, concretion, options);
         return this;
     }
-    getController(abstraction) {
+    controller(abstraction) {
         return appKernel.get(abstraction);
     }
-    getFilter(abstraction) {
+    filter(abstraction) {
         return appKernel.get(abstraction);
     }
-    getErrorHandler(abstraction) {
+    errorHandler(abstraction) {
         return appKernel.get(abstraction);
     }
     getCoreComponent(abstraction) {
@@ -81,8 +82,9 @@ function throwError(msg) {
 exports.Global = new GlobalRegister();
 //Default bindings
 exports.Global
-    .registerCoreComponent('Router', router_1.CoreRouter)
-    .registerCoreComponent('App', app_1.ExpressApp)
+    .registerCoreComponent(logging_1.Logger, logging_1.WinstonLogger)
+    .registerCoreComponent(router_1.Router, router_1.ExpressoRouter)
+    .registerCoreComponent(app_1.App, app_1.ExpressApp)
     .registerCoreComponent('Config', {
     server: {
         port: 8080

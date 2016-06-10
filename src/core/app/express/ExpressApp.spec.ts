@@ -1,7 +1,7 @@
 
 import {buildApp} from './ExpressApp';
-import {CoreRouter} from '../router';
-import {Global, inject, injectable, Filter, ErrorHandler, BindingContext} from '../../core';
+import {ExpressoRouter} from '../../router';
+import {Global, inject, injectable, Filter, ErrorHandler, BindingContext} from '../../../core';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
@@ -62,23 +62,23 @@ describe('ExpressApp', () => {
     beforeEach(() => {
         Global
             .snapshot()
-            .registerController('AuthController', AuthControllerMock)
-            .registerFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE })
-            .registerFilter('LoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
-            .registerFilter('UserFilter', new CustomFilter(), { context: BindingContext.VALUE })
-            .registerFilter('AdminFilter', new CustomFilter(), { context: BindingContext.VALUE })
-            .registerErrorHandler('RootErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
-            .registerErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
-            .registerErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
+            .addController('AuthController', AuthControllerMock)
+            .addFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE })
+            .addFilter('LoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
+            .addFilter('UserFilter', new CustomFilter(), { context: BindingContext.VALUE })
+            .addFilter('AdminFilter', new CustomFilter(), { context: BindingContext.VALUE })
+            .addErrorHandler('RootErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
+            .addErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
+            .addErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
-        authController = Global.getController<AuthControllerMock>('AuthController');
-        rootFilter = Global.getFilter<any>('RootFilter');
-        userFilter = Global.getFilter<any>('UserFilter');
-        loginFilter = Global.getFilter<any>('LoginFilter');
-        adminFilter = Global.getFilter<any>('AdminFilter');
-        rootErrorHandler = Global.getErrorHandler('RootErrorHandler');
-        loginErrorHandler = Global.getErrorHandler('LoginErrorHandler');
-        authErrorHandler = Global.getErrorHandler('AuthErrorHandler');
+        authController = Global.controller<AuthControllerMock>('AuthController');
+        rootFilter = Global.filter<any>('RootFilter');
+        userFilter = Global.filter<any>('UserFilter');
+        loginFilter = Global.filter<any>('LoginFilter');
+        adminFilter = Global.filter<any>('AdminFilter');
+        rootErrorHandler = Global.errorHandler('RootErrorHandler');
+        loginErrorHandler = Global.errorHandler('LoginErrorHandler');
+        authErrorHandler = Global.errorHandler('AuthErrorHandler');
     });
 
     afterEach(() => {
@@ -90,7 +90,7 @@ describe('ExpressApp', () => {
         let expressApp: express.Application;
 
         beforeEach(() => {
-            let coreRouter = new CoreRouter(routes);
+            let coreRouter = new ExpressoRouter(routes);
             expressApp = buildApp(coreRouter.getRoutesConfiguration());
         })
 
@@ -116,7 +116,7 @@ describe('ExpressApp', () => {
             })
 
             it('should have called the right filters', () => {
-                //expect(rootFilter.apply).toHaveBeenCalled();
+                expect(rootFilter.apply).toHaveBeenCalled();
                 expect(loginFilter.apply).toHaveBeenCalled();
                 expect(userFilter.apply).not.toHaveBeenCalled();
                 expect(adminFilter.apply).not.toHaveBeenCalled();
@@ -124,7 +124,7 @@ describe('ExpressApp', () => {
 
         })
 
-        xdescribe('POST /auth/login/user', () => {
+        describe('POST /auth/login/user', () => {
 
             beforeEach((done: DoneFn) => {
                 spyOn(rootFilter, 'apply').and.callThrough();
@@ -154,7 +154,7 @@ describe('ExpressApp', () => {
 
         })
 
-        xdescribe('and a controller throws an error', () => {
+        describe('and a controller throws an error', () => {
             beforeEach(() => {
                 spyOn(authController, 'login').and.throwError('Error on controller.');
             })
@@ -202,6 +202,33 @@ describe('ExpressApp', () => {
             })
 
 
+        })
+        
+        describe('when login filter responds', () => {
+            let response: request.Response;
+            beforeEach((done) => {
+                spyOn(authController, 'login');
+                spyOn(loginFilter, 'apply').and.callFake((req, res) => {
+                    res.status(200).send('HIJACKED');
+                });
+                request(expressApp)
+                    .get('/auth/login')
+                    .expect(200)
+                    .then((res: request.Response) => {
+                        response = res;
+                        done();
+                    })
+                    .catch(done.fail);
+                    
+            })
+            it('filter should have responded', () => {
+                expect(loginFilter.apply).toHaveBeenCalled();
+                expect(response.text).toEqual('HIJACKED');
+            })
+            it('controller should have not been called', () => {
+               expect(authController.login).not.toHaveBeenCalled(); 
+            });
+            
         })
     })
 

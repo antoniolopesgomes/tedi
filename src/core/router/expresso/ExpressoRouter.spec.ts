@@ -1,7 +1,8 @@
-import {Global, injectable, BindingContext, Filter, ErrorHandler} from '../../core';
-import {Route, CoreRouter, Router, RoutesDefinition} from '../../core/router';
+import {Global, injectable, BindingContext, Filter, ErrorHandler} from '../../../core';
+import {Route, Router, RoutesDefinition} from '../core';
+import {ExpressoRouter} from '../expresso/ExpressoRouter';
 
-describe('CoreRouter', () => {
+describe('StrongExpressoRouter', () => {
 
     let routes = {
         "/auth": {
@@ -13,11 +14,11 @@ describe('CoreRouter', () => {
         }
     };
 
-    let coreRouter: Router;
+    let strongExpressoRouter: Router;
 
     beforeAll(() => {
         Global.snapshot();
-        coreRouter = new CoreRouter(routes);
+        strongExpressoRouter = new ExpressoRouter(routes);
     });
 
     afterAll(() => {
@@ -47,11 +48,11 @@ describe('CoreRouter', () => {
 
             beforeAll(() => {
                 Global
-                    .registerFilter('DummyFilter', DummyFilterMock)
-                    .registerController('AuthController', AuthControllerMock)
-                    .registerErrorHandler('DummyErrorHandler', DummyErrorHandler);
+                    .addFilter('DummyFilter', DummyFilterMock)
+                    .addController('AuthController', AuthControllerMock)
+                    .addErrorHandler('DummyErrorHandler', DummyErrorHandler);
 
-                routeConfig = coreRouter.getRoutesConfiguration();
+                routeConfig = strongExpressoRouter.getRoutesConfiguration();
             })
 
             it('first node should be the ROOT / ', () => {
@@ -112,14 +113,14 @@ describe('CoreRouter', () => {
                 }
             }
             
-            let coreCouter = new CoreRouter(routes);
+            let expressoRouter = new ExpressoRouter(routes);
             
             beforeAll(() => {
-                Global.registerFilter<Filter<any>>('InvalidFilter', <any> InvalidFilter);
+                Global.addFilter<Filter<any>>('InvalidFilter', <any> InvalidFilter);
             })
             
             it('should throw an error', () => {
-                expect(() => { coreCouter.getRoutesConfiguration() })
+                expect(() => { expressoRouter.getRoutesConfiguration() })
                     .toThrowError(`CoreRouter: 'InvalidFilter' must extend from 'Filter'`);
             })
             
@@ -136,10 +137,10 @@ describe('CoreRouter', () => {
                 }
             }
             
-            let coreCouter = new CoreRouter(routes);
+            let coreCouter = new ExpressoRouter(routes);
             
             beforeAll(() => {
-                Global.registerErrorHandler('InvalidErrorHandler', <any> InvalidErrorHandler);
+                Global.addErrorHandler('InvalidErrorHandler', <any> InvalidErrorHandler);
             })
             
             it('should throw an error', () => {

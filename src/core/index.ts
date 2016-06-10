@@ -16,3 +16,16 @@ export class ErrorHandler {
         throw new Error('ErrorHandler.catch must be implemented.')
     }
 }
+
+export interface LoggerCfg {
+
+}
+
+export class Logger {
+
+    private _cfg: LoggerCfg;
+
+    constructor(cfg: LoggerCfg) {
+        this._cfg = cfg || <LoggerCfg> { };
+    }
+}

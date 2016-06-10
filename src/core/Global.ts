@@ -1,11 +1,12 @@
 export {inject, injectable} from 'inversify';
 
 import 'reflect-metadata';
-import * as inversify from 'inversify';
-import {Router, CoreRouter} from './router';
+import * as inversify from 'inversify'; 
+import {Router, ExpressoRouter} from './router';
 import {App, ExpressApp} from './app';
 import {Config} from './config';
 import {ErrorHandler, Filter} from './index';
+import {Logger, WinstonLogger} from './logging';
 
 let coreKernel = new inversify.Kernel();
 let appKernel = new inversify.Kernel();
@@ -22,7 +23,7 @@ interface BindingOptions {
 
 class GlobalRegister {
      
-    registerController<T>(
+    addController<T>(
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
@@ -31,7 +32,7 @@ class GlobalRegister {
         return this;
     }
     
-    registerFilter<T>(
+    addFilter<T>(
         abstraction: string | inversify.INewable<Filter<T>>, 
         concretion: inversify.INewable<Filter<T>> | Filter<T>,
         options?: BindingOptions
@@ -40,7 +41,7 @@ class GlobalRegister {
         return this;
     }
     
-    registerErrorHandler(
+    addErrorHandler(
         abstraction: string | inversify.INewable<ErrorHandler>, 
         concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
@@ -58,15 +59,15 @@ class GlobalRegister {
         return this;
     }
     
-    getController<T>(abstraction: string | inversify.INewable<T>): T {
+    controller<T>(abstraction: string | inversify.INewable<T>): T {
         return appKernel.get<T>(abstraction);
     }
     
-    getFilter<T>(abstraction: string | inversify.INewable<Filter<T>>): Filter<T> {
+    filter<T>(abstraction: string | inversify.INewable<Filter<T>>): Filter<T> {
         return appKernel.get<Filter<T>>(abstraction);
     }
     
-    getErrorHandler(abstraction: string | inversify.INewable<ErrorHandler>): ErrorHandler {
+    errorHandler(abstraction: string | inversify.INewable<ErrorHandler>): ErrorHandler {
         return appKernel.get<ErrorHandler>(abstraction);
     }
     
@@ -93,8 +94,6 @@ class GlobalRegister {
     }
     
 }
-
-
 
 function bindToKernel<T>(
     kernel: inversify.IKernel,
@@ -126,8 +125,9 @@ export let Global: GlobalRegister = new GlobalRegister();
 
 //Default bindings
 Global
-    .registerCoreComponent<Router>('Router', CoreRouter)
-    .registerCoreComponent<App>('App', ExpressApp)
+    .registerCoreComponent(Logger, WinstonLogger)
+    .registerCoreComponent(Router, ExpressoRouter)
+    .registerCoreComponent(App, ExpressApp)
     .registerCoreComponent<Config>(
         'Config', 
         <Config> { 

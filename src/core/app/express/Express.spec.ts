@@ -31,7 +31,7 @@ xdescribe('Express app', () => {
 
     })
 
-    xdescribe('when error handlers are chained in the app', () => {
+    describe('when error handlers are chained in the app', () => {
         let response: request.Response;
 
         beforeEach((done: DoneFn) => {
@@ -72,7 +72,7 @@ xdescribe('Express app', () => {
         })
     })
 
-    xdescribe('when error handlers are setted in the routers', () => {
+    describe('when error handlers are setted in the routers', () => {
         let response: request.Response;
         let infoFlag = false;
         let userFlag = false;
@@ -115,7 +115,7 @@ xdescribe('Express app', () => {
         })
     })
 
-    xdescribe('when filters are setted in the routers', () => {
+    describe('when filters are setted in the routers', () => {
         let response: request.Response;
         let infoFlag = false;
         let userFlag = false;

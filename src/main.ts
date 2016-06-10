@@ -7,8 +7,8 @@ import {
 //Config
 Global
     //Controllers
-    .registerController('UserController', UserController)
-    .registerController('AuthController', AuthController)
+    .addController('UserController', UserController)
+    .addController('AuthController', AuthController)
     //Filters
     //.registerFilter('HTTPFilter', )
     //Services

@@ -19,8 +19,8 @@ describe('Global', () => {
     
     describe('when I try to register a controller', () => {
         it('should get the registered controller', () => {
-            Global.registerController(abstraction, MockController);
-            let controller = Global.getController<MockController>('MockController');
+            Global.addController(abstraction, MockController);
+            let controller = Global.controller<MockController>('MockController');
             expect(controller).toEqual(jasmine.any(MockController));
             expect(controller.id).toEqual('mockController');
 
@@ -31,7 +31,7 @@ describe('Global', () => {
     describe('when I try to get a controller', () => {
        describe('and it doesn\'t exist', () => {
           it('should throw a error', () => {
-             expect(() => { Global.getController<MockController>('dummy'); })
+             expect(() => { Global.controller<MockController>('dummy'); })
                 .toThrow();
           });
        });

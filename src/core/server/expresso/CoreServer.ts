@@ -1,15 +1,16 @@
 import * as express from 'express';
-import * as Promise from 'bluebird';
 import * as http from 'http';
-import {App} from '../app';
-import {Server} from './index';
+import {Promise} from '../../extensions';
+import {App} from '../../app';
+import {Server} from '../core';
 
-export class CoreServer implements Server {
+export class CoreServer extends Server {
     
     private _app: App;
     private _server: http.Server;
     
     constructor(app: App) {
+        super();
         this._app = app;
         if (!this._app) {
             throw new Error('Server: Expected application');

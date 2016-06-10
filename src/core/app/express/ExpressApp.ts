@@ -1,20 +1,25 @@
 'use strict';
 import * as express from 'express';
-import * as Promise from 'bluebird';
 import * as http from 'http';
-import {Config} from '../config';
-import {App} from './index';
-import {Route, Router, RouteAction} from '../../core/router';
+import {Promise} from '../../extensions';
+import {Config} from '../../config';
+import {injectable, inject} from '../../Global';
+import {App} from '../core';
+import {Route, Router, RouteAction} from '../../../core/router';
+import {Logger} from '../../logging';
 
-export class ExpressApp implements App {
+@injectable()
+export class ExpressApp extends App {
 
     private _app: express.Application;
     private _server: http.Server;
 
     constructor(
-        private _config: Config,
-        private _router: Router
+        @inject('Config') private _config: Config,
+        @inject('Router') private _router: Router,
+        @inject(Logger) private _logger: Logger
     ) {
+        super();
         if (!this._config) {
             throw new Error('Application: No config was found.');
         }
@@ -87,36 +92,27 @@ function buildRouter(route: Route): express.Router {
 function addActions(expressRouter: express.Router, route: Route): void {
     //define route
     let expressRoute = expressRouter.route('/');
-    //get
-    if (route.get) {
-        addAction('get', expressRoute, route);
-    }
-    //post
-    if (route.post) {
-        addAction('post', expressRoute, route);
-    }
-    //put
-    if (route.put) {
-        addAction('put', expressRoute, route);
-    }
-    //delete
-    if (route.delete) {
-        addAction('delete', expressRoute, route);
-    }
+    //set actions
+    addAction('get', expressRoute, route.get);
+    addAction('post', expressRoute, route.post);
+    addAction('put', expressRoute, route.put);
+    addAction('delete', expressRoute, route.delete);
 }
 
-function addAction(method: string, expressRoute: express.IRoute, route: Route): void {
-    let routerAction = <RouteAction>route[method];
-    let controller: any = routerAction.controller;
-    let methodName: string = routerAction.controllerMethod;
-    
+function addAction(method: string, expressRoute: express.IRoute, routeAction: RouteAction): void {
+    //if there is no route action do nothing
+    if (!routeAction) {
+        return;
+    }
+    let controller: any = routeAction.controller;
+    let methodName: string = routeAction.controllerMethod;
+    //
     expressRoute[method]((req: any, res: any, next: Function) => {
         Promise
             .resolve(true)
             .then(() => {
                 return controller[methodName](req, res);
             })
-            .then(() => next())
             .catch((error) => next(error));
     })
 }
@@ -129,7 +125,14 @@ function addFilters(expressRouter: express.IRouter<any>, route: Route): void {
                 .then(() => {
                     return filter.apply(req, res);
                 })
-                .then(() => next())
+                .then(() => {
+                    //if the headers block was sent by this filter
+                    //stop downstream propagation
+                    //we expect that the response has ended
+                    if (!res.headersSent) {
+                        next();
+                    }
+                })
                 .catch((error: any) => next(error));
         }
     });
