@@ -1,5 +1,7 @@
 'use strict';
 
+import {Filter, ErrorHandler} from '../index';
+
 export interface RouteAction {
     controller: Object,
     controllerMethod: string;
@@ -7,8 +9,8 @@ export interface RouteAction {
 
 export class Route {
     path: string;
-    filters: string[];
-    errorHandlers: string[];
+    filters: Filter<any>[];
+    errorHandlers: ErrorHandler[];
     children: Route[];
     //actions
     get: RouteAction;

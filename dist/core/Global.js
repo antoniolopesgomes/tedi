@@ -6,6 +6,7 @@ require('reflect-metadata');
 const inversify = require('inversify');
 const router_1 = require('./router');
 const app_1 = require('./app');
+const express_1 = require('./app/express');
 const logging_1 = require('./logging');
 let coreKernel = new inversify.Kernel();
 let appKernel = new inversify.Kernel();
@@ -59,6 +60,10 @@ class GlobalRegister {
         appKernel.restore();
         return this;
     }
+    setAppJSON(value) {
+        bindToKernel(coreKernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
+        return this;
+    }
 }
 function bindToKernel(kernel, abstraction, concretion, options = { context: BindingContext.SINGLETON }) {
     switch (options.context) {
@@ -84,7 +89,8 @@ exports.Global = new GlobalRegister();
 exports.Global
     .registerCoreComponent(logging_1.Logger, logging_1.WinstonLogger)
     .registerCoreComponent(router_1.Router, router_1.ExpressoRouter)
-    .registerCoreComponent(app_1.App, app_1.ExpressApp)
+    .registerCoreComponent(express_1.ExpressAppBuilder, express_1.ExpressAppBuilder)
+    .registerCoreComponent(app_1.App, express_1.ExpressApp)
     .registerCoreComponent('Config', {
     server: {
         port: 8080

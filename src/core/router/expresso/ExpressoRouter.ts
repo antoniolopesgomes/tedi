@@ -71,7 +71,7 @@ function getRouteAction(routeAction: string[]): RouteAction {
     }
 }
 
-function getFilters(filterNames: string[]): any[] {
+function getFilters(filterNames: string[]): Filter<any>[] {
     
     function validateFilter(name: string, filter: any) {
         if (!(filter instanceof Filter)) {
@@ -94,7 +94,7 @@ function getFilters(filterNames: string[]): any[] {
     return filters;
 }
 
-function getErrorHandlers(errorHandlersNames: string[]): any[] {
+function getErrorHandlers(errorHandlersNames: string[]): ErrorHandler[] {
     
     function validateErrorHandler(name: string, errorHandler: any) {
         if (!(errorHandler instanceof ErrorHandler)) {

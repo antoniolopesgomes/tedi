@@ -18,10 +18,4 @@ class ErrorHandler {
     }
 }
 exports.ErrorHandler = ErrorHandler;
-class Logger {
-    constructor(cfg) {
-        this._cfg = cfg || {};
-    }
-}
-exports.Logger = Logger;
 //# sourceMappingURL=index.js.map

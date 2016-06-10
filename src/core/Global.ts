@@ -2,8 +2,9 @@ export {inject, injectable} from 'inversify';
 
 import 'reflect-metadata';
 import * as inversify from 'inversify'; 
-import {Router, ExpressoRouter} from './router';
-import {App, ExpressApp} from './app';
+import {Router, ExpressoRouter, RoutesDefinition} from './router';
+import {App} from './app';
+import {ExpressApp, ExpressAppBuilder} from './app/express';
 import {Config} from './config';
 import {ErrorHandler, Filter} from './index';
 import {Logger, WinstonLogger} from './logging';
@@ -93,6 +94,11 @@ class GlobalRegister {
         return this;
     }
     
+    setAppJSON(value: any): GlobalRegister {
+        bindToKernel(coreKernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
+        return this;
+    }
+
 }
 
 function bindToKernel<T>(
@@ -127,6 +133,7 @@ export let Global: GlobalRegister = new GlobalRegister();
 Global
     .registerCoreComponent(Logger, WinstonLogger)
     .registerCoreComponent(Router, ExpressoRouter)
+    .registerCoreComponent(ExpressAppBuilder, ExpressAppBuilder)
     .registerCoreComponent(App, ExpressApp)
     .registerCoreComponent<Config>(
         'Config', 
