@@ -1,4 +1,4 @@
-import {Global, injectable} from '../core';
+import {Global, injectable} from './Global';
 
 describe('Global', () => {
 

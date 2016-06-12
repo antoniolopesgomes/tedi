@@ -6,7 +6,7 @@ import {Router, ExpressoRouter, RoutesDefinition} from './router';
 import {App} from './app';
 import {ExpressApp, ExpressAppBuilder} from './app/express';
 import {Config} from './config';
-import {ErrorHandler, Filter} from './index';
+import {ErrorHandler, Filter} from './core';
 import {Logger, WinstonLogger} from './logging';
 
 let coreKernel = new inversify.Kernel();

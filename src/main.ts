@@ -1,4 +1,4 @@
-import {Global} from './core';
+import {Global} from './lib/Global';
 import {
     UserController,
     AuthController

@@ -1,14 +1,14 @@
 import * as express from 'express';
-import {Route, Router, RouteAction} from '../../router';
+import {Route, Router, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 import {Logger} from '../../logging';
 import {injectable} from '../../Global';
-import {Filter, ErrorHandler} from '../../index';
+import {Filter, ErrorHandler, FilterError, ErrorHandlerError, ActionError} from '../../core';
 
 @injectable()
 export class ExpressAppBuilder {
 
     constructor(
-        public log: Logger
+        public logger: Logger
     ) {
     }
 
@@ -63,27 +63,43 @@ export class ExpressAppBuilder {
             return;
         }
         let controller: any = routeAction.controller;
+        let controllerName: any = (<any> controller).constructor.name;
         let methodName: string = routeAction.controllerMethod;
+        let actionInfo: string = `Action: ${controllerName}#${methodName}`;
         //
-        expressRoute[method]((req: any, res: any, next: Function) => {
+        expressRoute[method]((req: express.Request, res: express.Response, next: express.NextFunction) => {
+            let requestInfo = `(${req.originalUrl}) - ${actionInfo}`;
             Promise
                 .resolve(true)
                 .then(() => {
+                    this.logger.debug(`${requestInfo} [CALLING]`);
                     return controller[methodName](req, res);
                 })
-                .catch((error) => next(error));
+                .then(() => {
+                    this.logger.debug(`${requestInfo} [SUCCESS]`);
+                })
+                .catch((error) => {
+                    this.logger.error(`${requestInfo} [ERROR]`, error);
+                    next(new ActionError(controllerName, methodName, error));
+                });
         })
     }
 
     addFilters(expressRouter: express.IRouter<any>, route: Route): void {
-        let filters: express.RequestHandler[] = route.filters.map((filter: Filter<any>) => {
-            return (req: express.Request, res: express.Response, next: Function): void => {
+        let filters  = route.filters.map<express.RequestHandler>((routeFilter: RouteFilter) => {
+            let filter = routeFilter.filter;
+            let filterName = routeFilter.name;
+            let filterInfo = `Filter: ${routeFilter.name}`;
+            return (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+                let requestInfo = `(${req.originalUrl}) - ${filterInfo}`;
                 Promise
                     .resolve(true)
                     .then(() => {
+                        this.logger.debug(`${requestInfo} [CALLING]`);
                         return filter.apply(req, res);
                     })
                     .then(() => {
+                        this.logger.debug(`${requestInfo} [SUCCESS]`);
                         //if the headers block was sent by this filter
                         //stop downstream propagation
                         //we expect that the response has ended
@@ -91,7 +107,10 @@ export class ExpressAppBuilder {
                             next();
                         }
                     })
-                    .catch((error: any) => next(error));
+                    .catch((error: any) => {
+                        this.logger.error(`${requestInfo} [ERROR]`, error);
+                        next(new FilterError(filterName, error));
+                    });
             }
         });
         if (filters.length > 0) {
@@ -111,14 +130,24 @@ export class ExpressAppBuilder {
     }
 
     addErrorHandlers(expressRouter: express.IRouter<any>, route: Route): void {
-        let errorHandlers: express.ErrorRequestHandler[] = route.errorHandlers.map((errorHandler: ErrorHandler) => {
-            return (error: any, req: express.Request, res: express.Response, next: Function): void => {
+        let errorHandlers = route.errorHandlers.map<express.ErrorRequestHandler>((routeErrorHandler: RouteErrorHandler) => {
+            let errorHandlerInfo = `ErrorHandler: ${routeErrorHandler.name}`;
+            let errorHandler = routeErrorHandler.errorHandler;
+            return (error: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
+                let requestInfo = `(${req.originalUrl}) - ${errorHandlerInfo}`;
                 Promise
                     .resolve(true)
                     .then(() => {
+                        this.logger.debug(`${requestInfo} [CALLING]`);
                         return errorHandler.catch(error, req, res);
                     })
-                    .catch((error: any) => next(error));
+                    .then(() => {
+                        this.logger.debug(`${requestInfo} [SUCCESS]`);
+                    })
+                    .catch((error: any) => {
+                        this.logger.error(`${requestInfo} [ERROR]`, error);
+                        next(error);
+                    });
             }
         });
         if (errorHandlers.length > 0) {

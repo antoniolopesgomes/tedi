@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import {Router, Route, RouteAction, ROUTE_KEYS} from '../core';
+import {Router, Route, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS} from '../core';
 import {Global, injectable, inject} from '../../Global';
-import {Filter, ErrorHandler} from '../../../core';
+import {Filter, ErrorHandler} from '../../core';
 
 @injectable()
 export class ExpressoRouter extends Router {
@@ -71,50 +71,50 @@ function getRouteAction(routeAction: string[]): RouteAction {
     }
 }
 
-function getFilters(filterNames: string[]): Filter<any>[] {
+function getFilters(filterNames: string[]): RouteFilter[] {
     
     function validateFilter(name: string, filter: any) {
         if (!(filter instanceof Filter)) {
             throwError(`'${name}' must extend from 'Filter'`);
         }
     }
-    
-    let filters: any[] = [];
-    
+        
     if (!_.isArray(filterNames)) {
-        return filters;
+        return [];
     }
     
-    filters = filterNames.map((name: string) => {
+    return filterNames.map<RouteFilter>((name: string) => {
         let filter = Global.filter(name);
         validateFilter(name, filter);
-        return filter;
+        return <RouteFilter> {
+            name: name,
+            filter: filter
+        }
     });
-    
-    return filters;
+
 }
 
-function getErrorHandlers(errorHandlersNames: string[]): ErrorHandler[] {
+function getErrorHandlers(errorHandlersNames: string[]): RouteErrorHandler[] {
     
     function validateErrorHandler(name: string, errorHandler: any) {
         if (!(errorHandler instanceof ErrorHandler)) {
             throwError(`'${name}' must extend from 'ErrorHandler'`);
         }
     }
-    
-    let errorHandlers: any[] = [];
-    
+        
     if (!_.isArray(errorHandlersNames)) {
-        return errorHandlers;
+        return [];
     }
     
-    errorHandlers = errorHandlersNames.map((name: string) => {
+    return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
         let errorHandler = Global.errorHandler(name);
         validateErrorHandler(name, errorHandler);
-        return errorHandler;
+        return <RouteErrorHandler> {
+            name: name,
+            errorHandler: errorHandler
+        };
     });
     
-    return errorHandlers;
 }
 
 function throwError(msg: string): void {

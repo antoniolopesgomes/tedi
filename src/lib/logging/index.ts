@@ -1,3 +1,3 @@
 export {WinstonLogger} from './winston//WinstonLogger';
-export {Logger} from './core';
+export {Logger, LoggerLevels} from './core';
 

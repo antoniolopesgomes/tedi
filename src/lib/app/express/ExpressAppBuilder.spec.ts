@@ -1,7 +1,9 @@
 
 import {ExpressAppBuilder} from './ExpressAppBuilder';
 import {Router} from '../../router';
-import {Global, inject, injectable, Filter, ErrorHandler, BindingContext} from '../../../core';
+import {Logger, LoggerLevels} from '../../logging';
+import {Global, inject, injectable, BindingContext} from '../../Global';
+import {Filter, ErrorHandler, ActionError, FilterError} from '../../core';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
@@ -26,7 +28,11 @@ describe('ExpressAppBuilder', () => {
     }
 
     @injectable()
-    class CustomErrorHandler extends ErrorHandler { }
+    class CustomErrorHandler extends ErrorHandler { 
+        catch(err: any) {
+            throw err;
+        }
+    }
 
     beforeEach(() => {
         Global.snapshot();
@@ -77,6 +83,8 @@ describe('ExpressAppBuilder', () => {
             router = Global.getCoreComponent(Router);
             expressAppBuilder = Global.getCoreComponent(ExpressAppBuilder);
             expressApp = expressAppBuilder.buildApp(router.getRoutesConfiguration());
+
+            Global.getCoreComponent<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);
         })
 
         describe('GET /auth/login', () => {
@@ -89,6 +97,8 @@ describe('ExpressAppBuilder', () => {
                 spyOn(Global.filter('LoginFilter'), 'apply').and.callThrough();
                 spyOn(Global.filter('AfterLoginFilter'), 'apply').and.callThrough();
                 spyOn(Global.filter('AdminFilter'), 'apply').and.callThrough();
+
+                Global.getCoreComponent<Logger>(Logger).setLevel(LoggerLevels.DEBUG);
 
                 return request(expressApp).get('/auth/login')
                     .expect(200)
@@ -168,10 +178,12 @@ describe('ExpressAppBuilder', () => {
         describe('and a controller throws an error', () => {
             beforeEach(() => {
                 spyOn(Global.controller('AuthController'), 'login').and.throwError('Error on controller.');
-            })
+            });
             describe('and loginErrorHandler handles it', () => {
+                let catchedError: any;
                 beforeEach((done: DoneFn) => {
                     spyOn(Global.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                        catchedError = error;
                         res.status(500).send('Error');
                     })
                     spyOn(Global.errorHandler('AuthErrorHandler'), 'catch');
@@ -183,11 +195,13 @@ describe('ExpressAppBuilder', () => {
                 it('loginErrorHandler #catch should have been called', () => {
                     expect(Global.errorHandler('LoginErrorHandler').catch).toHaveBeenCalled();
                 })
+                it('catchedError should be an ActionError', () => {
+                    expect(catchedError).toEqual(jasmine.any(ActionError));
+                })
                 it('authErrorHandler #catch should not have been called', () => {
                     expect(Global.errorHandler('AuthErrorHandler').catch).not.toHaveBeenCalled();
                 })
-            })
-
+            });
             describe('and loginErrorHandler does not handle it', () => {
                 beforeEach((done: DoneFn) => {
                     spyOn(Global.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
@@ -210,10 +224,28 @@ describe('ExpressAppBuilder', () => {
                     expect(Global.errorHandler('AuthErrorHandler').catch).toHaveBeenCalled();
                     expect(Global.errorHandler('RootErrorHandler').catch).toHaveBeenCalled();
                 })
+            });
+        });
+
+        describe('and LoginFilter throws an error', () => {
+            let catchedError: any;
+            beforeEach((done: DoneFn) => {
+                spyOn(Global.filter('LoginFilter'), 'apply').and.callFake(() => {
+                    throw new Error('Filter error');
+                });
+                spyOn(Global.errorHandler('RootErrorHandler'), 'catch').and.callFake((err: any, req, res: express.Response) => {
+                    catchedError = err;
+                    res.status(500).end();
+                })
+                return request(expressApp).get('/auth/login')
+                    .expect(500)
+                    .then(() => done())
+                    .catch((error) => done.fail(error))
+            });
+            it('catchedError should be a FilterError', () => {
+                expect(catchedError).toEqual(jasmine.any(FilterError));
             })
-
-
-        })
+        });
 
         describe('and a login filter responds', () => {
             let response: request.Response;
@@ -231,16 +263,15 @@ describe('ExpressAppBuilder', () => {
                     })
                     .catch(done.fail);
 
-            })
+            });
             it('filter should have responded', () => {
                 expect(Global.filter('LoginFilter').apply).toHaveBeenCalled();
                 expect(response.text).toEqual('HIJACKED');
-            })
+            });
             it('controller should have not been called', () => {
                 expect(Global.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
             });
-
-        })
+        });
     })
 
 })

@@ -1,16 +1,26 @@
 'use strict';
 
-import {Filter, ErrorHandler} from '../index';
+import {Filter, ErrorHandler} from '../core';
 
 export interface RouteAction {
-    controller: Object,
+    controller: Object;
     controllerMethod: string;
+}
+
+export interface RouteFilter {
+    name: string;
+    filter: Filter<any>;
+}
+
+export interface RouteErrorHandler {
+    name: string;
+    errorHandler: ErrorHandler;
 }
 
 export class Route {
     path: string;
-    filters: Filter<any>[];
-    errorHandlers: ErrorHandler[];
+    filters: RouteFilter[];
+    errorHandlers: RouteErrorHandler[];
     children: Route[];
     //actions
     get: RouteAction;

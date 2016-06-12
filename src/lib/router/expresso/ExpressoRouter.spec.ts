@@ -1,4 +1,5 @@
-import {Global, injectable, BindingContext, Filter, ErrorHandler} from '../../../core';
+import {Global, injectable, BindingContext} from '../../Global';
+import {Filter, ErrorHandler} from '../../core';
 import {Route, Router, RoutesDefinition} from '../core';
 import {ExpressoRouter} from '../expresso/ExpressoRouter';
 
@@ -91,12 +92,14 @@ describe('StrongExpressoRouter', () => {
                 it('should have a dummyFilter', () => {
                     expect(loginRoute.filters).toEqual(jasmine.any(Array));
                     expect(loginRoute.filters.length).toEqual(1);
-                    expect(loginRoute.filters[0]).toEqual(jasmine.any(DummyFilterMock));
+                    expect(loginRoute.filters[0].name).toEqual('DummyFilter');
+                    expect(loginRoute.filters[0].filter).toEqual(jasmine.any(DummyFilterMock));
                 });
                 it('should have a errorHandler', () => {
                     expect(loginRoute.errorHandlers).toEqual(jasmine.any(Array));
                     expect(loginRoute.errorHandlers.length).toEqual(1);
-                    expect(loginRoute.errorHandlers[0]).toEqual(jasmine.any(DummyErrorHandler));
+                    expect(loginRoute.errorHandlers[0].name).toEqual('DummyErrorHandler');
+                    expect(loginRoute.errorHandlers[0].errorHandler).toEqual(jasmine.any(DummyErrorHandler));
                 });
             })
 

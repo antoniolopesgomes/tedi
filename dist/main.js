@@ -1,8 +1,8 @@
 "use strict";
-const core_1 = require('./core');
+const Global_1 = require('./lib/Global');
 const controllers_1 = require('./controllers');
 //Config
-core_1.Global
+Global_1.Global
     .addController('UserController', controllers_1.UserController)
     .addController('AuthController', controllers_1.AuthController);
 //Filters
