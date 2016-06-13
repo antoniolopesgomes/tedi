@@ -22,13 +22,13 @@ interface BindingOptions {
     context: BindingContext
 } 
 
-class GlobalRegister {
+class ServerRegistry {
      
     addController<T>(
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
-    ): GlobalRegister {
+    ): ServerRegistry {
         bindToKernel(appKernel, abstraction, concretion, options)
         return this;
     }
@@ -37,7 +37,7 @@ class GlobalRegister {
         abstraction: string | inversify.INewable<Filter<T>>, 
         concretion: inversify.INewable<Filter<T>> | Filter<T>,
         options?: BindingOptions
-    ): GlobalRegister {
+    ): ServerRegistry {
         bindToKernel(appKernel, abstraction, concretion, options)
         return this;
     }
@@ -46,16 +46,16 @@ class GlobalRegister {
         abstraction: string | inversify.INewable<ErrorHandler>, 
         concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
-    ): GlobalRegister {
+    ): ServerRegistry {
         bindToKernel(appKernel, abstraction, concretion, options)
         return this;
     }
     
-    registerCoreComponent<T>(
+    addComponent<T>(
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
-    ): GlobalRegister {
+    ): ServerRegistry {
         bindToKernel(coreKernel, abstraction, concretion, options)
         return this;
     }
@@ -72,32 +72,33 @@ class GlobalRegister {
         return appKernel.get<ErrorHandler>(abstraction);
     }
     
-    getCoreComponent<T>(abstraction: string | inversify.INewable<T>): T {
+    component<T>(abstraction: string | inversify.INewable<T>): T {
         return coreKernel.get<T>(abstraction);
     }
     
-    clear(): GlobalRegister {
+    clear(): ServerRegistry {
         coreKernel.unbindAll();
         appKernel.unbindAll();
         return this;
     }
     
-    snapshot(): GlobalRegister {
+    snapshot(): ServerRegistry {
         coreKernel.snapshot();
         appKernel.snapshot();
         return this;
     }
     
-    restore(): GlobalRegister {
+    restore(): ServerRegistry {
         coreKernel.restore();
         appKernel.restore();
         return this;
     }
     
-    setAppJSON(value: any): GlobalRegister {
+    setRoutesJSON(value: any): ServerRegistry {
         bindToKernel(coreKernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
         return this;
     }
+
 
 }
 
@@ -127,17 +128,15 @@ function throwError(msg: string): void {
     throw new Error('Global error: ' + msg);
 }
 
-export let Global: GlobalRegister = new GlobalRegister();
+export let Server: ServerRegistry = new ServerRegistry();
 
 //Default bindings
-Global
-    .registerCoreComponent(Logger, WinstonLogger)
-    .registerCoreComponent(Router, ExpressoRouter)
-    .registerCoreComponent(ExpressAppBuilder, ExpressAppBuilder)
-    .registerCoreComponent(App, ExpressApp)
-    .registerCoreComponent<Config>(
-        'Config', 
-        <Config> { 
+Server
+    .addComponent(Logger, WinstonLogger)
+    .addComponent(Router, ExpressoRouter)
+    .addComponent(ExpressAppBuilder, ExpressAppBuilder)
+    .addComponent(App, ExpressApp)
+    .addComponent<Config>('Config', <Config> { 
             server: { 
                 port: 8080
             } 

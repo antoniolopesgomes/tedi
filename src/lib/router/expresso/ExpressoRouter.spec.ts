@@ -1,4 +1,4 @@
-import {Global, injectable, BindingContext} from '../../Global';
+import {Server, injectable, BindingContext} from '../../Server';
 import {Filter, ErrorHandler} from '../../core';
 import {Route, Router, RoutesDefinition} from '../core';
 import {ExpressoRouter} from '../expresso/ExpressoRouter';
@@ -18,12 +18,12 @@ describe('StrongExpressoRouter', () => {
     let strongExpressoRouter: Router;
 
     beforeAll(() => {
-        Global.snapshot();
+        Server.snapshot();
         strongExpressoRouter = new ExpressoRouter(routes);
     });
 
     afterAll(() => {
-        Global.restore();
+        Server.restore();
     });
 
     describe('when I try to build a Routing tree', () => {
@@ -48,7 +48,7 @@ describe('StrongExpressoRouter', () => {
             class DummyErrorHandler extends ErrorHandler { }
 
             beforeAll(() => {
-                Global
+                Server
                     .addFilter('DummyFilter', DummyFilterMock)
                     .addController('AuthController', AuthControllerMock)
                     .addErrorHandler('DummyErrorHandler', DummyErrorHandler);
@@ -119,7 +119,7 @@ describe('StrongExpressoRouter', () => {
             let expressoRouter = new ExpressoRouter(routes);
             
             beforeAll(() => {
-                Global.addFilter<Filter<any>>('InvalidFilter', <any> InvalidFilter);
+                Server.addFilter<Filter<any>>('InvalidFilter', <any> InvalidFilter);
             })
             
             it('should throw an error', () => {
@@ -143,7 +143,7 @@ describe('StrongExpressoRouter', () => {
             let coreCouter = new ExpressoRouter(routes);
             
             beforeAll(() => {
-                Global.addErrorHandler('InvalidErrorHandler', <any> InvalidErrorHandler);
+                Server.addErrorHandler('InvalidErrorHandler', <any> InvalidErrorHandler);
             })
             
             it('should throw an error', () => {

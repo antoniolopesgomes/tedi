@@ -1,6 +1,6 @@
-import {Global, injectable} from './Global';
+import {Server, injectable} from './Server';
 
-describe('Global', () => {
+describe('Server', () => {
 
     let abstraction = 'MockController';
 
@@ -10,17 +10,17 @@ describe('Global', () => {
     }
     
     beforeAll(() => {
-        Global.snapshot().clear();
+        Server.snapshot().clear();
     })
     
     afterAll(() => {
-        Global.restore();
+        Server.restore();
     })
     
     describe('when I try to register a controller', () => {
         it('should get the registered controller', () => {
-            Global.addController(abstraction, MockController);
-            let controller = Global.controller<MockController>('MockController');
+            Server.addController(abstraction, MockController);
+            let controller = Server.controller<MockController>('MockController');
             expect(controller).toEqual(jasmine.any(MockController));
             expect(controller.id).toEqual('mockController');
 
@@ -31,7 +31,7 @@ describe('Global', () => {
     describe('when I try to get a controller', () => {
        describe('and it doesn\'t exist', () => {
           it('should throw a error', () => {
-             expect(() => { Global.controller<MockController>('dummy'); })
+             expect(() => { Server.controller<MockController>('dummy'); })
                 .toThrow();
           });
        });

@@ -2,6 +2,6 @@ export interface ServerConfig {
     port: number;
 }
 
-export interface Config {
+export class Config {
     server: ServerConfig;
 }

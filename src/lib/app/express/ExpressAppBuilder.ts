@@ -1,7 +1,7 @@
 import * as express from 'express';
 import {Route, Router, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 import {Logger} from '../../logging';
-import {injectable} from '../../Global';
+import {injectable} from '../../Server';
 import {Filter, ErrorHandler, FilterError, ErrorHandlerError, ActionError} from '../../core';
 
 @injectable()

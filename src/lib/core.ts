@@ -1,8 +1,10 @@
 import * as express from 'express';
 import {CustomError} from './extensions';
 
+export {App} from './app';
+
 export class Filter<T> {
-    apply(req: express.Request, res: express.Response): void {
+    apply(req: express.Request, res: express.Response): any {
         throw new Error('Filter.apply must be implemented.')
     }
     getData(req: express.Request, res: express.Response): T {

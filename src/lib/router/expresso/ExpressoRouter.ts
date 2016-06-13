@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {Router, Route, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS} from '../core';
-import {Global, injectable, inject} from '../../Global';
+import {Server, injectable, inject} from '../../Server';
 import {Filter, ErrorHandler} from '../../core';
 
 @injectable()
@@ -60,7 +60,7 @@ function getRouteAction(routeAction: string[]): RouteAction {
     let controllerName = routeAction[0];
     let methodName = routeAction[1];
     
-    let controller: any = Global.controller(controllerName);
+    let controller: any = Server.controller(controllerName);
     if (!_.isFunction(controller[methodName])) {
         throwError(`invalid controller[${controllerName}] method[${methodName}]`);
     }
@@ -84,7 +84,7 @@ function getFilters(filterNames: string[]): RouteFilter[] {
     }
     
     return filterNames.map<RouteFilter>((name: string) => {
-        let filter = Global.filter(name);
+        let filter = Server.filter(name);
         validateFilter(name, filter);
         return <RouteFilter> {
             name: name,
@@ -107,7 +107,7 @@ function getErrorHandlers(errorHandlersNames: string[]): RouteErrorHandler[] {
     }
     
     return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
-        let errorHandler = Global.errorHandler(name);
+        let errorHandler = Server.errorHandler(name);
         validateErrorHandler(name, errorHandler);
         return <RouteErrorHandler> {
             name: name,

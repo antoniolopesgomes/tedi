@@ -1,1 +1,1 @@
-export * from './Global';
+export * from './Server';

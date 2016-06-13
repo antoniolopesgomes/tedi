@@ -1,11 +1,11 @@
-import {Global} from './lib/Global';
+import {Server} from './lib/Server';
 import {
     UserController,
     AuthController
 } from './controllers';
 
 //Config
-Global
+Server
     //Controllers
     .addController('UserController', UserController)
     .addController('AuthController', AuthController)
