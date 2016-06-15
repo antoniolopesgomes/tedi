@@ -8,10 +8,6 @@ import {ExpressApp, ExpressAppBuilder} from './app/express';
 import {Config} from './config';
 import {ErrorHandler, Filter} from './core';
 import {Logger, WinstonLogger} from './logging';
-import {Module} from './modules';
-
-let coreKernel = new inversify.Kernel();
-let appKernel = new inversify.Kernel();
 
 export enum BindingContext {
     SINGLETON,
@@ -23,42 +19,50 @@ interface BindingOptions {
     context: BindingContext
 } 
 
-export interface IServerRegistry {
+export interface IModule {
 
     addController<T>(
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
-    ): IServerRegistry;
+    ): IModule;
     
     addFilter<T>(
         abstraction: string | inversify.INewable<Filter<T>>, 
         concretion: inversify.INewable<Filter<T>> | Filter<T>,
         options?: BindingOptions
-    ): IServerRegistry;
+    ): IModule;
 
     addErrorHandler(
         abstraction: string | inversify.INewable<ErrorHandler>, 
         concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
-    ): IServerRegistry;
+    ): IModule;
 
     addComponent<T>(
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
-    ): IServerRegistry;
+    ): IModule;
 
 }
 
-class ServerRegistry implements IServerRegistry {
-     
+export class Module implements IModule {
+    
+    private _kernel: inversify.IKernel;
+    private _modules: Map<string, Module>;
+
+    constructor(kernel?: inversify.IKernel) {
+        this._kernel = kernel || new inversify.Kernel();
+        this._modules = new Map<string, Module>();
+    }
+
     addController<T>(
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
-    ): ServerRegistry {
-        bindToKernel(appKernel, abstraction, concretion, options)
+    ): Module {
+        bindToKernel(this._kernel, abstraction, concretion, options)
         return this;
     }
     
@@ -66,8 +70,8 @@ class ServerRegistry implements IServerRegistry {
         abstraction: string | inversify.INewable<Filter<T>>, 
         concretion: inversify.INewable<Filter<T>> | Filter<T>,
         options?: BindingOptions
-    ): ServerRegistry {
-        bindToKernel(appKernel, abstraction, concretion, options)
+    ): Module {
+        bindToKernel(this._kernel, abstraction, concretion, options)
         return this;
     }
     
@@ -75,8 +79,8 @@ class ServerRegistry implements IServerRegistry {
         abstraction: string | inversify.INewable<ErrorHandler>, 
         concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
-    ): ServerRegistry {
-        bindToKernel(appKernel, abstraction, concretion, options)
+    ): Module {
+        bindToKernel(this._kernel, abstraction, concretion, options)
         return this;
     }
     
@@ -84,62 +88,62 @@ class ServerRegistry implements IServerRegistry {
         abstraction: string | inversify.INewable<T>, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
-    ): ServerRegistry {
-        bindToKernel(coreKernel, abstraction, concretion, options)
+    ): Module {
+        bindToKernel(this._kernel, abstraction, concretion, options)
         return this;
     }
 
     addModule(
-        abstraction: string, 
+        name: string, 
         module: inversify.INewable<Module> | Module
-    ): ServerRegistry {
-        bindToKernel(coreKernel, abstraction, module, { context: BindingContext.SINGLETON })
+    ): Module {
+        bindToKernel(this._kernel, name, module, { context: BindingContext.VALUE })
         return this;
     }
     
     controller<T>(abstraction: string | inversify.INewable<T>): T {
-        return appKernel.get<T>(abstraction);
+        return this._kernel.get<T>(abstraction);
     }
     
     filter<T>(abstraction: string | inversify.INewable<Filter<T>>): Filter<T> {
-        return appKernel.get<Filter<T>>(abstraction);
+        return this._kernel.get<Filter<T>>(abstraction);
     }
     
     errorHandler(abstraction: string | inversify.INewable<ErrorHandler>): ErrorHandler {
-        return appKernel.get<ErrorHandler>(abstraction);
+        return this._kernel.get<ErrorHandler>(abstraction);
     }
     
     component<T>(abstraction: string | inversify.INewable<T>): T {
-        return coreKernel.get<T>(abstraction);
+        return this._kernel.get<T>(abstraction);
     }
 
     module(abstraction: string): Module {
-        return coreKernel.get<Module>(abstraction);
+        return this._kernel.get<Module>(abstraction);
     }
     
-    clear(): ServerRegistry {
-        coreKernel.unbindAll();
-        appKernel.unbindAll();
+    clear(): Module {
+        this._kernel.unbindAll();
         return this;
     }
     
-    snapshot(): ServerRegistry {
-        coreKernel.snapshot();
-        appKernel.snapshot();
+    snapshot(): Module {
+        this._kernel.snapshot();
         return this;
     }
     
-    restore(): ServerRegistry {
-        coreKernel.restore();
-        appKernel.restore();
+    restore(): Module {
+        this._kernel.restore();
         return this;
     }
     
-    setRoutesJSON(value: any): ServerRegistry {
-        bindToKernel(coreKernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
+    setRoutesDefinition(value: any): Module {
+        bindToKernel(this._kernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
         return this;
     }
 
+    getRoutesDefinition(): any {
+        return this._kernel.get<any>('RoutesDefinition');
+    }
 
 }
 
@@ -169,7 +173,7 @@ function throwError(msg: string): void {
     throw new Error('Global error: ' + msg);
 }
 
-export let Server: ServerRegistry = new ServerRegistry();
+export let Server: Module = new Module();
 
 //Default bindings
 Server

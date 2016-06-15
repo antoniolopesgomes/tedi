@@ -1,12 +1,11 @@
-import {Server, IServerRegistry, injectable, BindingContext} from '../Server';
+import {Server, IModule, injectable, BindingContext, Module} from '../Server';
 import {App} from '../app';
 import {ExpressApp} from '../app/express';
-import {Module} from './core';
 import {Filter} from '../core';
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
 
-describe('Modules', () => {
+fdescribe('Modules', () => {
 
     @injectable()
     class AuthController {
@@ -16,24 +15,17 @@ describe('Modules', () => {
     }
 
     @injectable()
-    class CustomFilter extends Filter<any> {}
+    class CustomFilter extends Filter<any> { }
 
-    @injectable()
-    class AuthModule extends Module {
-        getRawRouteDefinition(): any {
-            return {
-                '/login': {
-                    '$filters': ['auth.RootFilter'],
-                    'get': ['auth.AuthController', 'get']
-                }
+    let authModule = new Module()
+        .setRoutesDefinition({
+            '/login': {
+                '$filters': ['RootFilter'],
+                'get': ['AuthController', 'get']
             }
-        }
-        registerComponents(server: IServerRegistry): any {
-            server
-                .addController('auth.AuthController', AuthController)
-                .addFilter('auth.RootFilter', new CustomFilter(), { context: BindingContext.VALUE });
-        }
-    }
+        })
+        .addController('AuthController', AuthController)
+        .addFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE });
 
     describe('Modules', () => {
         beforeEach(() => {
@@ -48,18 +40,19 @@ describe('Modules', () => {
 
             beforeEach(() => {
                 Server
-                    .setRoutesJSON({
+                    .setRoutesDefinition({
                         '/auth': 'AuthModule'
                     })
-                    .addModule('AuthModule', AuthModule);
+                    .addModule('AuthModule', authModule);
 
                 app = Server.component<ExpressApp>(<any>App).getApp();
             });
 
             describe('/auth/login', () => {
+                let authModule = Server.module('AuthModule');
                 beforeEach((done: DoneFn) => {
-                    spyOn(Server.controller('auth.AuthController'), 'get').and.callThrough();
-                    spyOn(Server.filter('auth.RootFilter'), 'apply').and.callFake(() => {
+                    spyOn(authModule.controller('AuthController'), 'get').and.callThrough();
+                    spyOn(authModule.filter('RootFilter'), 'apply').and.callFake(() => {
                         return;
                     });
                     request(app)
@@ -72,11 +65,11 @@ describe('Modules', () => {
                 })
 
                 it('should have called the module controller', () => {
-                    expect(Server.controller<AuthController>('auth.AuthController').get).toHaveBeenCalled();
+                    expect(authModule.controller<AuthController>('auth.AuthController').get).toHaveBeenCalled();
                 });
 
                 it('should have called the module auth.RootFilter', () => {
-                    expect(Server.filter('auth.RootFilter').apply).toHaveBeenCalled();
+                    expect(authModule.filter('auth.RootFilter').apply).toHaveBeenCalled();
                 });
 
             })

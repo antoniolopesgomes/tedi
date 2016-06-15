@@ -1,6 +1,6 @@
 import * as express from 'express';
 import {CustomError} from './extensions';
-import {IServerRegistry} from './Server';
+import {IModule} from './Server';
 
 export {App} from './app';
 

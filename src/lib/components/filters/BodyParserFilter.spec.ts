@@ -15,7 +15,7 @@ describe('BodyParserFilter', () => {
     } 
 
     beforeEach(() => {
-        Server.snapshot().setRoutesJSON({
+        Server.snapshot().setRoutesDefinition({
             '/parser': {
                 '$filters': ['JSONBodyParser'],
                 'post': ['DummyController', 'post']

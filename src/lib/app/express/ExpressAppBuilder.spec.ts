@@ -50,7 +50,7 @@ describe('ExpressAppBuilder', () => {
 
         beforeEach(() => {
             Server
-                .setRoutesJSON({
+                .setRoutesDefinition({
                     "$errorHandlers": ["RootErrorHandler"],
                     "$filters": ["RootFilter"],
                     "/auth": {

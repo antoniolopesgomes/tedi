@@ -1,6 +1,6 @@
-import {IServerRegistry} from '../Server';
+import {IModule} from '../Server';
 
 export abstract class Module {
     abstract getRawRouteDefinition(): any;
-    abstract registerComponents(server: IServerRegistry): void;
+    abstract registerComponents(server: IModule): void;
 }

@@ -38,7 +38,7 @@ describe('StrongExpressoRouter', () => {
 
             beforeEach(() => {
                 Server
-                    .setRoutesJSON({
+                    .setRoutesDefinition({
                         "/auth": {
                             "/login": {
                                 "$filters": ["DummyFilter"],
@@ -110,7 +110,7 @@ describe('StrongExpressoRouter', () => {
 
             beforeEach(() => {
                 Server
-                    .setRoutesJSON({
+                    .setRoutesDefinition({
                         "/dummy": {
                             "$filters": ["InvalidFilter"]
                         }
@@ -132,7 +132,7 @@ describe('StrongExpressoRouter', () => {
 
             beforeEach(() => {
                 Server
-                    .setRoutesJSON({
+                    .setRoutesDefinition({
                         "/dummy": {
                             "$errorHandlers": ["InvalidErrorHandler"]
                         }
@@ -161,7 +161,7 @@ describe('StrongExpressoRouter', () => {
 
         beforeEach(() => {
             Server
-                .setRoutesJSON({
+                .setRoutesDefinition({
                     '$filters': [],
                     '/path1': {
                         '$filters': [],
