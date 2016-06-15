@@ -5,7 +5,7 @@ import {Promise} from '../../extensions';
 import {Config} from '../../config';
 import {injectable, inject} from '../../Server';
 import {App} from '../core';
-import {Route, Router, RouteAction} from '../../router';
+import {RouteDefinition, Router, RouteAction} from '../../router';
 import {Logger} from '../../logging';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
 

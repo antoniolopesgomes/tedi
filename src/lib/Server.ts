@@ -8,6 +8,7 @@ import {ExpressApp, ExpressAppBuilder} from './app/express';
 import {Config} from './config';
 import {ErrorHandler, Filter} from './core';
 import {Logger, WinstonLogger} from './logging';
+import {Module} from './modules';
 
 let coreKernel = new inversify.Kernel();
 let appKernel = new inversify.Kernel();
@@ -22,7 +23,35 @@ interface BindingOptions {
     context: BindingContext
 } 
 
-class ServerRegistry {
+export interface IServerRegistry {
+
+    addController<T>(
+        abstraction: string | inversify.INewable<T>, 
+        concretion: inversify.INewable<T> | T,
+        options?: BindingOptions
+    ): IServerRegistry;
+    
+    addFilter<T>(
+        abstraction: string | inversify.INewable<Filter<T>>, 
+        concretion: inversify.INewable<Filter<T>> | Filter<T>,
+        options?: BindingOptions
+    ): IServerRegistry;
+
+    addErrorHandler(
+        abstraction: string | inversify.INewable<ErrorHandler>, 
+        concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
+        options?: BindingOptions
+    ): IServerRegistry;
+
+    addComponent<T>(
+        abstraction: string | inversify.INewable<T>, 
+        concretion: inversify.INewable<T> | T,
+        options?: BindingOptions
+    ): IServerRegistry;
+
+}
+
+class ServerRegistry implements IServerRegistry {
      
     addController<T>(
         abstraction: string | inversify.INewable<T>, 
@@ -59,6 +88,14 @@ class ServerRegistry {
         bindToKernel(coreKernel, abstraction, concretion, options)
         return this;
     }
+
+    addModule(
+        abstraction: string, 
+        module: inversify.INewable<Module> | Module
+    ): ServerRegistry {
+        bindToKernel(coreKernel, abstraction, module, { context: BindingContext.SINGLETON })
+        return this;
+    }
     
     controller<T>(abstraction: string | inversify.INewable<T>): T {
         return appKernel.get<T>(abstraction);
@@ -74,6 +111,10 @@ class ServerRegistry {
     
     component<T>(abstraction: string | inversify.INewable<T>): T {
         return coreKernel.get<T>(abstraction);
+    }
+
+    module(abstraction: string): Module {
+        return coreKernel.get<Module>(abstraction);
     }
     
     clear(): ServerRegistry {

@@ -1,15 +1,16 @@
 import * as _ from 'lodash';
-import {Router, Route, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS} from '../core';
+import {Router, RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS} from '../core';
 import {Server, injectable, inject} from '../../Server';
 import {Filter, ErrorHandler} from '../../core';
+import {Module} from '../../modules';
 import {Logger} from '../../logging';
 
 @injectable()
 export class ExpressoRouter extends Router {
 
     private _routesDefinition: any;
-    private _root: Route;
-    private _routingTable: Map<string, Route>;
+    private _root: RouteDefinition;
+    private _routingTable: Map<string, RouteDefinition>;
     private _routeBuilder: RouteBuilder;
     private _routingTableBuilder: RoutingTableBuilder;
 
@@ -30,11 +31,11 @@ export class ExpressoRouter extends Router {
         this._routingTable = this._routingTableBuilder.getRoutingTable(this._root);
     }
 
-    getRoot(): Route {
+    getRoot(): RouteDefinition {
         return this._root;
     }
 
-    getPathRoute(path: string): Route {
+    getPathRoute(path: string): RouteDefinition {
         let route = this._routingTable.get(path);
         return route || null;
     }
@@ -58,40 +59,50 @@ export class RouteBuilder {
         private _logger: Logger
     ) { }
 
-    getRoutesConfiguration(routesDefinition: any): Route {
+    getRoutesConfiguration(routesDefinition: any): RouteDefinition {
         //create and setup root (add filters and errorHandlers)
-        let root = new Route('/');
+        let root = new RouteDefinition('/');
         root.filters = this.getFilters(routesDefinition[ROUTE_KEYS.FILTERS]);
         root.errorHandlers = this.getErrorHandlers(routesDefinition[ROUTE_KEYS.ERROR_HANDLERS])
         //build routing tree
-        this.buildRouteConfig(root, routesDefinition);
+        this.buildRouteDefinition(root, routesDefinition);
         return root;
     }
 
-    buildRouteConfig(routeConfig: Route, routes: any): void {
+    buildRouteDefinition(routeConfig: RouteDefinition, routes: any): void {
         Object.keys(routes).forEach((key: string) => {
             if (key.startsWith('/')) {
-                let childRouteConfig = new Route(key);
+                let rawRouteDefinition = routes[key];
+                //if we're deling with a module (string value)
+                if (_.isString(rawRouteDefinition)) {
+                    //load it
+                    let module = Server.module(rawRouteDefinition);
+                    //register modules components
+                    module.registerComponents(Server);
+                    //get the routerDefinition
+                    rawRouteDefinition = module.getRawRouteDefinition();
+                }
+                let childRouteConfig = new RouteDefinition(key);
                 routeConfig.children.push(childRouteConfig);
-                this.fillRoute(routes[key], childRouteConfig);
-                this.buildRouteConfig(childRouteConfig, routes[key]);
+                this.fillRouteDefinition(rawRouteDefinition, childRouteConfig);
+                this.buildRouteDefinition(childRouteConfig, rawRouteDefinition);
             }
             else if (['$filters', '$errorHandlers', 'get', 'post', 'put', 'delete'].indexOf(key) < 0) {
-
+                this._logger.debug(`Routing key: '${key}', will be ignored`);
             }
         })
     }
 
-    fillRoute(routeConfig: any, route: Route): void {
-        route.filters = this.getFilters(routeConfig[ROUTE_KEYS.FILTERS]);
-        route.errorHandlers = this.getErrorHandlers(routeConfig[ROUTE_KEYS.ERROR_HANDLERS]);
-        route.get = this.getRouteAction(routeConfig.get);
-        route.post = this.getRouteAction(routeConfig.post);
-        route.delete = this.getRouteAction(routeConfig.delete);
-        route.put = this.getRouteAction(routeConfig.put);
+    fillRouteDefinition(rawRouteDefinition: any, route: RouteDefinition): void {
+        route.filters = this.getFilters(rawRouteDefinition[ROUTE_KEYS.FILTERS]);
+        route.errorHandlers = this.getErrorHandlers(rawRouteDefinition[ROUTE_KEYS.ERROR_HANDLERS]);
+        route.get = this.getAction(rawRouteDefinition.get);
+        route.post = this.getAction(rawRouteDefinition.post);
+        route.delete = this.getAction(rawRouteDefinition.delete);
+        route.put = this.getAction(rawRouteDefinition.put);
     }
 
-    getRouteAction(routeAction: string[]): RouteAction {
+    getAction(routeAction: string[]): RouteAction {
 
         if (!routeAction) {
             return undefined;
@@ -169,19 +180,19 @@ export class RoutingTableBuilder {
         private _logger: Logger
     ) { }
 
-    getRoutingTable(route: Route): Map<string, Route> {
-        let routingTable = new Map<string, Route>();
+    getRoutingTable(route: RouteDefinition): Map<string, RouteDefinition> {
+        let routingTable = new Map<string, RouteDefinition>();
         let currentPath = '';
         this.setRoutingTableForRoute(currentPath, route, routingTable);
         return routingTable;
     }
 
-    setRoutingTableForRoute(currentPath: string, route: Route, routingTable: Map<string, Route>) {
+    setRoutingTableForRoute(currentPath: string, route: RouteDefinition, routingTable: Map<string, RouteDefinition>) {
         currentPath += route.path;
         //remove double slashes
         currentPath = currentPath.replace('//', '/');
         routingTable.set(currentPath, route);
-        route.children.forEach((childRoute: Route) => {
+        route.children.forEach((childRoute: RouteDefinition) => {
             this.setRoutingTableForRoute(currentPath, childRoute, routingTable);
         });
     }
@@ -190,5 +201,5 @@ export class RoutingTableBuilder {
 //ERRORS
 
 function throwError(msg: string): void {
-    throw new Error(`CoreRouter: ${msg}`);
+    throw new Error(`Router: ${msg}`);
 }

@@ -1,9 +1,9 @@
 import {Server, injectable, BindingContext} from '../../Server';
 import {Filter, ErrorHandler} from '../../core';
-import {Route, Router, RouteAction, RoutesDefinition} from '../core';
+import {RouteDefinition, Router, RouteAction, RoutesDefinition} from '../core';
 import {ExpressoRouter, RoutingTableBuilder} from '../expresso/ExpressoRouter';
 
-fdescribe('StrongExpressoRouter', () => {
+describe('StrongExpressoRouter', () => {
 
     beforeEach(() => {
         Server.snapshot();
@@ -19,9 +19,9 @@ fdescribe('StrongExpressoRouter', () => {
 
         describe('with valid components', () => {
 
-            let routeConfig: Route;
-            let authRoute: Route;
-            let loginRoute: Route;
+            let routeConfig: RouteDefinition;
+            let authRoute: RouteDefinition;
+            let loginRoute: RouteDefinition;
 
             @injectable()
             class AuthControllerMock {
@@ -120,7 +120,7 @@ fdescribe('StrongExpressoRouter', () => {
 
             it('should throw an error', () => {
                 expect(() => { Server.component(Router).getRoot() })
-                    .toThrowError(`CoreRouter: 'InvalidFilter' must extend from 'Filter'`);
+                    .toThrowError(`Router: 'InvalidFilter' must extend from 'Filter'`);
             })
 
         })
@@ -142,7 +142,7 @@ fdescribe('StrongExpressoRouter', () => {
 
             it('should throw an error', () => {
                 expect(() => { Server.component(Router).getRoot() })
-                    .toThrowError(`CoreRouter: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
+                    .toThrowError(`Router: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
             })
 
         })
@@ -185,19 +185,19 @@ fdescribe('StrongExpressoRouter', () => {
         })
 
         it('/ should be defined', () => {
-            expect(router.getPathRoute('/')).toEqual(jasmine.any(Route));
+            expect(router.getPathRoute('/')).toEqual(jasmine.any(RouteDefinition));
         });
         it('/path1 should be defined', () => {
-            expect(router.getPathRoute('/path1')).toEqual(jasmine.any(Route));
+            expect(router.getPathRoute('/path1')).toEqual(jasmine.any(RouteDefinition));
         });
         it('/path1/path11 should be defined', () => {
-            expect(router.getPathRoute('/path1/path11')).toEqual(jasmine.any(Route));
+            expect(router.getPathRoute('/path1/path11')).toEqual(jasmine.any(RouteDefinition));
         });
         it('/path1/path11/path111 should be defined', () => {
-            expect(router.getPathRoute('/path1/path11/path111')).toEqual(jasmine.any(Route));
+            expect(router.getPathRoute('/path1/path11/path111')).toEqual(jasmine.any(RouteDefinition));
         });
         it('/path2 should be defined', () => {
-            expect(router.getPathRoute('/path2')).toEqual(jasmine.any(Route));
+            expect(router.getPathRoute('/path2')).toEqual(jasmine.any(RouteDefinition));
         });
 
         describe('router#getPathAction', () => {

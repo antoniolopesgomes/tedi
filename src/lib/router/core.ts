@@ -17,11 +17,11 @@ export interface RouteErrorHandler {
     errorHandler: ErrorHandler;
 }
 
-export class Route {
+export class RouteDefinition {
     path: string;
     filters: RouteFilter[];
     errorHandlers: RouteErrorHandler[];
-    children: Route[];
+    children: RouteDefinition[];
     //actions
     get: RouteAction;
     post: RouteAction;
@@ -40,11 +40,11 @@ export class Route {
 }
 
 export class Router {
-    getRoot(): Route {
+    getRoot(): RouteDefinition {
         throwError('getRoot must be implemented.');
         return null;
     }
-    getPathRoute(path: string): Route {
+    getPathRoute(path: string): RouteDefinition {
         throwError('getPathRoute must be implemented.');
         return null;
     }

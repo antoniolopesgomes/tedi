@@ -1,5 +1,5 @@
 import * as express from 'express';
-import {Route, Router, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
+import {RouteDefinition, Router, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 import {Logger} from '../../logging';
 import {injectable} from '../../Server';
 import {Filter, ErrorHandler, FilterError, ErrorHandlerError, ActionError} from '../../core';
@@ -12,27 +12,27 @@ export class ExpressAppBuilder {
     ) {
     }
 
-    buildApp(rootRoute: Route): express.Application {
+    buildApp(rootRoute: RouteDefinition): express.Application {
         let app = express();
         //add app filters, this should be done before defining the app/router methods
         this.addFilters(app, rootRoute);
         //Create routes first, do not attach error handlers just yet
         //express error handlers should be attached after the routing tree is built if we want
         //the error to bubble up trough the error handlers
-        rootRoute.children.forEach((childRoute: Route) => {
+        rootRoute.children.forEach((childRoute: RouteDefinition) => {
             app.use(childRoute.path, this.buildRouter(childRoute));
         })
         //add error handling for the app
         this.addErrorHandlers(app, rootRoute);
         //add error handlers to all the children
-        rootRoute.children.forEach((childRoute: Route) => {
+        rootRoute.children.forEach((childRoute: RouteDefinition) => {
             this.attachErrorHandlersToRoute(childRoute);
         })
 
         return app;
     }
 
-    buildRouter(route: Route): express.Router {
+    buildRouter(route: RouteDefinition): express.Router {
         let expressRouter = express.Router();
         //save a reference to the express.Router, it will be used later
         //to attach the errors handlers
@@ -41,13 +41,13 @@ export class ExpressAppBuilder {
         this.addFilters(expressRouter, route);
         this.addActions(expressRouter, route);
         //recursive - create the children routers and attach them to parent
-        (route.children || []).forEach((childRoute: Route) => {
+        (route.children || []).forEach((childRoute: RouteDefinition) => {
             expressRouter.use(childRoute.path, this.buildRouter(childRoute));
         });
         return expressRouter;
     }
 
-    addActions(expressRouter: express.Router, route: Route): void {
+    addActions(expressRouter: express.Router, route: RouteDefinition): void {
         //define route
         let expressRoute = expressRouter.route('/');
         //set actions
@@ -85,7 +85,7 @@ export class ExpressAppBuilder {
         })
     }
 
-    addFilters(expressRouter: express.IRouter<any>, route: Route): void {
+    addFilters(expressRouter: express.IRouter<any>, route: RouteDefinition): void {
         let filters  = route.filters.map<express.RequestHandler>((routeFilter: RouteFilter) => {
             let filter = routeFilter.filter;
             let filterName = routeFilter.name;
@@ -118,18 +118,18 @@ export class ExpressAppBuilder {
         }
     }
 
-    attachErrorHandlersToRoute(route: Route): void {
+    attachErrorHandlersToRoute(route: RouteDefinition): void {
         let expressRouter = route.data.expressRouter;
         if (!expressRouter) {
             throwError('Expected an instance of an express router to attach error handlers');
         }
         this.addErrorHandlers(route.data.expressRouter, route);
-        route.children.forEach((childrenRoute: Route) => {
+        route.children.forEach((childrenRoute: RouteDefinition) => {
             this.attachErrorHandlersToRoute(childrenRoute);
         });
     }
 
-    addErrorHandlers(expressRouter: express.IRouter<any>, route: Route): void {
+    addErrorHandlers(expressRouter: express.IRouter<any>, route: RouteDefinition): void {
         let errorHandlers = route.errorHandlers.map<express.ErrorRequestHandler>((routeErrorHandler: RouteErrorHandler) => {
             let errorHandlerInfo = `ErrorHandler: ${routeErrorHandler.name}`;
             let errorHandler = routeErrorHandler.errorHandler;
