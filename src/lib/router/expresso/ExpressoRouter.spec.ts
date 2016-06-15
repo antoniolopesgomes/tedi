@@ -1,32 +1,21 @@
 import {Server, injectable, BindingContext} from '../../Server';
 import {Filter, ErrorHandler} from '../../core';
-import {Route, Router, RoutesDefinition} from '../core';
-import {ExpressoRouter} from '../expresso/ExpressoRouter';
+import {Route, Router, RouteAction, RoutesDefinition} from '../core';
+import {ExpressoRouter, RoutingTableBuilder} from '../expresso/ExpressoRouter';
 
-describe('StrongExpressoRouter', () => {
+fdescribe('StrongExpressoRouter', () => {
 
-    let routes = {
-        "/auth": {
-            "/login": {
-                "$filters": ["DummyFilter"],
-                "get": ["AuthController", "login"],
-                "$errorHandlers": ["DummyErrorHandler"]
-            }
-        }
-    };
-
-    let strongExpressoRouter: Router;
-
-    beforeAll(() => {
+    beforeEach(() => {
         Server.snapshot();
-        strongExpressoRouter = new ExpressoRouter(routes);
     });
 
-    afterAll(() => {
+    afterEach(() => {
         Server.restore();
     });
 
     describe('when I try to build a Routing tree', () => {
+
+        let strongExpressoRouter: Router;
 
         describe('with valid components', () => {
 
@@ -47,13 +36,22 @@ describe('StrongExpressoRouter', () => {
             @injectable()
             class DummyErrorHandler extends ErrorHandler { }
 
-            beforeAll(() => {
+            beforeEach(() => {
                 Server
+                    .setRoutesJSON({
+                        "/auth": {
+                            "/login": {
+                                "$filters": ["DummyFilter"],
+                                "get": ["AuthController", "login"],
+                                "$errorHandlers": ["DummyErrorHandler"]
+                            }
+                        }
+                    })
                     .addFilter('DummyFilter', DummyFilterMock)
                     .addController('AuthController', AuthControllerMock)
                     .addErrorHandler('DummyErrorHandler', DummyErrorHandler);
 
-                routeConfig = strongExpressoRouter.getRoutesConfiguration();
+                routeConfig = Server.component(Router).getRoot();
             })
 
             it('first node should be the ROOT / ', () => {
@@ -61,7 +59,7 @@ describe('StrongExpressoRouter', () => {
             });
 
             describe('auth route', () => {
-                beforeAll(() => {
+                beforeEach(() => {
                     authRoute = routeConfig.children[0];
                 })
                 it('should be present', () => {
@@ -70,7 +68,7 @@ describe('StrongExpressoRouter', () => {
             })
 
             describe('login route', () => {
-                beforeAll(() => {
+                beforeEach(() => {
                     loginRoute = authRoute.children[0];
                 })
                 it('should be present', () => {
@@ -104,56 +102,136 @@ describe('StrongExpressoRouter', () => {
             })
 
         })
-        
+
         describe('with invalid filters', () => {
-            
+
             @injectable()
-            class InvalidFilter {}
-            
-            let routes = {
-                "/dummy": {
-                    "$filters": ["InvalidFilter"]
-                }
-            }
-            
-            let expressoRouter = new ExpressoRouter(routes);
-            
-            beforeAll(() => {
-                Server.addFilter<Filter<any>>('InvalidFilter', <any> InvalidFilter);
+            class InvalidFilter { }
+
+            beforeEach(() => {
+                Server
+                    .setRoutesJSON({
+                        "/dummy": {
+                            "$filters": ["InvalidFilter"]
+                        }
+                    })
+                    .addFilter<Filter<any>>('InvalidFilter', <any>InvalidFilter);
             })
-            
+
             it('should throw an error', () => {
-                expect(() => { expressoRouter.getRoutesConfiguration() })
+                expect(() => { Server.component(Router).getRoot() })
                     .toThrowError(`CoreRouter: 'InvalidFilter' must extend from 'Filter'`);
             })
-            
+
         })
-        
+
         describe('with invalid errorHandlers', () => {
-            
+
             @injectable()
-            class InvalidErrorHandler {}
-            
-            let routes = {
-                "/dummy": {
-                    "$errorHandlers": ["InvalidErrorHandler"]
-                }
-            }
-            
-            let coreCouter = new ExpressoRouter(routes);
-            
-            beforeAll(() => {
-                Server.addErrorHandler('InvalidErrorHandler', <any> InvalidErrorHandler);
+            class InvalidErrorHandler { }
+
+            beforeEach(() => {
+                Server
+                    .setRoutesJSON({
+                        "/dummy": {
+                            "$errorHandlers": ["InvalidErrorHandler"]
+                        }
+                    })
+                    .addErrorHandler('InvalidErrorHandler', <any>InvalidErrorHandler);
             })
-            
+
             it('should throw an error', () => {
-                expect(() => { coreCouter.getRoutesConfiguration() })
+                expect(() => { Server.component(Router).getRoot() })
                     .toThrowError(`CoreRouter: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
             })
-            
+
         })
-        
+
     });
 
+    describe('routing table', () => {
+
+        @injectable()
+        class BaseController {
+            get(): void { }
+            post(): void { }
+        }
+
+        let router: Router;
+
+        beforeEach(() => {
+            Server
+                .setRoutesJSON({
+                    '$filters': [],
+                    '/path1': {
+                        '$filters': [],
+                        'get': ['Path1Controller', 'get'],
+                        '$errorHandlers': [],
+                        '/path11': {
+                            '/path111': {
+                                'get': ['Path111Controller', 'get']
+                            }
+                        }
+                    },
+                    '/path2': {
+                        'post': ['Path2Controller', 'post']
+                    }
+                })
+                .addController('Path1Controller', BaseController)
+                .addController('Path111Controller', BaseController)
+                .addController('Path2Controller', BaseController);
+
+            router = Server.component(Router);
+        })
+
+        it('/ should be defined', () => {
+            expect(router.getPathRoute('/')).toEqual(jasmine.any(Route));
+        });
+        it('/path1 should be defined', () => {
+            expect(router.getPathRoute('/path1')).toEqual(jasmine.any(Route));
+        });
+        it('/path1/path11 should be defined', () => {
+            expect(router.getPathRoute('/path1/path11')).toEqual(jasmine.any(Route));
+        });
+        it('/path1/path11/path111 should be defined', () => {
+            expect(router.getPathRoute('/path1/path11/path111')).toEqual(jasmine.any(Route));
+        });
+        it('/path2 should be defined', () => {
+            expect(router.getPathRoute('/path2')).toEqual(jasmine.any(Route));
+        });
+
+        describe('router#getPathAction', () => {
+            describe('when the path and methods were defined', () => {
+                let routerAction: RouteAction;
+                beforeEach(() => {
+                    routerAction = router.getPathAction('/path1/path11/path111', 'get');
+                });
+                it('should return a valid action', () => {
+                    expect(routerAction.controller).toEqual(jasmine.any(BaseController));
+                    expect(routerAction.controllerMethod).toEqual('get');
+                });
+            });
+            describe('when the path is invalid', () => {
+                let routerAction: RouteAction;
+                beforeEach(() => {
+                    routerAction = router.getPathAction('/invalid_path', 'get');
+                });
+                it('should return null', () => {
+                    expect(routerAction).toBeNull();
+                });
+            });
+            describe('when the method was not defined', () => {
+                let routerAction: RouteAction;
+                beforeEach(() => {
+                    routerAction = router.getPathAction('/path1/path11/path111', 'delete');
+                });
+                it('should return null', () => {
+                    expect(routerAction).toBeNull();
+                });
+            });
+
+
+        });
+    });
 
 });

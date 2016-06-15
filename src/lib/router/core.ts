@@ -40,8 +40,16 @@ export class Route {
 }
 
 export class Router {
-    getRoutesConfiguration(): Route {
-        throwError('getRoutesConfiguration must be implemented.');
+    getRoot(): Route {
+        throwError('getRoot must be implemented.');
+        return null;
+    }
+    getPathRoute(path: string): Route {
+        throwError('getPathRoute must be implemented.');
+        return null;
+    }
+    getPathAction(path: string, method: string): RouteAction {
+        throwError('getPathAction must be implemented.');
         return null;
     }
 }

@@ -29,7 +29,7 @@ export class ExpressApp extends App {
 
     getApp(): express.Application {
         if (!this._app) {
-            this._app = this._appBuilder.buildApp(this._router.getRoutesConfiguration());
+            this._app = this._appBuilder.buildApp(this._router.getRoot());
         }
         return this._app;
     }

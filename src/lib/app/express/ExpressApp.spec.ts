@@ -1,7 +1,7 @@
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
-xdescribe('Express app', () => {
+describe('Express app', () => {
 
     let userRouter: express.Router;
     let infoRouter: express.Router;
@@ -154,11 +154,11 @@ xdescribe('Express app', () => {
             infoRouter.use((req: any, res: any, next: any) => {
                 infoFlag = true;
                 next();
-            })
+            });
            
             spyOn(controller, 'fn').and.callFake((req, res, next) => {
                 res.status(200).send('OK');
-            })
+            });
 
             request(app)
                 .get('/user/info')
@@ -167,16 +167,13 @@ xdescribe('Express app', () => {
                     response = res;
                     done();
                 })
-                .catch((error) => done.fail(error))
-        })
+                .catch((error) => done.fail(error));
+        });
         it('should have called root filter', () => {
             expect(rootFlag).toBeTruthy();
-        })
+        });
         it('should have called user filter', () => {
             expect(userFlag).toBeTruthy();
-        })
-        it('should have called info filter', () => {
-            expect(infoFlag).toBeTruthy();
-        })
+        });
     })
 })

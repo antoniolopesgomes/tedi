@@ -35,7 +35,11 @@ describe('BodyParserFilter', () => {
         let parsedBody: any;
         beforeEach((done: DoneFn) => {
             //add filter
-            Server.addFilter('JSONBodyParser', new BodyParserFilter(BodyParserFilter.ParserTypes.JSON), {context: BindingContext.VALUE})
+            Server.addFilter(
+                'JSONBodyParser', 
+                new BodyParserFilter(BodyParserFilter.ParserTypes.JSON), 
+                {context: BindingContext.VALUE}
+            );
             //get express app
             app = Server.component<ExpressApp>(<any> App).getApp();
             //spy on controller

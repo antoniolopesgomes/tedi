@@ -82,7 +82,7 @@ describe('ExpressAppBuilder', () => {
 
             router = Server.component(Router);
             expressAppBuilder = Server.component(ExpressAppBuilder);
-            expressApp = expressAppBuilder.buildApp(router.getRoutesConfiguration());
+            expressApp = expressAppBuilder.buildApp(router.getRoot());
 
             Server.component<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);
         })
