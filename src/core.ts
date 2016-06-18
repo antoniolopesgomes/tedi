@@ -8,7 +8,3 @@ export {Module, inject, injectable, BindingContext} from './modules';
 export {Router} from './router';
 export {Server} from './server';
 export {Config} from './config';
-
-export const ROUTER = Symbol('router');
-export const CONFIG = Symbol('config');
-export const APP = Symbol('app');

@@ -1,8 +1,7 @@
 import {App} from '../app';
 import {ExpressApp} from '../app/express';
 import {Filter} from '../filters';
-import {IModule, injectable, BindingContext} from './core';
-import {Module} from './Module';
+import {IModule, injectable, BindingContext, Module} from './core';
 import {Server} from '../server';
 
 import * as express from 'express';

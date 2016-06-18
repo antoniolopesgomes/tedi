@@ -3,9 +3,9 @@ import {Filter} from '../../filters';
 import {ErrorHandler} from '../../errorHandlers';
 import {Server} from '../../server';
 import {RouteDefinition, Router, RouteAction, RoutesDefinition} from '../core';
-import {ExpressoRouter, RoutingTableBuilder} from '../expresso/ExpressoRouter';
+import {DefaultRouter, RoutingTableBuilder} from '../default/DefaultRouter';
 
-describe('StrongExpressoRouter', () => {
+describe('DefaultRouter', () => {
 
     let server = new Server();
 
@@ -19,7 +19,7 @@ describe('StrongExpressoRouter', () => {
 
     describe('when I try to build a Routing tree', () => {
 
-        let strongExpressoRouter: Router;
+        let defaultRouter: Router;
 
         describe('with valid components', () => {
 
@@ -55,7 +55,7 @@ describe('StrongExpressoRouter', () => {
                     .addController('AuthController', AuthControllerMock)
                     .addErrorHandler('DummyErrorHandler', DummyErrorHandler);
 
-                routeConfig = server.component(Router).getRouterRoot();
+                routeConfig = server.component<Router>(Router).getRouterRoot();
             })
 
             it('first node should be the ROOT / ', () => {
@@ -123,7 +123,7 @@ describe('StrongExpressoRouter', () => {
             })
 
             it('should throw an error', () => {
-                expect(() => { server.component(Router).getRouterRoot() })
+                expect(() => { server.component<Router>(Router).getRouterRoot() })
                     .toThrowError(`Router: 'InvalidFilter' must extend from 'Filter'`);
             })
 
@@ -145,7 +145,7 @@ describe('StrongExpressoRouter', () => {
             })
 
             it('should throw an error', () => {
-                expect(() => { server.component(Router).getRouterRoot() })
+                expect(() => { server.component<Router>(Router).getRouterRoot() })
                     .toThrowError(`Router: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
             })
 
@@ -185,7 +185,7 @@ describe('StrongExpressoRouter', () => {
                 .addController('Path111Controller', BaseController)
                 .addController('Path2Controller', BaseController);
 
-            router = server.component(Router);
+            router = server.component<Router>(Router);
         })
 
         it('/ should be defined', () => {

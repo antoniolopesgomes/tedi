@@ -42,10 +42,10 @@ export class RouteDefinition {
 
 const ROUTER_SYMBOL = Symbol('ROUTER');
 
-export interface Router {
-    getRouterRoot(): RouteDefinition;
-    getPathRoute(path: string): RouteDefinition;
-    getPathAction(path: string, method: string): RouteAction;
+export abstract class Router {
+    abstract getRouterRoot(): RouteDefinition;
+    abstract getPathRoute(path: string): RouteDefinition;
+    abstract getPathAction(path: string, method: string): RouteAction;
 }
 
 export interface RoutesDefinition {

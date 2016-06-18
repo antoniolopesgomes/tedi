@@ -1,32 +1,41 @@
-/*
-import {Filter} from '../lib/core';
-import {Logger} from '../lib/logging';
-import {ExpressAppBuilder} from '../lib/app/express';
-import {Server, injectable, inject} from '../lib';
+import {
+    Filter,
+    Logger,
+    LoggerLevels,
+    Server,
+    inject,
+    injectable,
+
+} from '../core';
+import {ExpressAppBuilder} from '../app/express';
 import * as express from 'express';
 
-@injectable()
-class CustomFilter extends Filter<any> {
-    constructor(logger: Logger) {
-        super();
+function qq(cfg: any): any  {
+   
+    @injectable() class CustomFilter extends Filter<any> {
+        constructor(private logger: Logger) {
+            super();
+        }
+        apply() {
+            this.logger.setLevel(LoggerLevels.DEBUG);
+            this.logger.debug('qweqweqwe');
+            return 'applied ' + cfg;
+        }
     }
-    apply() {
-        return 'applied ';
-    }
+
+    return CustomFilter;
 }
 
-fdescribe('asdasd', () => {
+xdescribe('asdasd', () => {
 
+    let server = new Server();
 
     it('should work', () => {
 
-        Server
-            .setRoutesDefinition({})
-            .addFilter('MockFilter', CustomFilter);
-    let f = Server.filter('MockFilter');
-    console.log(f.apply.call(f));
+        server.addFilter('MockFilter', qq(1));
+        let f = server.filter('MockFilter');
+        console.log(f.apply(null, null));
 
-})
+    })
 
 });
-*/

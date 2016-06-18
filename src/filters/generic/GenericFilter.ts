@@ -1,6 +1,6 @@
 
 import * as express from 'express';
-import {Filter} from '../filters';
+import {Filter} from '../../core';
 import * as Promise from 'bluebird';
 
 export class GenericFilter extends Filter<any> {

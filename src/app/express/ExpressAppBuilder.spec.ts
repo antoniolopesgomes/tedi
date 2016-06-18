@@ -12,14 +12,13 @@ import {
     ErrorHandler, 
     inject, 
     injectable, 
-    BindingContext,
-    APP
+    BindingContext
 } from '../../core';
 import {ExpressApp} from './ExpressApp';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
-fdescribe('ExpressAppBuilder', () => {
+describe('ExpressAppBuilder', () => {
     
     let server = new Server();
 
@@ -93,8 +92,8 @@ fdescribe('ExpressAppBuilder', () => {
                 .addErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
                 .addErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
-            expressApp = server.component<ExpressApp>('App').getApp();
-            server.component<Logger>('Logger').setLevel(LoggerLevels.EMERGENCY);
+            expressApp = server.component<ExpressApp>(App).getApp();
+            server.component<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);
         })
 
         describe('GET /auth/login', () => {
@@ -108,7 +107,7 @@ fdescribe('ExpressAppBuilder', () => {
                 spyOn(server.filter('AfterLoginFilter'), 'apply').and.callThrough();
                 spyOn(server.filter('AdminFilter'), 'apply').and.callThrough();
 
-                server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
+                server.component<Logger>(Logger).setLevel(LoggerLevels.DEBUG);
 
                 return request(expressApp).get('/auth/login')
                     .expect(200)

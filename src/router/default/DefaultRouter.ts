@@ -1,13 +1,23 @@
 import * as _ from 'lodash';
-import {Router, RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS} from '../core';
-import {injectable, inject, Module} from '../../modules';
-import {Filter} from '../../filters';
-import {ErrorHandler} from '../../errorHandlers';
-import {Server} from '../../server';
-import {Logger} from '../../logging';
+import {
+    Router,
+    RouteDefinition,
+    RouteAction,
+    RouteFilter,
+    RouteErrorHandler,
+    ROUTE_KEYS,
+} from '../core';
+import {
+    injectable, 
+    inject, 
+    Module,
+    Filter,
+    ErrorHandler,
+    Logger
+} from '../../core';
 
 @injectable()
-export class ExpressoRouter implements Router {
+export class DefaultRouter implements Router {
 
     private _routesDefinition: any;
     private _root: RouteDefinition;
@@ -18,7 +28,7 @@ export class ExpressoRouter implements Router {
     constructor(
         @inject('RoutesDefinition') routesDefinition: any,
         @inject('Server') serverModule: Module,
-        @inject('Logger') logger: Logger
+        logger: Logger
     ) {
         this._routesDefinition = routesDefinition;
         this._routeBuilder = new RouteBuilder(logger);

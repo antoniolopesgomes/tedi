@@ -1,5 +1,5 @@
-import {Filter} from '../filters';
-import {Promise} from '../extensions';
+import {Filter} from '../../core';
+import {Promise} from '../../extensions';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 

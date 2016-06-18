@@ -8,7 +8,6 @@ import {App} from '../core';
 import {RouteDefinition, Router, RouteAction} from '../../router';
 import {Logger} from '../../logging';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
-import {ROUTER, CONFIG} from '../../core';
 
 @injectable()
 export class ExpressApp implements App {
@@ -18,9 +17,9 @@ export class ExpressApp implements App {
     private _appBuilder: ExpressAppBuilder;
 
     constructor(
-        @inject('Config') private _config: Config,
-        @inject('Logger') private _logger: Logger,
-        @inject('Router') private _router: Router
+        private _config: Config,
+        private _logger: Logger,
+        private _router: Router
     ) {
         this._appBuilder = new ExpressAppBuilder(this._logger);
     }

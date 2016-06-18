@@ -2,11 +2,7 @@ export interface IConfig {
     port: number;
 }
 
-const CONFIG_SYMBOL = Symbol('Config');
-
 export class Config {
-
-    static get SYMBOL(): Symbol { return CONFIG_SYMBOL }
 
     private _value: IConfig;
 

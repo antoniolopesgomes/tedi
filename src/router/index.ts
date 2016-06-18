@@ -1,2 +1,2 @@
-export {ExpressoRouter} from './expresso/ExpressoRouter';
+export {DefaultRouter} from './default/DefaultRouter';
 export * from './core';

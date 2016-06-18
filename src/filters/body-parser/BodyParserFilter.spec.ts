@@ -1,7 +1,11 @@
-import {Module, injectable, BindingContext} from '../modules';
-import {App} from '../app';
-import {Server} from '../server';
-import {ExpressApp} from '../app/express';
+import {
+    Module, 
+    injectable, 
+    BindingContext,
+    App,
+    Server
+} from '../../core';
+import {ExpressApp} from '../../app/express';
 import {BodyParserFilter} from './BodyParserFilter';
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
