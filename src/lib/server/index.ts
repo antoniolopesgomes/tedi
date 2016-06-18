@@ -1,3 +1,1 @@
-export interface Server {
-    
-}
+export {Server} from './Server';

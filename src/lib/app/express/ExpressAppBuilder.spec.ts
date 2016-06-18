@@ -1,13 +1,27 @@
 
-import {ExpressAppBuilder} from './ExpressAppBuilder';
-import {Router} from '../../router';
-import {Logger, LoggerLevels} from '../../logging';
-import {Server, inject, injectable, BindingContext} from '../../Server';
-import {Filter, ErrorHandler, ActionError, FilterError} from '../../core';
+import {
+    App,
+    Router, 
+    Logger, 
+    LoggerLevels, 
+    Module, 
+    Server, 
+    Filter, 
+    FilterError, 
+    ActionError,
+    ErrorHandler, 
+    inject, 
+    injectable, 
+    BindingContext,
+    APP
+} from '../../core';
+import {ExpressApp} from './ExpressApp';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
-describe('ExpressAppBuilder', () => {
+fdescribe('ExpressAppBuilder', () => {
+    
+    let server = new Server();
 
     @injectable()
     class AuthController {
@@ -24,7 +38,7 @@ describe('ExpressAppBuilder', () => {
 
     @injectable()
     class CustomFilter extends Filter<any> {
-        apply(): void { return; }
+        apply(req, res): void { return; }
     }
 
     @injectable()
@@ -35,21 +49,20 @@ describe('ExpressAppBuilder', () => {
     }
 
     beforeEach(() => {
-        Server.snapshot();
+        server.snapshot();
     });
 
     afterEach(() => {
-        Server.restore();
+        server.restore();
     })
 
     describe('when we have a valid app', () => {
 
         let router: Router;
-        let expressAppBuilder: ExpressAppBuilder;
         let expressApp: express.Application;
 
         beforeEach(() => {
-            Server
+            server
                 .setRoutesDefinition({
                     "$errorHandlers": ["RootErrorHandler"],
                     "$filters": ["RootFilter"],
@@ -80,25 +93,22 @@ describe('ExpressAppBuilder', () => {
                 .addErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
                 .addErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
-            router = Server.component(Router);
-            expressAppBuilder = Server.component(ExpressAppBuilder);
-            expressApp = expressAppBuilder.buildApp(router.getRoot());
-
-            Server.component<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);
+            expressApp = server.component<ExpressApp>('App').getApp();
+            server.component<Logger>('Logger').setLevel(LoggerLevels.EMERGENCY);
         })
 
         describe('GET /auth/login', () => {
 
             beforeEach((done: DoneFn) => {
-                spyOn(Server.controller('AuthController'), 'saveUser').and.callThrough();
-                spyOn(Server.controller('AuthController'), 'login').and.callThrough();
-                spyOn(Server.filter('UserFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('RootFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('LoginFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('AfterLoginFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('AdminFilter'), 'apply').and.callThrough();
+                spyOn(server.controller('AuthController'), 'saveUser').and.callThrough();
+                spyOn(server.controller('AuthController'), 'login').and.callThrough();
+                spyOn(server.filter('UserFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('RootFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('LoginFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('AfterLoginFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('AdminFilter'), 'apply').and.callThrough();
 
-                Server.component<Logger>(Logger).setLevel(LoggerLevels.DEBUG);
+                server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
 
                 return request(expressApp).get('/auth/login')
                     .expect(200)
@@ -107,16 +117,16 @@ describe('ExpressAppBuilder', () => {
             })
 
             it('should have called the right controllers', () => {
-                expect(Server.controller<AuthController>('AuthController').login).toHaveBeenCalled();
-                expect(Server.controller<AuthController>('AuthController').saveUser).not.toHaveBeenCalled();
+                expect(server.controller<AuthController>('AuthController').login).toHaveBeenCalled();
+                expect(server.controller<AuthController>('AuthController').saveUser).not.toHaveBeenCalled();
             })
 
             it('should have called the right filters', () => {
-                expect(Server.filter('RootFilter').apply).toHaveBeenCalled();
-                expect(Server.filter('LoginFilter').apply).toHaveBeenCalled();
-                expect(Server.filter('AfterLoginFilter').apply).toHaveBeenCalled();
-                expect(Server.filter('UserFilter').apply).not.toHaveBeenCalled();
-                expect(Server.filter('AdminFilter').apply).not.toHaveBeenCalled();
+                expect(server.filter('RootFilter').apply).toHaveBeenCalled();
+                expect(server.filter('LoginFilter').apply).toHaveBeenCalled();
+                expect(server.filter('AfterLoginFilter').apply).toHaveBeenCalled();
+                expect(server.filter('UserFilter').apply).not.toHaveBeenCalled();
+                expect(server.filter('AdminFilter').apply).not.toHaveBeenCalled();
             })
 
         })
@@ -124,12 +134,12 @@ describe('ExpressAppBuilder', () => {
         describe('POST /auth/login/user', () => {
 
             beforeEach((done: DoneFn) => {
-                spyOn(Server.controller('AuthController'), 'saveUser').and.callThrough();
-                spyOn(Server.controller('AuthController'), 'login').and.callThrough();
-                spyOn(Server.filter('RootFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('UserFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('LoginFilter'), 'apply').and.callThrough();
-                spyOn(Server.filter('AdminFilter'), 'apply').and.callThrough();
+                spyOn(server.controller('AuthController'), 'saveUser').and.callThrough();
+                spyOn(server.controller('AuthController'), 'login').and.callThrough();
+                spyOn(server.filter('RootFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('UserFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('LoginFilter'), 'apply').and.callThrough();
+                spyOn(server.filter('AdminFilter'), 'apply').and.callThrough();
 
                 return request(expressApp).post('/auth/login/user')
                     .expect(200)
@@ -138,15 +148,15 @@ describe('ExpressAppBuilder', () => {
             })
 
             it('should have called the right controllers', () => {
-                expect(Server.controller<AuthController>('AuthController').saveUser).toHaveBeenCalled();
-                expect(Server.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
+                expect(server.controller<AuthController>('AuthController').saveUser).toHaveBeenCalled();
+                expect(server.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
             })
 
             it('should have called the right filters', () => {
-                expect(Server.filter('RootFilter').apply).toHaveBeenCalled();
-                expect(Server.filter('LoginFilter').apply).toHaveBeenCalled();
-                expect(Server.filter('UserFilter').apply).toHaveBeenCalled();
-                expect(Server.filter('AdminFilter').apply).not.toHaveBeenCalled();
+                expect(server.filter('RootFilter').apply).toHaveBeenCalled();
+                expect(server.filter('LoginFilter').apply).toHaveBeenCalled();
+                expect(server.filter('UserFilter').apply).toHaveBeenCalled();
+                expect(server.filter('AdminFilter').apply).not.toHaveBeenCalled();
             })
 
         })
@@ -155,13 +165,13 @@ describe('ExpressAppBuilder', () => {
             let filterQueue: string[];
             beforeEach((done: DoneFn) => {
                 filterQueue = [];
-                spyOn(Server.filter('RootFilter'), 'apply').and.callFake(() => {
+                spyOn(server.filter('RootFilter'), 'apply').and.callFake(() => {
                     filterQueue.push('RootFilter');
                 })
-                spyOn(Server.filter('LoginFilter'), 'apply').and.callFake(() => {
+                spyOn(server.filter('LoginFilter'), 'apply').and.callFake(() => {
                     filterQueue.push('LoginFilter');
                 })
-                spyOn(Server.filter('AfterLoginFilter'), 'apply').and.callFake(() => {
+                spyOn(server.filter('AfterLoginFilter'), 'apply').and.callFake(() => {
                     filterQueue.push('AfterLoginFilter');
                 })
 
@@ -177,40 +187,40 @@ describe('ExpressAppBuilder', () => {
 
         describe('and a controller throws an error', () => {
             beforeEach(() => {
-                spyOn(Server.controller('AuthController'), 'login').and.throwError('Error on controller.');
+                spyOn(server.controller('AuthController'), 'login').and.throwError('Error on controller.');
             });
             describe('and loginErrorHandler handles it', () => {
                 let catchedError: any;
                 beforeEach((done: DoneFn) => {
-                    spyOn(Server.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                    spyOn(server.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
                         catchedError = error;
                         res.status(500).send('Error');
                     })
-                    spyOn(Server.errorHandler('AuthErrorHandler'), 'catch');
+                    spyOn(server.errorHandler('AuthErrorHandler'), 'catch');
                     return request(expressApp).get('/auth/login')
                         .expect(500)
                         .then(() => done())
                         .catch((error) => done.fail(error))
                 })
                 it('loginErrorHandler #catch should have been called', () => {
-                    expect(Server.errorHandler('LoginErrorHandler').catch).toHaveBeenCalled();
+                    expect(server.errorHandler('LoginErrorHandler').catch).toHaveBeenCalled();
                 })
                 it('catchedError should be an ActionError', () => {
                     expect(catchedError).toEqual(jasmine.any(ActionError));
                 })
                 it('authErrorHandler #catch should not have been called', () => {
-                    expect(Server.errorHandler('AuthErrorHandler').catch).not.toHaveBeenCalled();
+                    expect(server.errorHandler('AuthErrorHandler').catch).not.toHaveBeenCalled();
                 })
             });
             describe('and loginErrorHandler does not handle it', () => {
                 beforeEach((done: DoneFn) => {
-                    spyOn(Server.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                    spyOn(server.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
                         throw error;
                     });
-                    spyOn(Server.errorHandler('AuthErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                    spyOn(server.errorHandler('AuthErrorHandler'), 'catch').and.callFake((error, req, res) => {
                         throw error;
                     });
-                    spyOn(Server.errorHandler('RootErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                    spyOn(server.errorHandler('RootErrorHandler'), 'catch').and.callFake((error, req, res) => {
                         res.status(500).end();
                     });
 
@@ -220,9 +230,9 @@ describe('ExpressAppBuilder', () => {
                         .catch((error) => done.fail(error))
                 })
                 it('catch should have been called', () => {
-                    expect(Server.errorHandler('LoginErrorHandler').catch).toHaveBeenCalled();
-                    expect(Server.errorHandler('AuthErrorHandler').catch).toHaveBeenCalled();
-                    expect(Server.errorHandler('RootErrorHandler').catch).toHaveBeenCalled();
+                    expect(server.errorHandler('LoginErrorHandler').catch).toHaveBeenCalled();
+                    expect(server.errorHandler('AuthErrorHandler').catch).toHaveBeenCalled();
+                    expect(server.errorHandler('RootErrorHandler').catch).toHaveBeenCalled();
                 })
             });
         });
@@ -230,10 +240,10 @@ describe('ExpressAppBuilder', () => {
         describe('and LoginFilter throws an error', () => {
             let catchedError: any;
             beforeEach((done: DoneFn) => {
-                spyOn(Server.filter('LoginFilter'), 'apply').and.callFake(() => {
+                spyOn(server.filter('LoginFilter'), 'apply').and.callFake(() => {
                     throw new Error('Filter error');
                 });
-                spyOn(Server.errorHandler('RootErrorHandler'), 'catch').and.callFake((err: any, req, res: express.Response) => {
+                spyOn(server.errorHandler('RootErrorHandler'), 'catch').and.callFake((err: any, req, res: express.Response) => {
                     catchedError = err;
                     res.status(500).end();
                 })
@@ -250,8 +260,8 @@ describe('ExpressAppBuilder', () => {
         describe('and a login filter responds', () => {
             let response: request.Response;
             beforeEach((done) => {
-                spyOn(Server.controller('AuthController'), 'login');
-                spyOn(Server.filter('LoginFilter'), 'apply').and.callFake((req, res) => {
+                spyOn(server.controller('AuthController'), 'login');
+                spyOn(server.filter('LoginFilter'), 'apply').and.callFake((req, res) => {
                     res.status(200).send('HIJACKED');
                 });
                 request(expressApp)
@@ -265,11 +275,11 @@ describe('ExpressAppBuilder', () => {
 
             });
             it('filter should have responded', () => {
-                expect(Server.filter('LoginFilter').apply).toHaveBeenCalled();
+                expect(server.filter('LoginFilter').apply).toHaveBeenCalled();
                 expect(response.text).toEqual('HIJACKED');
             });
             it('controller should have not been called', () => {
-                expect(Server.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
+                expect(server.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
             });
         });
     })

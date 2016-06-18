@@ -3,33 +3,31 @@ import * as express from 'express';
 import * as http from 'http';
 import {Promise} from '../../extensions';
 import {Config} from '../../config';
-import {injectable, inject} from '../../Server';
+import {injectable, inject} from '../../modules';
 import {App} from '../core';
 import {RouteDefinition, Router, RouteAction} from '../../router';
 import {Logger} from '../../logging';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
+import {ROUTER, CONFIG} from '../../core';
 
 @injectable()
-export class ExpressApp extends App {
+export class ExpressApp implements App {
 
     private _app: express.Application;
     private _server: http.Server;
+    private _appBuilder: ExpressAppBuilder;
 
     constructor(
         @inject('Config') private _config: Config,
-        private _router: Router,
-        private _logger: Logger,
-        private _appBuilder: ExpressAppBuilder
+        @inject('Logger') private _logger: Logger,
+        @inject('Router') private _router: Router
     ) {
-        super();
-        if (!this._config) {
-            throw new Error('Application: No config was found.');
-        }
+        this._appBuilder = new ExpressAppBuilder(this._logger);
     }
 
     getApp(): express.Application {
         if (!this._app) {
-            this._app = this._appBuilder.buildApp(this._router.getRoot());
+            this._app = this._appBuilder.buildApp(this._router.getRouterRoot());
         }
         return this._app;
     }
@@ -40,7 +38,7 @@ export class ExpressApp extends App {
 
         return new Promise((resolve: Function, reject: Function) => {
             this._server = app.listen(
-                this._config.server.port,
+                this._config.getValue().port,
                 (error: any) => { return error ? reject(error) : resolve(); }
             )
         });

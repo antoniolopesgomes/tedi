@@ -1,51 +1,12 @@
-export {inject, injectable} from 'inversify';
-
 import 'reflect-metadata';
 import * as inversify from 'inversify'; 
-import {Router, ExpressoRouter, RoutesDefinition} from './router';
-import {App} from './app';
-import {ExpressApp, ExpressAppBuilder} from './app/express';
-import {Config} from './config';
-import {ErrorHandler, Filter} from './core';
-import {Logger, WinstonLogger} from './logging';
-
-export enum BindingContext {
-    SINGLETON,
-    TRANSIENT,
-    VALUE
-}
-
-interface BindingOptions {
-    context: BindingContext
-} 
-
-export interface IModule {
-
-    addController<T>(
-        abstraction: string | inversify.INewable<T>, 
-        concretion: inversify.INewable<T> | T,
-        options?: BindingOptions
-    ): IModule;
-    
-    addFilter<T>(
-        abstraction: string | inversify.INewable<Filter<T>>, 
-        concretion: inversify.INewable<Filter<T>> | Filter<T>,
-        options?: BindingOptions
-    ): IModule;
-
-    addErrorHandler(
-        abstraction: string | inversify.INewable<ErrorHandler>, 
-        concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
-        options?: BindingOptions
-    ): IModule;
-
-    addComponent<T>(
-        abstraction: string | inversify.INewable<T>, 
-        concretion: inversify.INewable<T> | T,
-        options?: BindingOptions
-    ): IModule;
-
-}
+import {Router, ExpressoRouter, RoutesDefinition} from '../router';
+import {App} from '../app';
+import {Config} from '../config';
+import {Filter} from '../filters';
+import {ErrorHandler} from '../errorHandlers';
+import {Logger, WinstonLogger} from '../logging';
+import {IModule, BindingContext, BindingOptions} from '../modules';
 
 export class Module implements IModule {
     
@@ -85,7 +46,7 @@ export class Module implements IModule {
     }
     
     addComponent<T>(
-        abstraction: string | inversify.INewable<T>, 
+        abstraction: string | inversify.INewable<T> | Symbol, 
         concretion: inversify.INewable<T> | T,
         options?: BindingOptions
     ): Module {
@@ -93,7 +54,7 @@ export class Module implements IModule {
         return this;
     }
 
-    addModule(
+    addChildModule(
         name: string, 
         module: inversify.INewable<Module> | Module
     ): Module {
@@ -113,11 +74,11 @@ export class Module implements IModule {
         return this._kernel.get<ErrorHandler>(abstraction);
     }
     
-    component<T>(abstraction: string | inversify.INewable<T>): T {
+    component<T>(abstraction: string | inversify.INewable<T> | Symbol): T {
         return this._kernel.get<T>(abstraction);
     }
 
-    module(abstraction: string): Module {
+    childModule(abstraction: string): Module {
         return this._kernel.get<Module>(abstraction);
     }
     
@@ -149,7 +110,7 @@ export class Module implements IModule {
 
 function bindToKernel<T>(
     kernel: inversify.IKernel,
-    abstraction: string | inversify.INewable<T>, 
+    abstraction: string | inversify.INewable<T> | Symbol, 
     concretion: inversify.INewable<T> | T,
     options: BindingOptions = { context: BindingContext.SINGLETON }
 ): void {
@@ -172,20 +133,3 @@ function bindToKernel<T>(
 function throwError(msg: string): void {
     throw new Error('Global error: ' + msg);
 }
-
-export let Server: Module = new Module();
-
-//Default bindings
-Server
-    .addComponent(Logger, WinstonLogger)
-    .addComponent(Router, ExpressoRouter)
-    .addComponent(ExpressAppBuilder, ExpressAppBuilder)
-    .addComponent(App, ExpressApp)
-    .addComponent<Config>('Config', <Config> { 
-            server: { 
-                port: 8080
-            } 
-        }, 
-        { context: BindingContext.VALUE }
-    );
-

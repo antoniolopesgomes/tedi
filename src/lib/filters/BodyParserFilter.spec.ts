@@ -1,11 +1,14 @@
-import {Server, injectable, BindingContext} from '../../Server';
-import {App} from '../../core';
-import {ExpressApp} from '../../app/express';
+import {Module, injectable, BindingContext} from '../modules';
+import {App} from '../app';
+import {Server} from '../server';
+import {ExpressApp} from '../app/express';
 import {BodyParserFilter} from './BodyParserFilter';
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
 
 describe('BodyParserFilter', () => {
+
+    let server = new Server();
 
     @injectable()
     class DummyController {
@@ -15,7 +18,7 @@ describe('BodyParserFilter', () => {
     } 
 
     beforeEach(() => {
-        Server.snapshot().setRoutesDefinition({
+        server.snapshot().setRoutesDefinition({
             '/parser': {
                 '$filters': ['JSONBodyParser'],
                 'post': ['DummyController', 'post']
@@ -24,7 +27,7 @@ describe('BodyParserFilter', () => {
         .addController('DummyController', DummyController);
     })
     afterEach(() => {
-        Server.restore()
+        server.restore()
     })
 
     describe('JSON body parser', () => {
@@ -35,18 +38,18 @@ describe('BodyParserFilter', () => {
         let parsedBody: any;
         beforeEach((done: DoneFn) => {
             //add filter
-            Server.addFilter(
+            server.addFilter(
                 'JSONBodyParser', 
                 new BodyParserFilter(BodyParserFilter.ParserTypes.JSON), 
                 {context: BindingContext.VALUE}
             );
-            //get express app
-            app = Server.component<ExpressApp>(<any> App).getApp();
             //spy on controller
-            spyOn(Server.controller('DummyController'), 'post').and.callFake((req, res) => {
+            spyOn(server.controller('DummyController'), 'post').and.callFake((req, res) => {
                 parsedBody = req.body;
                 res.status(200).end();
             });
+            //get express app
+            app = server.component<ExpressApp>(<any> App).getApp();
             //request
             request(app)
                 .post('/parser')

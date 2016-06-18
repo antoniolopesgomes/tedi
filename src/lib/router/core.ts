@@ -1,6 +1,7 @@
 'use strict';
 
-import {Filter, ErrorHandler} from '../core';
+import {Filter} from '../filters';
+import {ErrorHandler} from '../errorHandlers';
 
 export interface RouteAction {
     controller: Object;
@@ -39,19 +40,12 @@ export class RouteDefinition {
     }
 }
 
-export class Router {
-    getRoot(): RouteDefinition {
-        throwError('getRoot must be implemented.');
-        return null;
-    }
-    getPathRoute(path: string): RouteDefinition {
-        throwError('getPathRoute must be implemented.');
-        return null;
-    }
-    getPathAction(path: string, method: string): RouteAction {
-        throwError('getPathAction must be implemented.');
-        return null;
-    }
+const ROUTER_SYMBOL = Symbol('ROUTER');
+
+export interface Router {
+    getRouterRoot(): RouteDefinition;
+    getPathRoute(path: string): RouteDefinition;
+    getPathAction(path: string, method: string): RouteAction;
 }
 
 export interface RoutesDefinition {

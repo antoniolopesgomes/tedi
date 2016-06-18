@@ -1,11 +1,17 @@
-import {Server, IModule, injectable, BindingContext, Module} from '../Server';
 import {App} from '../app';
 import {ExpressApp} from '../app/express';
-import {Filter} from '../core';
+import {Filter} from '../filters';
+import {IModule, injectable, BindingContext} from './core';
+import {Module} from './Module';
+import {Server} from '../server';
+
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
 
-fdescribe('Modules', () => {
+
+describe('Modules', () => {
+
+    let server =  new Server();
 
     @injectable()
     class AuthController {
@@ -29,28 +35,29 @@ fdescribe('Modules', () => {
 
     describe('Modules', () => {
         beforeEach(() => {
-            Server.snapshot();
+            server.snapshot();
         })
         afterEach(() => {
-            Server.restore();
+            server.restore();
         })
         describe('an app with a module', () => {
 
             let app: express.Application;
 
             beforeEach(() => {
-                Server
+                server
                     .setRoutesDefinition({
                         '/auth': 'AuthModule'
                     })
-                    .addModule('AuthModule', authModule);
+                    .addChildModule('AuthModule', authModule);
 
-                app = Server.component<ExpressApp>(<any>App).getApp();
+                app = server.component<ExpressApp>(<any>App).getApp();
             });
 
             describe('/auth/login', () => {
-                let authModule = Server.module('AuthModule');
+                let authModule: Module;
                 beforeEach((done: DoneFn) => {
+                    authModule = server.childModule('AuthModule');
                     spyOn(authModule.controller('AuthController'), 'get').and.callThrough();
                     spyOn(authModule.filter('RootFilter'), 'apply').and.callFake(() => {
                         return;
@@ -65,20 +72,13 @@ fdescribe('Modules', () => {
                 })
 
                 it('should have called the module controller', () => {
-                    expect(authModule.controller<AuthController>('auth.AuthController').get).toHaveBeenCalled();
+                    expect(authModule.controller<AuthController>('AuthController').get).toHaveBeenCalled();
                 });
 
                 it('should have called the module auth.RootFilter', () => {
-                    expect(authModule.filter('auth.RootFilter').apply).toHaveBeenCalled();
+                    expect(authModule.filter('RootFilter').apply).toHaveBeenCalled();
                 });
-
             })
-
-
-
         });
-
-
     })
-
 })

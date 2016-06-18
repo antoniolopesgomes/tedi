@@ -2,23 +2,12 @@
 
 import {Promise} from '../extensions';
 
-export class App {
-    
-    listen(): Promise<any> {
-        return Promise
-            .resolve()
-            .then(() => {
-                throwError('listen must be implemented');
-            });
-    }
+const APP_SYMBOL = Symbol('App');
 
-    close(): Promise<any> {
-        return Promise
-            .resolve()
-            .then(() => {
-                throwError('close must be implemented');
-            });
-    }
+
+export interface App {
+    listen(): Promise<any>;
+    close(): Promise<any>;
 }
 
 function throwError(message: string): void {

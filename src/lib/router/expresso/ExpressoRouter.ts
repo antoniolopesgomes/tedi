@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
 import {Router, RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS} from '../core';
-import {Server, injectable, inject, Module} from '../../Server';
-import {Filter, ErrorHandler} from '../../core';
+import {injectable, inject, Module} from '../../modules';
+import {Filter} from '../../filters';
+import {ErrorHandler} from '../../errorHandlers';
+import {Server} from '../../server';
 import {Logger} from '../../logging';
 
 @injectable()
-export class ExpressoRouter extends Router {
+export class ExpressoRouter implements Router {
 
     private _routesDefinition: any;
     private _root: RouteDefinition;
@@ -15,22 +17,18 @@ export class ExpressoRouter extends Router {
 
     constructor(
         @inject('RoutesDefinition') routesDefinition: any,
-        logger: Logger
+        @inject('Server') serverModule: Module,
+        @inject('Logger') logger: Logger
     ) {
-        super();
         this._routesDefinition = routesDefinition;
         this._routeBuilder = new RouteBuilder(logger);
         this._routingTableBuilder = new RoutingTableBuilder(logger);
-        //build elements
-        this._build();
-    }
-
-    private _build(): void {
-        this._root = this._routeBuilder.getRoutesConfiguration(this._routesDefinition);
+        //BUILD
+        this._root = this._routeBuilder.getRoutesConfiguration(this._routesDefinition, serverModule);
         this._routingTable = this._routingTableBuilder.getRoutingTable(this._root);
     }
 
-    getRoot(): RouteDefinition {
+    getRouterRoot(): RouteDefinition {
         return this._root;
     }
 
@@ -58,13 +56,13 @@ export class RouteBuilder {
         private _logger: Logger
     ) { }
 
-    getRoutesConfiguration(routesDefinition: any): RouteDefinition {
+    getRoutesConfiguration(routesDefinition: any, module: Module): RouteDefinition {
         //create and setup root (add filters and errorHandlers)
         let root = new RouteDefinition('/');
-        root.filters = this.getFilters(routesDefinition[ROUTE_KEYS.FILTERS], Server);
-        root.errorHandlers = this.getErrorHandlers(routesDefinition[ROUTE_KEYS.ERROR_HANDLERS], Server)
+        root.filters = this.getFilters(routesDefinition[ROUTE_KEYS.FILTERS], module);
+        root.errorHandlers = this.getErrorHandlers(routesDefinition[ROUTE_KEYS.ERROR_HANDLERS], module)
         //build routing tree
-        this.buildRouteDefinition(routesDefinition, root, Server);
+        this.buildRouteDefinition(routesDefinition, root, module);
         return root;
     }
 
@@ -75,7 +73,7 @@ export class RouteBuilder {
                 //if we're deling with a module (string value)
                 if (_.isString(rawRouteDefinition)) {
                     //load it
-                    module = Server.module(rawRouteDefinition);
+                    module = module.childModule(rawRouteDefinition);
                     //get the routerDefinition
                     rawRouteDefinition = module.getRoutesDefinition();
                 }

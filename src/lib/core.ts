@@ -1,38 +1,14 @@
-import * as express from 'express';
-import {CustomError} from './extensions';
-import {IModule} from './Server';
-
 export {App} from './app';
+export {ActionError} from './controllers';
+export {ErrorHandler, ErrorHandlerError} from './errorHandlers';
+export {CustomError, Promise} from './extensions';
+export {Filter, FilterError} from './filters';
+export {Logger, LoggerLevels} from './logging';
+export {Module, inject, injectable, BindingContext} from './modules';
+export {Router} from './router';
+export {Server} from './server';
+export {Config} from './config';
 
-export class Filter<T> {
-    apply(req: express.Request, res: express.Response): any {
-        throw new Error('Filter.apply must be implemented.')
-    }
-    getData(req: express.Request, res: express.Response): T {
-        throw new Error('Filter.getData must be implemented.')
-    }
-}
-
-export class FilterError extends CustomError {
-    constructor(name: string, err: any) {
-        super(`${name}`, err);
-    }
-}
-
-export class ErrorHandler {
-    catch(error:any, req: express.Request, res: express.Response): void {
-        throw new Error('ErrorHandler.catch must be implemented.')
-    }
-}
-
-export class ErrorHandlerError extends CustomError {
-    constructor(name: string, err: any) {
-        super(`${name}`, err);
-    }
-}
-
-export class ActionError extends CustomError {
-    constructor(name: string, methodName: string, err: any) {
-        super(`${name}#${methodName}`, err);
-    }
-}
+export const ROUTER = Symbol('router');
+export const CONFIG = Symbol('config');
+export const APP = Symbol('app');

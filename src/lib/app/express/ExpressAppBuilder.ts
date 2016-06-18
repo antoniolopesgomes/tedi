@@ -1,10 +1,17 @@
 import * as express from 'express';
-import {RouteDefinition, Router, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
-import {Logger} from '../../logging';
-import {injectable} from '../../Server';
-import {Filter, ErrorHandler, FilterError, ErrorHandlerError, ActionError} from '../../core';
+import {
+    Router,
+    Logger,
+    Filter,
+    FilterError,
+    ErrorHandler,
+    ErrorHandlerError,
+    ActionError,
+    injectable,
+    inject
+} from '../../core';
+import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 
-@injectable()
 export class ExpressAppBuilder {
 
     constructor(

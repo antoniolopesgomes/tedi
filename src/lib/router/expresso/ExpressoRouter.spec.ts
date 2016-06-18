@@ -1,16 +1,20 @@
-import {Server, injectable, BindingContext} from '../../Server';
-import {Filter, ErrorHandler} from '../../core';
+import {injectable, BindingContext} from '../../modules';
+import {Filter} from '../../filters';
+import {ErrorHandler} from '../../errorHandlers';
+import {Server} from '../../server';
 import {RouteDefinition, Router, RouteAction, RoutesDefinition} from '../core';
 import {ExpressoRouter, RoutingTableBuilder} from '../expresso/ExpressoRouter';
 
 describe('StrongExpressoRouter', () => {
 
+    let server = new Server();
+
     beforeEach(() => {
-        Server.snapshot();
+        server.snapshot();
     });
 
     afterEach(() => {
-        Server.restore();
+        server.restore();
     });
 
     describe('when I try to build a Routing tree', () => {
@@ -37,7 +41,7 @@ describe('StrongExpressoRouter', () => {
             class DummyErrorHandler extends ErrorHandler { }
 
             beforeEach(() => {
-                Server
+                server
                     .setRoutesDefinition({
                         "/auth": {
                             "/login": {
@@ -51,7 +55,7 @@ describe('StrongExpressoRouter', () => {
                     .addController('AuthController', AuthControllerMock)
                     .addErrorHandler('DummyErrorHandler', DummyErrorHandler);
 
-                routeConfig = Server.component(Router).getRoot();
+                routeConfig = server.component(Router).getRouterRoot();
             })
 
             it('first node should be the ROOT / ', () => {
@@ -109,7 +113,7 @@ describe('StrongExpressoRouter', () => {
             class InvalidFilter { }
 
             beforeEach(() => {
-                Server
+                server
                     .setRoutesDefinition({
                         "/dummy": {
                             "$filters": ["InvalidFilter"]
@@ -119,7 +123,7 @@ describe('StrongExpressoRouter', () => {
             })
 
             it('should throw an error', () => {
-                expect(() => { Server.component(Router).getRoot() })
+                expect(() => { server.component(Router).getRouterRoot() })
                     .toThrowError(`Router: 'InvalidFilter' must extend from 'Filter'`);
             })
 
@@ -131,7 +135,7 @@ describe('StrongExpressoRouter', () => {
             class InvalidErrorHandler { }
 
             beforeEach(() => {
-                Server
+                server
                     .setRoutesDefinition({
                         "/dummy": {
                             "$errorHandlers": ["InvalidErrorHandler"]
@@ -141,7 +145,7 @@ describe('StrongExpressoRouter', () => {
             })
 
             it('should throw an error', () => {
-                expect(() => { Server.component(Router).getRoot() })
+                expect(() => { server.component(Router).getRouterRoot() })
                     .toThrowError(`Router: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
             })
 
@@ -160,7 +164,7 @@ describe('StrongExpressoRouter', () => {
         let router: Router;
 
         beforeEach(() => {
-            Server
+            server
                 .setRoutesDefinition({
                     '$filters': [],
                     '/path1': {
@@ -181,7 +185,7 @@ describe('StrongExpressoRouter', () => {
                 .addController('Path111Controller', BaseController)
                 .addController('Path2Controller', BaseController);
 
-            router = Server.component(Router);
+            router = server.component(Router);
         })
 
         it('/ should be defined', () => {

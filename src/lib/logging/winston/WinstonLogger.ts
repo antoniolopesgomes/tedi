@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 import {Logger, LoggerLevels} from '../core';
-import {injectable} from '../../Server';
+import {injectable} from '../../modules';
 
 @injectable()
 export class WinstonLogger extends Logger {

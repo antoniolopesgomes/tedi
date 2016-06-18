@@ -11,7 +11,11 @@ export enum LoggerLevels {
     DEBUG
 }
 
+const LOGGER_SYMBOL = Symbol('LOGGER');
+
 export class Logger {
+
+    static get SYMBOL(): Symbol { return LOGGER_SYMBOL; }
 
     warn(msg: string): void {
         throwError('#warn not implemented');
