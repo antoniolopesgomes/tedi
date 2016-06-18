@@ -1,7 +1,8 @@
 'use strict';
-
-import {Filter} from '../filters';
-import {ErrorHandler} from '../errorHandlers';
+import {
+    Filter,
+    ErrorHandler
+} from '../core';
 
 export interface RouteAction {
     controller: Object;

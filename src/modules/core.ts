@@ -1,7 +1,9 @@
 import 'reflect-metadata';
-import {ErrorHandler} from '../errorHandlers';
-import {Filter} from '../filters';
 import * as inversify from 'inversify';
+import {
+    ErrorHandler,
+    Filter
+} from '../core';
 
 export {inject, injectable} from 'inversify';
 

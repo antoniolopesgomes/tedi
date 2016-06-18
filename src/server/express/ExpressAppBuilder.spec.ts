@@ -92,7 +92,7 @@ describe('ExpressAppBuilder', () => {
                 .addErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
                 .addErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
-            expressApp = server.component<ExpressApp>(App).getApp();
+            expressApp = server.getApp();
             server.component<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);
         })
 

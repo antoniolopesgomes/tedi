@@ -1,6 +1,6 @@
 export {App} from './app';
 export {ActionError} from './controllers';
-export {ErrorHandler, ErrorHandlerError} from './errorHandlers';
+export {ErrorHandler, ErrorHandlerError} from './errors';
 export {CustomError, Promise} from './extensions';
 export {Filter, FilterError} from './filters';
 export {Logger, LoggerLevels} from './logging';
