@@ -1,8 +1,12 @@
-import {App} from '../app';
-import {ExpressApp} from '../app/express';
-import {Filter} from '../filters';
-import {IModule, injectable, BindingContext, Module} from './core';
-import {Server} from '../server';
+import {
+    App,
+    Filter,
+    Module,
+    BindingContext,
+    inject,
+    injectable
+} from '../core';
+import {ExpressServer, ExpressApp} from '../server/express';
 
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
@@ -10,7 +14,7 @@ import * as request from 'supertest-as-promised';
 
 describe('Modules', () => {
 
-    let server =  new Server();
+    let server =  new ExpressServer();
 
     @injectable()
     class AuthController {

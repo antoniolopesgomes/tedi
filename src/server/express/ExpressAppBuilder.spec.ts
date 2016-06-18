@@ -5,7 +5,6 @@ import {
     Logger, 
     LoggerLevels, 
     Module, 
-    Server, 
     Filter, 
     FilterError, 
     ActionError,
@@ -15,12 +14,13 @@ import {
     BindingContext
 } from '../../core';
 import {ExpressApp} from './ExpressApp';
+import {ExpressServer} from './ExpressServer';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
 describe('ExpressAppBuilder', () => {
     
-    let server = new Server();
+    let server = new ExpressServer();
 
     @injectable()
     class AuthController {

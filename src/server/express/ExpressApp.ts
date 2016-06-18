@@ -1,12 +1,15 @@
 'use strict';
 import * as express from 'express';
 import * as http from 'http';
+import {
+    Config,
+    App,
+    inject,
+    injectable,
+    Logger
+} from '../../core';
 import {Promise} from '../../extensions';
-import {Config} from '../../config';
-import {injectable, inject} from '../../modules';
-import {App} from '../core';
 import {RouteDefinition, Router, RouteAction} from '../../router';
-import {Logger} from '../../logging';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
 
 @injectable()

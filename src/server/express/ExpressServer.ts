@@ -8,11 +8,11 @@ import {
     Config
 } from '../../core';
 import {WinstonLogger} from '../../logging';
-import {DefaultRouter} from '../../router';
-import {ExpressApp, ExpressAppBuilder} from '../../app/express';
+import {DefaultRouter} from '../../router/default';
+import {ExpressApp} from '../../server/express';
 
 @injectable()
-export class Server extends Module {
+export class ExpressServer extends Module {
     
     constructor() {
         super();

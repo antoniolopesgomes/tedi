@@ -2,12 +2,10 @@ import {
     Filter,
     Logger,
     LoggerLevels,
-    Server,
     inject,
     injectable,
-
+    Module
 } from '../core';
-import {ExpressAppBuilder} from '../app/express';
 import * as express from 'express';
 
 function qq(cfg: any): any  {
@@ -28,7 +26,7 @@ function qq(cfg: any): any  {
 
 xdescribe('asdasd', () => {
 
-    let server = new Server();
+    let server = new Module();
 
     it('should work', () => {
 

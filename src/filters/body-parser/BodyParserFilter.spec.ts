@@ -2,17 +2,16 @@ import {
     Module, 
     injectable, 
     BindingContext,
-    App,
-    Server
+    App
 } from '../../core';
-import {ExpressApp} from '../../app/express';
-import {BodyParserFilter} from './BodyParserFilter';
+import {ExpressServer, ExpressApp} from '../../server/express';
+import {BodyParserFilter} from '../../filters/body-parser';
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
 
 describe('BodyParserFilter', () => {
 
-    let server = new Server();
+    let server = new ExpressServer();
 
     @injectable()
     class DummyController {

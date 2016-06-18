@@ -6,5 +6,4 @@ export {Filter, FilterError} from './filters';
 export {Logger, LoggerLevels} from './logging';
 export {Module, inject, injectable, BindingContext} from './modules';
 export {Router} from './router';
-export {Server} from './server';
 export {Config} from './config';

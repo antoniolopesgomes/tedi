@@ -1,13 +1,21 @@
-import {injectable, BindingContext} from '../../modules';
-import {Filter} from '../../filters';
-import {ErrorHandler} from '../../errorHandlers';
-import {Server} from '../../server';
-import {RouteDefinition, Router, RouteAction, RoutesDefinition} from '../core';
-import {DefaultRouter, RoutingTableBuilder} from '../default/DefaultRouter';
+import {
+    injectable, 
+    BindingContext,
+    Filter,
+    ErrorHandler,
+} from '../../core';
+import {
+    RouteDefinition, 
+    Router, 
+    RouteAction, 
+    RoutesDefinition
+} from '../../router';
+import {DefaultRouter} from '../../router/default';
+import {ExpressServer} from '../../server/express';
 
 describe('DefaultRouter', () => {
 
-    let server = new Server();
+    let server = new ExpressServer();
 
     beforeEach(() => {
         server.snapshot();

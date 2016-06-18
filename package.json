@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "node jasmine-runner"
   },
   "author": "António Gomes",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "inversify-dts": "^1.0.1",
     "jasmine": "^2.4.1",
     "jasmine-promises": "^0.4.1",
+    "jasmine-spec-reporter": "^2.5.0",
     "supertest": "^1.2.0",
     "supertest-as-promised": "^3.1.0"
   },
