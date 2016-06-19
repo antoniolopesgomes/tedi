@@ -1,1 +1,1 @@
-export {WinstonLogger} from './WinstonLogger';
+export {WinstonLoggerFactory} from './WinstonLogger';

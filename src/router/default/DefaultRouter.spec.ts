@@ -130,7 +130,7 @@ describe('DefaultRouter', () => {
                     .setFilter<Filter<any>>('InvalidFilter', <any>InvalidFilter);
             })
 
-            it('should throw an error', () => {
+            it('should throw a FilterError', () => {
                 expect(() => { server.component<Router>(Router).getRouterRoot() })
                     .toThrowError(`Router: 'InvalidFilter' must extend from 'Filter'`);
             })
@@ -152,7 +152,7 @@ describe('DefaultRouter', () => {
                     .setErrorHandler('InvalidErrorHandler', <any>InvalidErrorHandler);
             })
 
-            it('should throw an error', () => {
+            it('should throw an ErrorHandlerError', () => {
                 expect(() => { server.component<Router>(Router).getRouterRoot() })
                     .toThrowError(`Router: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
             })

@@ -8,7 +8,7 @@ import {
     Config
 } from '../../core';
 import {Promise} from '../../extensions';
-import {WinstonLogger} from '../../logging/winston';
+import {WinstonLoggerFactory} from '../../logging/winston';
 import {DefaultRouter} from '../../router/default';
 import {ExpressApp} from '../../server/express';
 import * as express from 'express';
@@ -19,13 +19,12 @@ export class ExpressServer extends Module {
 
     private _server: http.Server;
 
-    constructor() {
-        super();
-        this
+    init(): void {
+         this
             .setComponent('Server', this, { context: BindingContext.VALUE })
             .setComponent(App, ExpressApp)
             .setComponent(Router, DefaultRouter)
-            .setComponent(Logger, WinstonLogger)
+            .setComponent<Logger>(Logger, WinstonLoggerFactory())
             .setComponent(Config, new Config({
                 port: 8080
             })
