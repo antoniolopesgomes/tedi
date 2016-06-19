@@ -33,8 +33,8 @@ describe('Modules', () => {
                 'get': ['AuthController', 'get']
             }
         })
-        .addController('AuthController', AuthController)
-        .addFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE });
+        .setController('AuthController', AuthController)
+        .setFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE });
 
     describe('Modules', () => {
         beforeEach(() => {
@@ -81,7 +81,26 @@ describe('Modules', () => {
                 it('should have called the module auth.RootFilter', () => {
                     expect(authModule.filter('RootFilter').apply).toHaveBeenCalled();
                 });
-            })
+            });
+
+            describe('when we try to override the controller', () => {
+                
+                @injectable()
+                class CustomAuthController {
+                    get(req, res): void {
+                        res.status(200).end();
+                    }
+                }
+
+                beforeEach(() => {
+                    authModule.setController('AuthController', CustomAuthController);
+                })
+
+                it('should have override AuthController', () => {
+                    expect(authModule.controller('AuthController')).toEqual(jasmine.any(CustomAuthController));
+                })
+
+            });
         });
     })
 })

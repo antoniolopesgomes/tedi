@@ -59,9 +59,9 @@ describe('DefaultRouter', () => {
                             }
                         }
                     })
-                    .addFilter('DummyFilter', DummyFilterMock)
-                    .addController('AuthController', AuthControllerMock)
-                    .addErrorHandler('DummyErrorHandler', DummyErrorHandler);
+                    .setFilter('DummyFilter', DummyFilterMock)
+                    .setController('AuthController', AuthControllerMock)
+                    .setErrorHandler('DummyErrorHandler', DummyErrorHandler);
 
                 routeConfig = server.component<Router>(Router).getRouterRoot();
             })
@@ -127,7 +127,7 @@ describe('DefaultRouter', () => {
                             "$filters": ["InvalidFilter"]
                         }
                     })
-                    .addFilter<Filter<any>>('InvalidFilter', <any>InvalidFilter);
+                    .setFilter<Filter<any>>('InvalidFilter', <any>InvalidFilter);
             })
 
             it('should throw an error', () => {
@@ -149,7 +149,7 @@ describe('DefaultRouter', () => {
                             "$errorHandlers": ["InvalidErrorHandler"]
                         }
                     })
-                    .addErrorHandler('InvalidErrorHandler', <any>InvalidErrorHandler);
+                    .setErrorHandler('InvalidErrorHandler', <any>InvalidErrorHandler);
             })
 
             it('should throw an error', () => {
@@ -189,9 +189,9 @@ describe('DefaultRouter', () => {
                         'post': ['Path2Controller', 'post']
                     }
                 })
-                .addController('Path1Controller', BaseController)
-                .addController('Path111Controller', BaseController)
-                .addController('Path2Controller', BaseController);
+                .setController('Path1Controller', BaseController)
+                .setController('Path111Controller', BaseController)
+                .setController('Path2Controller', BaseController);
 
             router = server.component<Router>(Router);
         })

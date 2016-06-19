@@ -27,7 +27,7 @@ describe('BodyParserFilter', () => {
                 'post': ['DummyController', 'post']
             }
         })
-        .addController('DummyController', DummyController);
+        .setController('DummyController', DummyController);
     })
     afterEach(() => {
         server.restore()
@@ -41,7 +41,7 @@ describe('BodyParserFilter', () => {
         let parsedBody: any;
         beforeEach((done: DoneFn) => {
             //add filter
-            server.addFilter(
+            server.setFilter(
                 'JSONBodyParser', 
                 new BodyParserFilter(BodyParserFilter.ParserTypes.JSON), 
                 {context: BindingContext.VALUE}

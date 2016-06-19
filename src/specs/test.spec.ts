@@ -30,7 +30,7 @@ xdescribe('asdasd', () => {
 
     it('should work', () => {
 
-        server.addFilter('MockFilter', qq(1));
+        server.setFilter('MockFilter', qq(1));
         let f = server.filter('MockFilter');
         console.log(f.apply(null, null));
 

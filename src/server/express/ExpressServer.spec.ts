@@ -18,7 +18,7 @@ import {ExpressServer} from './ExpressServer';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
-describe('ExpressAppBuilder', () => {
+describe('ExpressServer', () => {
     
     let server = new ExpressServer();
 
@@ -82,15 +82,15 @@ describe('ExpressAppBuilder', () => {
                         }
                     }
                 })
-                .addController('AuthController', AuthController)
-                .addFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE })
-                .addFilter('LoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
-                .addFilter('AfterLoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
-                .addFilter('UserFilter', new CustomFilter(), { context: BindingContext.VALUE })
-                .addFilter('AdminFilter', new CustomFilter(), { context: BindingContext.VALUE })
-                .addErrorHandler('RootErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
-                .addErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
-                .addErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
+                .setController('AuthController', AuthController)
+                .setFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE })
+                .setFilter('LoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
+                .setFilter('AfterLoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
+                .setFilter('UserFilter', new CustomFilter(), { context: BindingContext.VALUE })
+                .setFilter('AdminFilter', new CustomFilter(), { context: BindingContext.VALUE })
+                .setErrorHandler('RootErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
+                .setErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
+                .setErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
             expressApp = server.getApp();
             server.component<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);

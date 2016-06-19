@@ -33,31 +33,5 @@ export class ExpressApp implements App {
         }
         return this._app;
     }
-
-    listen(): Promise<any> {
-
-        let app = this.getApp();
-
-        return new Promise((resolve: Function, reject: Function) => {
-            this._server = app.listen(
-                this._config.getValue().port,
-                (error: any) => { return error ? reject(error) : resolve(); }
-            )
-        });
-    }
-
-    close(): Promise<any> {
-        return new Promise((resolve: Function, reject: Function) => {
-            if (!this._server) {
-                return resolve();
-            }
-            this._server.close((error: any) => {
-                this._server = null;
-                return error ? reject(error) : resolve();
-            });
-        })
-        .finally(() => {
-            this._app = null;
-        })
-    }
+    
 }

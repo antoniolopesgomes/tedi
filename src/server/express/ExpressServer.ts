@@ -22,11 +22,11 @@ export class ExpressServer extends Module {
     constructor() {
         super();
         this
-            .addComponent('Server', this, { context: BindingContext.VALUE })
-            .addComponent(App, ExpressApp)
-            .addComponent(Router, DefaultRouter)
-            .addComponent(Logger, WinstonLogger)
-            .addComponent(Config, new Config({
+            .setComponent('Server', this, { context: BindingContext.VALUE })
+            .setComponent(App, ExpressApp)
+            .setComponent(Router, DefaultRouter)
+            .setComponent(Logger, WinstonLogger)
+            .setComponent(Config, new Config({
                 port: 8080
             })
             , { context: BindingContext.VALUE });

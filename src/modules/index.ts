@@ -4,5 +4,5 @@ export {
     IModule, 
     BindingContext, 
     BindingOptions,
-    Module
 } from './core';
+export {Module} from './Module';

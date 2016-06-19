@@ -41,8 +41,6 @@ export class RouteDefinition {
     }
 }
 
-const ROUTER_SYMBOL = Symbol('ROUTER');
-
 export abstract class Router {
     abstract getRouterRoot(): RouteDefinition;
     abstract getPathRoute(path: string): RouteDefinition;
