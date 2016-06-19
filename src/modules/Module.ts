@@ -84,7 +84,7 @@ export abstract class Module implements IModule {
             }
             currentModule = currentModule.parentModule;
         }
-        throw new ModuleError(`Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
+        throw new ModuleError(`${(<Object>this).constructor.name} - Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
     filter<T>(abstraction: string | inversify.INewable<Filter<T>>): Filter<T> {
@@ -95,7 +95,7 @@ export abstract class Module implements IModule {
             }
             currentModule = currentModule.parentModule;
         }
-        throw new ModuleError(`Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
+        throw new ModuleError(`${(<Object>this).constructor.name} - Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
     errorHandler(abstraction: string | inversify.INewable<ErrorHandler>): ErrorHandler {
@@ -106,7 +106,7 @@ export abstract class Module implements IModule {
             }
             currentModule = currentModule.parentModule;
         }
-        throw new ModuleError(`Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
+        throw new ModuleError(`${(<Object>this).constructor.name} - Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
     component<T>(abstraction: string | Function | Symbol): T {
@@ -117,7 +117,7 @@ export abstract class Module implements IModule {
             }
             currentModule = currentModule.parentModule;
         }
-        throw new ModuleError(`Could not find component '${(abstraction || '?').toString()}' in the module tree`, null);
+        throw new ModuleError(`${(<Object>this).constructor.name} - Could not find component '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
     childModule(abstraction: string): Module {
