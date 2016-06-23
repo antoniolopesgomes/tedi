@@ -1,4 +1,6 @@
-let NestedError: { new(...args: any[]): Object } = require('nested-error-stacks');
+import {Constructor} from './core';
+
+export const NestedError: Constructor<Object> = require('nested-error-stacks');
 
 export class CustomError extends NestedError {
 

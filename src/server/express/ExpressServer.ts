@@ -31,6 +31,11 @@ export class ExpressServer extends Module {
             , { context: BindingContext.VALUE });
     }
 
+    setConfig(config: Config): ExpressServer {
+        this.setComponent(Config, config, { context: BindingContext.VALUE });
+        return this;
+    }
+
     getApp(): express.Application {
         return this.component<ExpressApp>(App).getApp();
     }

@@ -3,6 +3,8 @@ import {
     Filter,
 } from '../core';
 
+import * as inversify from 'inversify';
+
 export {inject, injectable} from 'inversify';
 
 export enum BindingContext {
