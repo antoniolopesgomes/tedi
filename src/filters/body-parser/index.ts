@@ -1,1 +1,0 @@
-export {BodyParserFilter} from './BodyParserFilter';
