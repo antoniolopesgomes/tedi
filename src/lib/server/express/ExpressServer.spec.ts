@@ -55,7 +55,7 @@ describe('ExpressServer', () => {
 
         beforeEach(() => {
             server
-                .setRoutesDefinition({
+                .setRoutes({
                     "$errorHandlers": ["RootErrorHandler"],
                     "$filters": ["RootFilter"],
                     "/auth": {

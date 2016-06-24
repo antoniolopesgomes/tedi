@@ -53,7 +53,7 @@ describe('DefaultRouter', () => {
 
             beforeEach(() => {
                 server
-                    .setRoutesDefinition({
+                    .setRoutes({
                         "/auth": {
                             "/login": {
                                 "$filters": ["DummyFilter"],
@@ -125,7 +125,7 @@ describe('DefaultRouter', () => {
 
             beforeEach(() => {
                 server
-                    .setRoutesDefinition({
+                    .setRoutes({
                         "/dummy": {
                             "$filters": ["InvalidFilter"]
                         }
@@ -147,7 +147,7 @@ describe('DefaultRouter', () => {
 
             beforeEach(() => {
                 server
-                    .setRoutesDefinition({
+                    .setRoutes({
                         "/dummy": {
                             "$errorHandlers": ["InvalidErrorHandler"]
                         }
@@ -176,7 +176,7 @@ describe('DefaultRouter', () => {
 
         beforeEach(() => {
             server
-                .setRoutesDefinition({
+                .setRoutes({
                     '$filters': [],
                     '/path1': {
                         '$filters': [],

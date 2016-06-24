@@ -32,7 +32,7 @@ describe('Modules', () => {
     class AuthModule extends Module {
         init(): void {
             this
-                .setRoutesDefinition({
+                .setRoutes({
                     '/login': {
                         '$filters': ['RootFilter'],
                         'get': ['AuthController', 'get']
@@ -56,7 +56,7 @@ describe('Modules', () => {
 
         beforeEach(() => {
             server
-                .setRoutesDefinition({
+                .setRoutes({
                     '/auth': 'AuthModule'
                 })
                 .addChildModule('AuthModule', AuthModule);

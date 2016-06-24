@@ -1,16 +1,10 @@
-#tedi
-
-typescript, express, dependency injection
-
-Comprehensible express wrapper, written in typescript, that uses dependency injection to manage an express server.
-
-##Quick start
-
-```javascript
 import * as express from 'express';
 import * as http from 'http';
-import {injectable,  Config} from 'tedi';
-import {ExpressServer} from 'tedi/server';
+import {
+    injectable,
+    Config
+} from '../lib';
+import {ExpressServer} from '../lib/server';
 
 /* INFO
 Create a controller class:
@@ -57,4 +51,3 @@ server
     .then((httpServer: http.Server) => {
         console.log(`Server running at port ${server.getConfig().port}`);
     });
-```

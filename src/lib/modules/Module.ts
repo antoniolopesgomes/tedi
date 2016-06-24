@@ -56,7 +56,7 @@ export abstract class Module implements IModule {
     }
 
     setComponent<T>(
-        abstraction: string | Function | Symbol,
+        abstraction: string | Constructor<T> | Symbol,
         concretion: Constructor<T> | T | typeof Object,
         options?: BindingOptions
     ): Module {
@@ -106,7 +106,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    component<T>(abstraction: string | Function | Symbol): T {
+    component<T>(abstraction: string | Constructor<T> | Symbol): T {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -139,12 +139,12 @@ export abstract class Module implements IModule {
         return this;
     }
 
-    setRoutesDefinition(value: any): Module {
+    setRoutes(value: any): Module {
         setBinding(this._kernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
         return this;
     }
 
-    getRoutesDefinition(): any {
+    getRoutes(): any {
         return this._kernel.get<any>('RoutesDefinition');
     }
 
@@ -152,7 +152,7 @@ export abstract class Module implements IModule {
 
 function getBinding<T>(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<any> | Symbol | Function
+    abstraction: string | Constructor<T> | Symbol
 ): T {
     return kernel.get<T>(<any> abstraction);
 }
@@ -160,7 +160,7 @@ function getBinding<T>(
 //TODO hack to check if a binding is registered in the kernel. Update to inversify RC when it's released
 function hasBinding(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<any> | Symbol | Function
+    abstraction: string | Constructor<any> | Symbol
 ): boolean {
     let kernelLookup = (<any> kernel)._bindingDictionary;
     return kernelLookup.hasKey(abstraction);

@@ -1,21 +1,26 @@
 {
   "name": "tedi",
-  "version": "1.0.0",
+  "version": "0.0.4",
   "description": "Express wrappper written in typescript with dependency injection capabilities",
   "keywords": [
     "express",
     "typescript",
     "di"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antoniolopesgomes/tedi"
+  },
   "main": "index.js",
   "scripts": {
     "test": "node jasmine"
   },
   "author": "António Gomes",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "del": "^2.2.1",
     "gulp": "^3.9.1",
+    "gulp-copy": "0.0.2",
     "gulp-sequence": "^0.4.5",
     "gulp-typescript": "^2.13.6",
     "inversify-dts": "^1.0.1",

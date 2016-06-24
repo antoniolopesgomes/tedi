@@ -32,6 +32,10 @@ export class ExpressServer extends Module {
         return this;
     }
 
+    getConfig(): Config {
+        return this.component<Config>('Config');
+    }
+
     getApp(): express.Application {
         return this.component<ExpressApp>('App').getApp();
     }

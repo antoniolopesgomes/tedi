@@ -81,7 +81,7 @@ export class RouteBuilder {
                     //load it
                     module = module.childModule(rawRouteDefinition);
                     //get the routerDefinition
-                    rawRouteDefinition = module.getRoutesDefinition();
+                    rawRouteDefinition = module.getRoutes();
                 }
                 let childRouteConfig = new RouteDefinition(key);
                 routeConfig.children.push(childRouteConfig);

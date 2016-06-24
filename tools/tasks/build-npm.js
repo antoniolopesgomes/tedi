@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var gTs = require('gulp-typescript');
 var gSeq = require('gulp-sequence');
+var gCopy = require('gulp-copy');
 var merge = require('merge2');
 var del = require('del');
 var fs = require('fs');
@@ -27,7 +28,7 @@ gulp.task('npm:typescript', function () {
     //compile
     var tsResult = gulp
         .src([
-            'src/**/*.ts',
+            'src/lib/**/*.ts',
             'typings/**/*.ts',
             'node_modules/inversify-dts/inversify/**/*.ts'
         ])
@@ -47,6 +48,7 @@ gulp.task('npm:package.json', function () {
         version: packageJson.version,
         description: packageJson.description,
         keywords: packageJson.keywords,
+        repository: packageJson.repository,
         main: 'js/index.js',
         typings: 'definitions/index.d.ts',
         scripts: packageJson.scripts,
@@ -73,8 +75,17 @@ gulp.task('npm:jasmine.json', function () {
     fs.writeFileSync(BUILD_PATH + '/spec/support/jasmine.json', JSON.stringify(jasmineJson, null, 2));
 });
 
+gulp.task('npm:copy-files', function () {
+    return gulp.
+        src([
+            'README.md',
+            'LICENSE'
+        ])
+        .pipe(gCopy(BUILD_PATH));
+});
+
 gulp.task('npm:build', gSeq(
     'npm:clean', 
     'npm:typescript', 
-    ['npm:package.json', 'npm:jasmine.json'])
+    ['npm:package.json', 'npm:jasmine.json', 'npm:copy-files'])
 );
