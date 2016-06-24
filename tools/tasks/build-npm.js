@@ -44,7 +44,9 @@ gulp.task('npm:package.json', function () {
     //
     var buildPackageJson = {
         name: packageJson.name,
+        version: packageJson.version,
         description: packageJson.description,
+        keywords: packageJson.keywords,
         main: 'js/index.js',
         typings: 'definitions/index.d.ts',
         scripts: packageJson.scripts,
