@@ -1,30 +1,31 @@
 {
-  "name": "fullstack-ts-seed",
+  "name": "tedi",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node jasmine-runner"
+    "test": "node jasmine"
   },
   "author": "António Gomes",
   "license": "ISC",
   "devDependencies": {
     "del": "^2.2.1",
     "gulp": "^3.9.1",
+    "gulp-sequence": "^0.4.5",
     "gulp-typescript": "^2.13.6",
     "inversify-dts": "^1.0.1",
     "jasmine": "^2.4.1",
-    "jasmine-promises": "^0.4.1",
     "jasmine-spec-reporter": "^2.5.0",
     "merge2": "^1.0.2",
-    "supertest": "^1.2.0",
-    "supertest-as-promised": "^3.1.0",
+    "mkdirp": "^0.5.1",
     "typescript": "^1.9.0-dev.20160622-1.0",
     "typings": "^1.0.4"
   },
   "dependencies": {
     "bluebird": "^3.4.0",
-    "body-parser": "^1.15.1",
+    "supertest": "^1.2.0",
+    "supertest-as-promised": "^3.1.0",
+    "jasmine-promises": "^0.4.1",
     "express": "^4.13.4",
     "inversify": "^2.0.0-beta.6",
     "lodash": "^4.13.1",

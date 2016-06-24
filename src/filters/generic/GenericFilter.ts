@@ -1,14 +1,13 @@
 
 import * as express from 'express';
-import {Filter} from '../../core';
 import * as Promise from 'bluebird';
+import {Filter} from '../../filters';
 
-export class GenericFilter extends Filter<any> {
+export class GenericFilter implements Filter<any> {
 
     constructor(
         private _requestHandler: express.RequestHandler
     ) {
-        super();
     }
 
     apply(req: express.Request, res: express.Response): any {
@@ -19,7 +18,7 @@ export class GenericFilter extends Filter<any> {
         });
     }
 
-    getData(req: express.Request, res: express.Response): any {
+    getDataFromRequest(req: express.Request): any {
         throw new Error('Filter.getData must be implemented.')
     }
 

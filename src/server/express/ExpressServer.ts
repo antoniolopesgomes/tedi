@@ -1,18 +1,14 @@
-import {
-    Router,
-    App,
-    Logger,
-    Module,
-    BindingContext,
-    injectable,
-    Config
-} from '../../core';
-import {Promise} from '../../extensions';
+import * as express from 'express';
+import * as http from 'http';
+import {Router} from '../../router';
+import {App} from '../../app';
+import {Logger} from '../../logging';
+import {Module, BindingContext, injectable} from '../../modules';
+import {Config} from '../../config';
+import {Promise} from '../../core';
 import {WinstonLoggerFactory} from '../../logging/winston';
 import {DefaultRouter} from '../../router/default';
 import {ExpressApp} from '../../server/express';
-import * as express from 'express';
-import * as http from 'http';
 
 @injectable()
 export class ExpressServer extends Module {
@@ -21,28 +17,28 @@ export class ExpressServer extends Module {
 
     init(): void {
          this
-            .setComponent('Server', this, { context: BindingContext.VALUE })
-            .setComponent(App, ExpressApp)
-            .setComponent(Router, DefaultRouter)
-            .setComponent<Logger>(Logger, WinstonLoggerFactory())
-            .setComponent(Config, new Config({
+            .setComponent<Module>('Server', this, { context: BindingContext.VALUE })
+            .setComponent<App>('App', ExpressApp)
+            .setComponent<Router>('Router', DefaultRouter)
+            .setComponent<Logger>('Logger', WinstonLoggerFactory())
+            .setComponent<Config>('Config', {
                 port: 8080
-            })
+            }
             , { context: BindingContext.VALUE });
     }
 
     setConfig(config: Config): ExpressServer {
-        this.setComponent(Config, config, { context: BindingContext.VALUE });
+        this.setComponent<Config>('Config', config, { context: BindingContext.VALUE });
         return this;
     }
 
     getApp(): express.Application {
-        return this.component<ExpressApp>(App).getApp();
+        return this.component<ExpressApp>('App').getApp();
     }
 
     run(): Promise<http.Server> {
-        let config = this.component<Config>(Config).getValue()
-        let logger = this.component<Logger>(Logger);
+        let config = this.component<Config>('Config');
+        let logger = this.component<Logger>('Logger');
         return new Promise<http.Server>((resolve, reject) => {
             this._server = this.getApp().listen(config.port, (error) => {
                 return error ? reject(error) : resolve(this._server);
@@ -54,7 +50,7 @@ export class ExpressServer extends Module {
     }
 
     stop(): Promise<any> {
-        let logger = this.component<Logger>(Logger);
+        let logger = this.component<Logger>('Logger');
         return new Promise((resolve, reject) => {
             if (!this._server) {
                 logger.debug('#stop called but no running server exists');

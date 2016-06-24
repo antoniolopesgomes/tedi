@@ -7,14 +7,10 @@ import {
     RouteErrorHandler,
     ROUTE_KEYS,
 } from '../core';
-import {
-    injectable, 
-    inject, 
-    Module,
-    Filter,
-    ErrorHandler,
-    Logger
-} from '../../core';
+import {Filter} from '../../filters';
+import {ErrorHandler} from '../../errors';
+import {Logger} from '../../logging';
+import {Module, inject, injectable} from '../../modules';
 
 @injectable()
 export class DefaultRouter implements Router {
@@ -28,7 +24,7 @@ export class DefaultRouter implements Router {
     constructor(
         @inject('RoutesDefinition') routesDefinition: any,
         @inject('Server') serverModule: Module,
-        logger: Logger
+        @inject('Logger') logger: Logger
     ) {
         this._routesDefinition = routesDefinition;
         this._routeBuilder = new RouteBuilder(logger);
@@ -133,9 +129,10 @@ export class RouteBuilder {
 
     getFilters(filterNames: string[], module: Module): RouteFilter[] {
 
-        function validateFilter(name: string, filter: any) {
-            if (!(filter instanceof Filter)) {
-                throwError(`'${name}' must extend from 'Filter'`);
+        function validateFilter(name: string, filter: Filter<any>) {
+            let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
+            if (!hasFilterInterface) {
+                throwError(`'${name}' must implement 'Filter'`);
             }
         }
 
@@ -156,9 +153,10 @@ export class RouteBuilder {
 
     getErrorHandlers(errorHandlersNames: string[], module: Module): RouteErrorHandler[] {
 
-        function validateErrorHandler(name: string, errorHandler: any) {
-            if (!(errorHandler instanceof ErrorHandler)) {
-                throwError(`'${name}' must extend from 'ErrorHandler'`);
+        function validateErrorHandler(name: string, errorHandler: ErrorHandler) {
+            let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
+            if (!hasErrorHandlerInterface) {
+                throwError(`'${name}' must implement 'ErrorHandler'`);
             }
         }
 

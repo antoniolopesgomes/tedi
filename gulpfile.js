@@ -1,1 +1,1 @@
-require('./tools/tasks/npm');
+require('./tools/tasks/build-npm');

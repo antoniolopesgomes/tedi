@@ -11,10 +11,10 @@ export enum LoggerLevels {
     DEBUG
 }
 
-export abstract class Logger {
-    abstract warn(msg: string): void;
-    abstract info(msg: string): void;
-    abstract error(msg: string, err: any): void;
-    abstract debug(msg: any): void;
-    abstract setLevel(leven: any);
+export interface Logger {
+    warn(msg: string): void;
+    info(msg: string): void;
+    error(msg: string, err: any): void;
+    debug(msg: any): void;
+    setLevel(leven: any);
 }

@@ -1,14 +1,11 @@
 'use strict';
 import * as express from 'express';
 import * as http from 'http';
-import {
-    Config,
-    App,
-    inject,
-    injectable,
-    Logger
-} from '../../core';
-import {Promise} from '../../extensions';
+import {Config} from '../../config';
+import {App} from '../../app';
+import {inject, injectable} from '../../modules';
+import {Logger} from '../../logging';
+import {Promise} from '../../core';
 import {RouteDefinition, Router, RouteAction} from '../../router';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
 
@@ -20,9 +17,9 @@ export class ExpressApp implements App {
     private _appBuilder: ExpressAppBuilder;
 
     constructor(
-        private _config: Config,
-        private _logger: Logger,
-        private _router: Router
+        @inject('Config') private _config: Config,
+        @inject('Logger') private _logger: Logger,
+        @inject('Router') private _router: Router
     ) {
         this._appBuilder = new ExpressAppBuilder(this._logger);
     }

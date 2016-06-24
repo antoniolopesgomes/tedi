@@ -1,1 +1,3 @@
-export {App} from './core';
+'use strict';
+
+export interface App { }

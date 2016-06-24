@@ -1,13 +1,11 @@
+import * as express from 'express';
+import {BindingContext, injectable} from '../../modules';
+import {Filter} from '../../filters';
+import {ErrorHandler} from '../../errors';
 import {
-    injectable, 
-    BindingContext,
-    Filter,
-    ErrorHandler,
-} from '../../core';
-import {
-    RouteDefinition, 
-    Router, 
-    RouteAction, 
+    RouteDefinition,
+    Router,
+    RouteAction,
     RoutesDefinition
 } from '../../router';
 import {DefaultRouter} from '../../router/default';
@@ -43,10 +41,15 @@ describe('DefaultRouter', () => {
             }
 
             @injectable()
-            class DummyFilterMock extends Filter<any> { }
+            class DummyFilterMock implements Filter<any> {
+                apply(req: express.Request, res: express.Response): any { }
+                getDataFromRequest(req: express.Request): any { }
+            }
 
             @injectable()
-            class DummyErrorHandler extends ErrorHandler { }
+            class DummyErrorHandler implements ErrorHandler {
+                catch(error:any, req: express.Request, res: express.Response): void {}
+             }
 
             beforeEach(() => {
                 server
@@ -63,7 +66,7 @@ describe('DefaultRouter', () => {
                     .setController('AuthController', AuthControllerMock)
                     .setErrorHandler('DummyErrorHandler', DummyErrorHandler);
 
-                routeConfig = server.component<Router>(Router).getRouterRoot();
+                routeConfig = server.component<Router>('Router').getRouterRoot();
             })
 
             it('first node should be the ROOT / ', () => {
@@ -131,8 +134,8 @@ describe('DefaultRouter', () => {
             })
 
             it('should throw a FilterError', () => {
-                expect(() => { server.component<Router>(Router).getRouterRoot() })
-                    .toThrowError(`Router: 'InvalidFilter' must extend from 'Filter'`);
+                expect(() => { server.component<Router>('Router').getRouterRoot() })
+                    .toThrowError(`Router: 'InvalidFilter' must implement 'Filter'`);
             })
 
         })
@@ -153,8 +156,8 @@ describe('DefaultRouter', () => {
             })
 
             it('should throw an ErrorHandlerError', () => {
-                expect(() => { server.component<Router>(Router).getRouterRoot() })
-                    .toThrowError(`Router: 'InvalidErrorHandler' must extend from 'ErrorHandler'`);
+                expect(() => { server.component<Router>('Router').getRouterRoot() })
+                    .toThrowError(`Router: 'InvalidErrorHandler' must implement 'ErrorHandler'`);
             })
 
         })
@@ -193,7 +196,7 @@ describe('DefaultRouter', () => {
                 .setController('Path111Controller', BaseController)
                 .setController('Path2Controller', BaseController);
 
-            router = server.component<Router>(Router);
+            router = server.component<Router>('Router');
         })
 
         it('/ should be defined', () => {

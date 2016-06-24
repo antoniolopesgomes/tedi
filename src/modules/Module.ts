@@ -1,20 +1,17 @@
-import 'reflect-metadata';
 import * as inversify from 'inversify';
-import {
-    ErrorHandler,
-    Filter,
-} from '../core';
+import {Filter} from '../filters';
+import {ErrorHandler} from '../errors';
+import {Constructor, CustomError} from '../core';
 import {
     IModule,
     BindingOptions,
     BindingContext
 } from './core';
-import { CustomError } from '../extensions';
 
 export abstract class Module implements IModule {
 
     private _parentModule: Module;
-    private _kernel: inversify.IKernel;
+    private _kernel: inversify.interfaces.Kernel;
     private _modules: Map<string, Module>;
 
     constructor(parentModule?: Module) {
@@ -32,8 +29,8 @@ export abstract class Module implements IModule {
     }
 
     setController<T>(
-        abstraction: string | inversify.INewable<T>,
-        concretion: inversify.INewable<T> | T,
+        abstraction: string | Constructor<T>,
+        concretion: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -41,8 +38,8 @@ export abstract class Module implements IModule {
     }
 
     setFilter<T>(
-        abstraction: string | inversify.INewable<Filter<T>>,
-        concretion: inversify.INewable<Filter<T>> | Filter<T>,
+        abstraction: string | Constructor<Filter<T>>,
+        concretion: Constructor<Filter<T>> | Filter<T>,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -50,8 +47,8 @@ export abstract class Module implements IModule {
     }
 
     setErrorHandler(
-        abstraction: string | inversify.INewable<ErrorHandler>,
-        concretion: inversify.INewable<ErrorHandler> | ErrorHandler,
+        abstraction: string | Constructor<ErrorHandler>,
+        concretion: Constructor<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -60,7 +57,7 @@ export abstract class Module implements IModule {
 
     setComponent<T>(
         abstraction: string | Function | Symbol,
-        concretion: inversify.INewable<T> | T | typeof Object,
+        concretion: Constructor<T> | T | typeof Object,
         options?: BindingOptions
     ): Module {
         //TODO check for this any casts
@@ -70,13 +67,13 @@ export abstract class Module implements IModule {
 
     addChildModule(
         name: string,
-        ModuleClass: inversify.INewable<Module>
+        ModuleClass: Constructor<Module>
     ): Module {
         setBinding(this._kernel, name, new ModuleClass(this), { context: BindingContext.VALUE });
         return this;
     }
 
-    controller<T>(abstraction: string | inversify.INewable<T>): T {
+    controller<T>(abstraction: string | Constructor<T>): T {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -87,7 +84,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    filter<T>(abstraction: string | inversify.INewable<Filter<T>>): Filter<T> {
+    filter<T>(abstraction: string | Constructor<Filter<T>>): Filter<T> {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -98,7 +95,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    errorHandler(abstraction: string | inversify.INewable<ErrorHandler>): ErrorHandler {
+    errorHandler(abstraction: string | Constructor<ErrorHandler>): ErrorHandler {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -154,40 +151,40 @@ export abstract class Module implements IModule {
 }
 
 function getBinding<T>(
-    kernel: inversify.IKernel,
-    abstraction: string | inversify.INewable<any> | Symbol | Function
+    kernel: inversify.interfaces.Kernel,
+    abstraction: string | Constructor<any> | Symbol | Function
 ): T {
     return kernel.get<T>(<any> abstraction);
 }
 
 //TODO hack to check if a binding is registered in the kernel. Update to inversify RC when it's released
 function hasBinding(
-    kernel: inversify.IKernel,
-    abstraction: string | inversify.INewable<any> | Symbol | Function
+    kernel: inversify.interfaces.Kernel,
+    abstraction: string | Constructor<any> | Symbol | Function
 ): boolean {
     let kernelLookup = (<any> kernel)._bindingDictionary;
     return kernelLookup.hasKey(abstraction);
 }
 
 function unbindFromKernel(
-    kernel: inversify.IKernel,
-    abstraction: string | inversify.INewable<any> | Symbol
+    kernel: inversify.interfaces.Kernel,
+    abstraction: string | Constructor<any> | Symbol
 ): void {
     kernel.unbind(abstraction);
 }
 
 function bindToKernel<T>(
-    kernel: inversify.IKernel,
-    abstraction: string | inversify.INewable<T> | Symbol,
-    concretion: inversify.INewable<T> | T,
+    kernel: inversify.interfaces.Kernel,
+    abstraction: string | Constructor<T> | Symbol,
+    concretion: Constructor<T> | T,
     options: BindingOptions = { context: BindingContext.SINGLETON }
 ): void {
     switch (options.context) {
         case BindingContext.SINGLETON:
-            kernel.bind<T>(abstraction).to(<inversify.INewable<T>>concretion).inSingletonScope();
+            kernel.bind<T>(abstraction).to(<Constructor<T>>concretion).inSingletonScope();
             break;
         case BindingContext.TRANSIENT:
-            kernel.bind<T>(abstraction).to(<inversify.INewable<T>>concretion)
+            kernel.bind<T>(abstraction).to(<Constructor<T>>concretion)
             break;
         case BindingContext.VALUE:
             kernel.bind<T>(abstraction).toConstantValue(<T>concretion);
@@ -198,9 +195,9 @@ function bindToKernel<T>(
 }
 
 function setBinding<T>(
-    kernel: inversify.IKernel,
-    abstraction: string | inversify.INewable<T>,
-    concretion: inversify.INewable<T> | T,
+    kernel: inversify.interfaces.Kernel,
+    abstraction: string | Constructor<T>,
+    concretion: Constructor<T> | T,
     options?: BindingOptions
 ): void {
     if (hasBinding(kernel, abstraction)) {

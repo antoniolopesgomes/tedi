@@ -1,12 +1,7 @@
-import {
-    App,
-    Filter,
-    Module,
-    BindingContext,
-    inject,
-    injectable,
-    Logger
-} from '../core';
+import {App} from '../app';
+import {Filter} from '../filters';
+import {Logger} from '../logging';
+import {Module, BindingContext, inject, injectable} from '../modules';
 import {ExpressServer, ExpressApp} from '../server/express';
 
 import * as express from 'express';
@@ -24,7 +19,14 @@ describe('Modules', () => {
     }
 
     @injectable()
-    class CustomFilter extends Filter<any> { }
+    class CustomFilter implements Filter<any> {
+        apply(req: express.Request, res: express.Response): any {
+
+        }
+        getDataFromRequest(req: express.Request): any {
+            
+        }
+    }
 
     @injectable()
     class AuthModule extends Module {
@@ -59,7 +61,7 @@ describe('Modules', () => {
                 })
                 .addChildModule('AuthModule', AuthModule);
 
-            app = server.component<ExpressApp>(<any>App).getApp();
+            app = server.component<ExpressApp>('App').getApp();
             authModule = server.childModule('AuthModule');
         });
 
@@ -92,7 +94,7 @@ describe('Modules', () => {
                 expect(authModule).toEqual(jasmine.any(AuthModule));
             });
             it('childModule should have access to root module dependencies', () => {
-                expect(authModule.component(Logger)).toEqual(jasmine.any(Logger));
+                expect(authModule.component<Logger>('Logger')).not.toBeNull();
             });
 
             describe('and override an internal component', () => {

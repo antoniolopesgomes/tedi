@@ -1,8 +1,6 @@
 'use strict';
-import {
-    Filter,
-    ErrorHandler
-} from '../core';
+import {Filter} from '../filters';
+import {ErrorHandler} from '../errors';
 
 export interface RouteAction {
     controller: Object;
@@ -31,7 +29,7 @@ export class RouteDefinition {
     put: RouteAction;
     //data
     data: any;
-    
+
     constructor(path: string) {
         this.path = path;
         this.filters = [];
@@ -41,19 +39,19 @@ export class RouteDefinition {
     }
 }
 
-export abstract class Router {
-    abstract getRouterRoot(): RouteDefinition;
-    abstract getPathRoute(path: string): RouteDefinition;
-    abstract getPathAction(path: string, method: string): RouteAction;
+export interface Router {
+    getRouterRoot(): RouteDefinition;
+    getPathRoute(path: string): RouteDefinition;
+    getPathAction(path: string, method: string): RouteAction;
 }
 
 export interface RoutesDefinition {
-    
+
 }
 
 export const ROUTE_KEYS: any = {
     'FILTERS': '$filters',
-    'ERROR_HANDLERS': '$errorHandlers' 
+    'ERROR_HANDLERS': '$errorHandlers'
 }
 
 function throwError(message: string): void {

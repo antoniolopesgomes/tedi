@@ -1,10 +1,8 @@
 import * as express from 'express';
-import {CustomError} from '../extensions';
+import {CustomError} from '../core';
 
-export class ErrorHandler {
-    catch(error:any, req: express.Request, res: express.Response): void {
-        throw new Error('ErrorHandler.catch must be implemented.')
-    }
+export interface ErrorHandler {
+    catch(error:any, req: express.Request, res: express.Response): void;
 }
 
 export class ErrorHandlerError extends CustomError {

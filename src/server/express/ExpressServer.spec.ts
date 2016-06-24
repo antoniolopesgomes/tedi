@@ -1,25 +1,17 @@
-
-import {
-    App,
-    Router, 
-    Logger, 
-    LoggerLevels, 
-    Module, 
-    Filter, 
-    FilterError, 
-    ActionError,
-    ErrorHandler, 
-    inject, 
-    injectable, 
-    BindingContext
-} from '../../core';
+import {inject, injectable, BindingContext} from '../../modules';
+import {Router} from '../../router';
+import {Logger, LoggerLevels} from '../../logging';
+import {Filter, FilterError} from '../../filters';
+import {ErrorHandler, ErrorHandlerError} from '../../errors';
+import {ActionError} from '../../controllers';
+import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 import {ExpressApp} from './ExpressApp';
 import {ExpressServer} from './ExpressServer';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
 describe('ExpressServer', () => {
-    
+
     let server = new ExpressServer();
 
     @injectable()
@@ -36,12 +28,13 @@ describe('ExpressServer', () => {
     }
 
     @injectable()
-    class CustomFilter extends Filter<any> {
-        apply(req, res): void { return; }
+    class CustomFilter implements Filter<any> {
+        apply(req: express.Request, res: express.Response): any { }
+        getDataFromRequest(req: express.Request): any { }
     }
 
     @injectable()
-    class CustomErrorHandler extends ErrorHandler { 
+    class CustomErrorHandler implements ErrorHandler {
         catch(err: any) {
             throw err;
         }
@@ -93,7 +86,7 @@ describe('ExpressServer', () => {
                 .setErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
             expressApp = server.getApp();
-            server.component<Logger>(Logger).setLevel(LoggerLevels.EMERGENCY);
+            server.component<Logger>('Logger').setLevel(LoggerLevels.EMERGENCY);
         })
 
         describe('GET /auth/login', () => {
@@ -107,7 +100,7 @@ describe('ExpressServer', () => {
                 spyOn(server.filter('AfterLoginFilter'), 'apply').and.callThrough();
                 spyOn(server.filter('AdminFilter'), 'apply').and.callThrough();
 
-                server.component<Logger>(Logger).setLevel(LoggerLevels.DEBUG);
+                server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
 
                 return request(expressApp).get('/auth/login')
                     .expect(200)

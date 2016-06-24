@@ -7,10 +7,11 @@
         "sourceMap": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "outDir": "./dist/release"
+        "outDir": "./dist/build"
     },
     "exclude": [
         "node_modules",
-        "typings"
+        "typings",
+        "dist"
     ]
 }

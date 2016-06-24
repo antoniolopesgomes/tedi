@@ -1,4 +1,4 @@
-import {Constructor} from './core';
+import {Constructor} from './interfaces';
 
 export const NestedError: Constructor<Object> = require('nested-error-stacks');
 

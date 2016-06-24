@@ -12,12 +12,11 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
     };
 
     @injectable()
-    class WinstonLogger extends Logger {
+    class WinstonLogger implements Logger {
 
         private _logger: winston.LoggerInstance;
 
         constructor() {
-            super();
             this._logger = new winston.Logger(cfg);
             //set syslog levels
             this._logger.setLevels((<any>winston).config.syslog.levels);
