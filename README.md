@@ -51,7 +51,7 @@ server
             "delete": ["UserController", "delete"],
         }
     })
-    .setController('UserController', UserController)
+    .setController('UserController', UserController);
 
 //Run server
 server
@@ -72,6 +72,8 @@ You should avoid sending data from a filter (e.g. res.send()), that's the contro
 We can make use of the various express middleware modules that already exist:
 ```javascript
 import {injectable, Filter, ExpressUtils} from 'tedi';
+//npm install body-parser --save
+let bodyParser = require('body-parser');
 /* INFO
 - Filters must implement the Filter<T> interface.
 - Like any other component they must be decorated with @injectable()
@@ -101,29 +103,35 @@ server
             "post": ["UserController", "create"],
             "get": ["UserController", "read"],
             "put": ["UserController", "update"],
-            "delete": ["UserController", "delete"],
+            "delete": ["UserController", "delete"]
         }
     })
-    .setFilter("JsonBodyParserFilter", JsonBodyParserFilter);
-    .setController('UserController', UserController)
+    .setFilter("JsonBodyParserFilter", JsonBodyParserFilter)
+    .setController('UserController', UserController);
 ```
 If you want a more genreal body parser you can create a scoped filter class:
 ```javascript
+import * as express from 'express';
+import {Constructor} from 'tedi/core';
+import {Filter, ExpressUtils} from 'tedi';
+
+let bodyParser = require('body-parser');
+
 function BodyParserFilterFactory(type: string, opts: any): Constructor<Filter<any>> {
 
     let bodyParserMiddleware: any;
     switch(type.toUpperCase()) {
         case 'JSON':
-            bodyParser.json(opts);
+            bodyParserMiddleware = bodyParser.json(opts);
         break;
         case 'RAW':
-            bodyParser.raw(opts);
+            bodyParserMiddleware = bodyParser.raw(opts);
         break;
         case 'TEXT':
-            bodyParser.text(opts);
+            bodyParserMiddleware = bodyParser.text(opts);
         break;
         case 'URLENCODED':
-            bodyParser.urlencoded(opts);
+            bodyParserMiddleware = bodyParser.urlencoded(opts);
         break;
     }
 
@@ -138,7 +146,6 @@ function BodyParserFilterFactory(type: string, opts: any): Constructor<Filter<an
     }
 
     return BodyParserFilter;
-
 }
 ```
 And use it like this:
@@ -150,11 +157,11 @@ server
             "post": ["UserController", "create"],
             "get": ["UserController", "read"],
             "put": ["UserController", "update"],
-            "delete": ["UserController", "delete"],
+            "delete": ["UserController", "delete"]
         }
     })
-    .setFilter("JsonBodyParserFilter", BodyParserFilterFactory('json', { inflate: false }));
-    .setController('UserController', UserController)
+    .setFilter("JsonBodyParserFilter", BodyParserFilterFactory('json', { inflate: false }))
+    .setController('UserController', UserController);
 ```
 Filters are always called in an ascending order, from root to node.
 For example:
@@ -179,5 +186,72 @@ If we call -> POST: /user - the component order would be:
 
 FirstFilter -> SecondFilter -> ThirdFilter -> UserController.create
 
+#Error Handlers
 
+You can add error handlers to any route. ErrorHandlers are classes that wrap the concept of an express middleware
+that deals with errors.
+They are responsible for managing any error that happened in a filter or controller.
+
+```javascript
+import * as express from 'express';
+import {injectable, ErrorHandler} from 'tedi';
+/* INFO
+- ErrorHandlers must implement the ErrorHandler interface.
+- Like any other component they must be decorated with @injectable()
+*/
+@injectable()
+class CustomErrorHandler implements ErrorHandler {
+    catch(error:any, req: express.Request, res: express.Response): void {
+        //deal with the error
+        console.log(error);
+        res.status(500).send('Error: ' + error.message);
+        //if you want the error to bubble up just throw it again
+        //throw error;
+        //or wrap it in a custom error before bubbling up
+        //throw new CustomError(error);
+    }
+}
+```
+And then you can add it to the server:
+```javascript
+server
+    .setRoutes({
+        "$filters": ["JsonBodyParserFilter"],
+        "$errorHandlers": ["RootErrorHandler"],
+        "/user": {
+            //you could add it here, in this case only the errors of this route will be handled by this ErrorHandler
+            //"$errorHandlers": ["RootErrorHandler"]
+            "post": ["UserController", "create"],
+            "get": ["UserController", "read"],
+            "put": ["UserController", "update"],
+            "delete": ["UserController", "delete"],
+        }
+    })
+    .setFilter("JsonBodyParserFilter", JsonBodyParserFilter)
+    .setController('UserController', UserController)
+    .setErrorHandler('RootErrorHandler', CustomErrorHandler);
+```
+ErrorHandlers are always called in an descending order, from node to root.
+For example:
+```javascript
+{
+    "$errorHandlers": ["FirstErrorHandler"],
+    "/user": {
+        "$errorHandlers": ["SecondErrorHandler", "ThirdErrorHandler"],
+        "post": ["UserController", "create"],
+        "/details": {
+            "$errorHandlers": ["FourthErrorHandler"]
+            "get": ["UserDetailsController", "read"]
+        }
+    }
+}
+```
+If we call -> GET: /user/details - and UserDetailsController.read throws an error, the order will be like this: 
+
+FourthErrorHandler -> ThirdErrorHandler -> SecondErrorHandler -> FirstErrorHandler
+
+It is the responsability of the error handler to deal with the error, so if the FourthErrorHandler threw an an error
+the ThirdErrorHandler would be called. If this handler does not rethrow an error then the flow would end here. This
+handler would need to send a response back or else the connection would become pending and eventually the client
+would disconnect. 
 

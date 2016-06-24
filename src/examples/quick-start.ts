@@ -5,6 +5,7 @@ import {
     Config,
     Filter,
     ExpressUtils,
+    ErrorHandler
 } from '../lib';
 import {Constructor} from '../lib/core';
 import {ExpressServer} from '../lib/server';
@@ -74,6 +75,20 @@ function BodyParserFilterFactory(type: string, opts: any): Constructor<Filter<an
 
     return BodyParserFilter;
 
+}
+
+//ERRORS
+class CustomErrorHandler implements ErrorHandler {
+    catch(error:any, req: express.Request, res: express.Response): void {
+        //deal with the error
+        console.log(error);
+        //send response
+        res.status(500).send('Error: ' + error.message);
+        //if you want the error to bubble up just throw it again
+        //throw error;
+        //or wrap it in a custom error before sending
+        //throw new Error('CustomErrorHandler: ' + error.message);
+    }
 }
 
 //Create server
