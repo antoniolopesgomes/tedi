@@ -5,30 +5,26 @@ typescript, express, dependency injection
 Comprehensible express wrapper, written in typescript, that uses dependency injection to manage an express server.
 
 ##Typescript  
-Your tsconfig.json must have the following properties:
+Your tsconfig.json must have the following properties (these are used by the di engine):
 ```javascript
 "compilerOptions": {
-    "target": "es6",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
 },
 ```
-tedi is compiled in ES6.  
-##Node
-version: 6.2.0 (covers 93% of the ES6 spec)
 
 ##Typings
-```bash
-#install typings  
-npm install typings -g
-
-#initialize typings  
-typings init
-
-#install node definitions  
+install and initialize typings 
+```bash 
+$ npm install typings -g
+$ typings init
+```
+install node definitions  
+```bash 
 typings install dt~node --global
-
-#install express definitions  
+```
+install express definitions
+```bash
 typings install dt~express --global
 typings install dt~express-serve-static-core --global
 typings install dt~serve-static --global
