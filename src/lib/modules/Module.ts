@@ -28,7 +28,7 @@ export abstract class Module implements IModule {
     }
 
     setController<T>(
-        abstraction: string | Constructor<T> | Symbol,
+        abstraction: string | Constructor<T>,
         concretion: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
@@ -37,7 +37,7 @@ export abstract class Module implements IModule {
     }
 
     setFilter<T>(
-        abstraction: string | Constructor<Filter<T>> | Symbol,
+        abstraction: string | Constructor<Filter<T>>,
         concretion: Constructor<Filter<T>> | Filter<T>,
         options?: BindingOptions
     ): Module {
@@ -46,7 +46,7 @@ export abstract class Module implements IModule {
     }
 
     setErrorHandler(
-        abstraction: string | Constructor<ErrorHandler> | Symbol,
+        abstraction: string | Constructor<ErrorHandler>,
         concretion: Constructor<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
     ): Module {
@@ -55,7 +55,7 @@ export abstract class Module implements IModule {
     }
 
     setComponent<T>(
-        abstraction: string | Constructor<T> | Symbol,
+        abstraction: string | Constructor<T>,
         concretion: Constructor<T> | T | typeof Object,
         options?: BindingOptions
     ): Module {
@@ -72,7 +72,7 @@ export abstract class Module implements IModule {
         return this;
     }
 
-    controller<T>(abstraction: string | Constructor<T> | Symbol): T {
+    controller<T>(abstraction: string | Constructor<T>): T {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -83,7 +83,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    filter<T>(abstraction: string | Constructor<Filter<T>> | Symbol): Filter<T> {
+    filter<T>(abstraction: string | Constructor<Filter<T>>): Filter<T> {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -94,7 +94,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    errorHandler(abstraction: string | Constructor<ErrorHandler> | Symbol): ErrorHandler {
+    errorHandler(abstraction: string | Constructor<ErrorHandler>): ErrorHandler {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -105,7 +105,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    component<T>(abstraction: string | Constructor<T> | Symbol): T {
+    component<T>(abstraction: string | Constructor<T>): T {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -151,28 +151,28 @@ export abstract class Module implements IModule {
 
 function getBinding<T>(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T> | Symbol
+    abstraction: string | Constructor<T>
 ): T {
     return kernel.get<T>(<any> abstraction);
 }
 
 function hasBinding(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<any> | Symbol
+    abstraction: string | Constructor<any>
 ): boolean {
     return kernel.isBound(abstraction);
 }
 
 function unbindFromKernel(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<any> | Symbol
+    abstraction: string | Constructor<any>
 ): void {
     kernel.unbind(abstraction);
 }
 
 function bindToKernel<T>(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T> | Symbol,
+    abstraction: string | Constructor<T>,
     concretion: Constructor<T> | T,
     options: BindingOptions = { context: BindingContext.SINGLETON }
 ): void {
@@ -193,7 +193,7 @@ function bindToKernel<T>(
 
 function setBinding<T>(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T> | Symbol,
+    abstraction: string | Constructor<T>,
     concretion: Constructor<T> | T,
     options?: BindingOptions
 ): void {
