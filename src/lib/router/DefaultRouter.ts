@@ -17,7 +17,7 @@ export class DefaultRouter implements Router {
 
     private _routesDefinition: any;
     private _root: RouteDefinition;
-    private _routingTable: Map<string, RouteDefinition>;
+    private _routingTable: {[key: string]: RouteDefinition};
     private _routeBuilder: RouteBuilder;
     private _routingTableBuilder: RoutingTableBuilder;
 
@@ -39,12 +39,12 @@ export class DefaultRouter implements Router {
     }
 
     getPathRoute(path: string): RouteDefinition {
-        let route = this._routingTable.get(path);
+        let route = this._routingTable[path];
         return route || null;
     }
 
     getPathAction(path: string, method: string): RouteAction {
-        let route = this._routingTable.get(path);
+        let route = this._routingTable[path];
         if (!route) {
             return null;
         }
@@ -74,7 +74,7 @@ export class RouteBuilder {
 
     buildRouteDefinition(routes: any, routeConfig: RouteDefinition, module: Module): void {
         Object.keys(routes).forEach((key: string) => {
-            if (key.startsWith('/')) {
+            if (key.indexOf('/') === 0) {
                 let rawRouteDefinition = routes[key];
                 //if we're deling with a module (string value)
                 if (_.isString(rawRouteDefinition)) {
@@ -183,18 +183,18 @@ export class RoutingTableBuilder {
         private _logger: Logger
     ) { }
 
-    getRoutingTable(route: RouteDefinition): Map<string, RouteDefinition> {
-        let routingTable = new Map<string, RouteDefinition>();
+    getRoutingTable(route: RouteDefinition): {[key: string]: RouteDefinition} {
+        let routingTable = {};
         let currentPath = '';
         this.setRoutingTableForRoute(currentPath, route, routingTable);
         return routingTable;
     }
 
-    setRoutingTableForRoute(currentPath: string, route: RouteDefinition, routingTable: Map<string, RouteDefinition>) {
+    setRoutingTableForRoute(currentPath: string, route: RouteDefinition, routingTable: {[key: string]: RouteDefinition}) {
         currentPath += route.path;
         //remove double slashes
         currentPath = currentPath.replace('//', '/');
-        routingTable.set(currentPath, route);
+        routingTable[currentPath] = route;
         route.children.forEach((childRoute: RouteDefinition) => {
             this.setRoutingTableForRoute(currentPath, childRoute, routingTable);
         });

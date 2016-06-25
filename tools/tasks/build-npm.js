@@ -11,7 +11,7 @@ var mkdirp = require('mkdirp');
 
 const TSCONFIG = '../../tsconfig.json'
 const PACKAGE_JSON = '../../package.json'
-const BUILD_PATH = 'dist';
+const BUILD_PATH = 'dist/npm';
 
 gulp.task('npm:clean', function () {
     return del([

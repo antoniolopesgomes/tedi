@@ -46,6 +46,6 @@ export interface IModule {
 
 export class ModuleError extends CustomError {
     constructor(module: IModule, msg: string, error: any) {
-        super(`${(<Object>module).constructor.name} - ${msg}`, error);
+        super(`${(<any>module.constructor).name} - ${msg}`, error);
     }
 }

@@ -13,12 +13,10 @@ export abstract class Module implements IModule {
 
     private _parentModule: Module;
     private _kernel: inversify.interfaces.Kernel;
-    private _modules: Map<string, Module>;
 
     constructor(parentModule?: Module) {
         this._parentModule = parentModule;
         this._kernel = new inversify.Kernel();
-        this._modules = new Map<string, Module>();
         //initialize
         this.init();
     }
