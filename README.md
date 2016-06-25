@@ -9,7 +9,7 @@ Comprehensible express wrapper, written in typescript, that uses dependency inje
 ```javascript
 import * as express from 'express';
 import * as http from 'http';
-import {injectable,  Config} from 'tedi';
+import {injectable, Config} from 'tedi/core';
 import {ExpressServer} from 'tedi/server';
 
 /* INFO
@@ -74,7 +74,8 @@ You should avoid sending data from a filter (e.g. res.send()), that's the contro
 
 We can make use of the various express middleware modules that already exist:
 ```javascript
-import {injectable, Filter, ExpressUtils} from 'tedi';
+import {injectable, Filter} from 'tedi/core';
+import {ExpressUtils} from 'tedi/utils';
 //npm install body-parser --save
 let bodyParser = require('body-parser');
 /* INFO
@@ -115,8 +116,8 @@ server
 If you want a more genreal body parser you can create a scoped filter class:
 ```javascript
 import * as express from 'express';
-import {Constructor} from 'tedi/core';
-import {Filter, ExpressUtils} from 'tedi';
+import {Constructor, Filter} from 'tedi/core';
+import {ExpressUtils} from 'tedi/utils';
 
 let bodyParser = require('body-parser');
 
@@ -197,7 +198,7 @@ They are responsible for managing any error that happened in a filter or control
 
 ```javascript
 import * as express from 'express';
-import {injectable, ErrorHandler} from 'tedi';
+import {injectable, ErrorHandler} from 'tedi/core';
 /* INFO
 - ErrorHandlers must implement the ErrorHandler interface.
 - Like any other component they must be decorated with @injectable()

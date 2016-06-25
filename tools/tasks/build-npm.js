@@ -63,7 +63,7 @@ gulp.task('npm:package.json', function () {
 
 gulp.task('npm:jasmine.json', function () {
     var jasmineJson = {
-        "spec_dir": "js",
+        "spec_dir": "test",
         "spec_files": [
             "**/*[sS]pec.js"
         ],

@@ -4,10 +4,10 @@ import {
     injectable,
     Config,
     Filter,
-    ExpressUtils,
     ErrorHandler,
-    Constructor
+    Constructor,
 } from '../core';
+import {ExpressUtils} from '../utils';
 import {Logger, LoggerLevels} from '../logger';
 import {ExpressServer} from '../server';
 
