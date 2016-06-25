@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var gTs = require('gulp-typescript');
-var gCopy = require('gulp-copy');
 var gSeq = require('gulp-sequence');
 var gCopy = require('gulp-copy');
 var merge = require('merge2');
@@ -41,26 +40,6 @@ gulp.task('npm:typescript', function () {
     ]);
 });
 
-gulp.task('npm:package.json', function () {
-    /*var packageJson = require(PACKAGE_JSON);
-    //
-    var buildPackageJson = {
-        name: packageJson.name,
-        version: packageJson.version,
-        description: packageJson.description,
-        keywords: packageJson.keywords,
-        repository: packageJson.repository,
-        main: 'js/index.js',
-        typings: 'definitions/index.d.ts',
-        scripts: packageJson.scripts,
-        author: packageJson.author,
-        license: packageJson.license,
-        dependencies: packageJson.dependencies
-    };*/
-    //save
-    fs.writeFileSync(BUILD_PATH + '/package.json', JSON.stringify(require(PACKAGE_JSON), null, 2));
-});
-
 gulp.task('npm:jasmine.json', function () {
     var jasmineJson = {
         "spec_dir": "test",
@@ -79,6 +58,7 @@ gulp.task('npm:jasmine.json', function () {
 gulp.task('npm:copy-files', function () {
     return gulp.
         src([
+            'package.json',
             'README.md',
             'LICENSE'
         ])
@@ -95,5 +75,5 @@ gulp.task('npm:copy', function () {
 gulp.task('npm:build', gSeq(
     'npm:clean', 
     'npm:typescript', 
-    ['npm:package.json', 'npm:jasmine.json', 'npm:copy-files'])
+    ['npm:copy-files', 'npm:jasmine.json'])
 );
