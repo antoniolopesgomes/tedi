@@ -4,6 +4,7 @@ import {ErrorHandler} from '../errors';
 import {Constructor, CustomError} from '../core';
 import {
     IModule,
+    ModuleError,
     BindingOptions,
     BindingContext
 } from './core';
@@ -29,7 +30,7 @@ export abstract class Module implements IModule {
     }
 
     setController<T>(
-        abstraction: string | Constructor<T>,
+        abstraction: string | Constructor<T> | Symbol,
         concretion: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
@@ -38,7 +39,7 @@ export abstract class Module implements IModule {
     }
 
     setFilter<T>(
-        abstraction: string | Constructor<Filter<T>>,
+        abstraction: string | Constructor<Filter<T>> | Symbol,
         concretion: Constructor<Filter<T>> | Filter<T>,
         options?: BindingOptions
     ): Module {
@@ -47,7 +48,7 @@ export abstract class Module implements IModule {
     }
 
     setErrorHandler(
-        abstraction: string | Constructor<ErrorHandler>,
+        abstraction: string | Constructor<ErrorHandler> | Symbol,
         concretion: Constructor<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
     ): Module {
@@ -73,7 +74,7 @@ export abstract class Module implements IModule {
         return this;
     }
 
-    controller<T>(abstraction: string | Constructor<T>): T {
+    controller<T>(abstraction: string | Constructor<T> | Symbol): T {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -84,7 +85,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    filter<T>(abstraction: string | Constructor<Filter<T>>): Filter<T> {
+    filter<T>(abstraction: string | Constructor<Filter<T>> | Symbol): Filter<T> {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -95,7 +96,7 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    errorHandler(abstraction: string | Constructor<ErrorHandler>): ErrorHandler {
+    errorHandler(abstraction: string | Constructor<ErrorHandler> | Symbol): ErrorHandler {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
@@ -117,11 +118,11 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find component '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    childModule(abstraction: string): Module {
-        if (!hasBinding(this._kernel, abstraction)) {
-            throw new ModuleError(this, `Could not find module '${(abstraction || '?').toString()}'`, null);
+    childModule(name: string): Module {
+        if (!hasBinding(this._kernel, name)) {
+            throw new ModuleError(this, `Could not find module '${(name || '?').toString()}'`, null);
         }
-        return this._kernel.get<Module>(abstraction);
+        return this._kernel.get<Module>(name);
     }
 
     clear(): Module {
@@ -157,13 +158,11 @@ function getBinding<T>(
     return kernel.get<T>(<any> abstraction);
 }
 
-//TODO hack to check if a binding is registered in the kernel. Update to inversify RC when it's released
 function hasBinding(
     kernel: inversify.interfaces.Kernel,
     abstraction: string | Constructor<any> | Symbol
 ): boolean {
-    let kernelLookup = (<any> kernel)._bindingDictionary;
-    return kernelLookup.hasKey(abstraction);
+    return kernel.isBound(abstraction);
 }
 
 function unbindFromKernel(
@@ -196,7 +195,7 @@ function bindToKernel<T>(
 
 function setBinding<T>(
     kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T>,
+    abstraction: string | Constructor<T> | Symbol,
     concretion: Constructor<T> | T,
     options?: BindingOptions
 ): void {
@@ -204,10 +203,4 @@ function setBinding<T>(
         unbindFromKernel(kernel, abstraction);
     }
     bindToKernel(kernel, abstraction, concretion, options)
-}
-
-export class ModuleError extends CustomError {
-    constructor(module: Module, msg: string, error: any) {
-        super(`${(<Object>module).constructor.name} - ${msg}`, error);
-    }
 }

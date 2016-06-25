@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import {ErrorHandler} from '../errors';
 import {Filter} from '../filters';
-import {Constructor} from '../core';
+import {Constructor, CustomError} from '../core';
 
 import * as inversify from 'inversify';
 
@@ -42,4 +42,10 @@ export interface IModule {
         concretion: Constructor<T> | T,
         options?: BindingOptions
     ): IModule;
+}
+
+export class ModuleError extends CustomError {
+    constructor(module: IModule, msg: string, error: any) {
+        super(`${(<Object>module).constructor.name} - ${msg}`, error);
+    }
 }

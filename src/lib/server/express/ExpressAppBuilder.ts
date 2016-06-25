@@ -1,7 +1,7 @@
 import * as express from 'express';
 import {inject, injectable} from '../../modules';
 import {Router} from '../../router';
-import {Logger} from '../../logging';
+import {Logger} from '../../logger';
 import {Filter, FilterError} from '../../filters';
 import {ErrorHandler, ErrorHandlerError} from '../../errors';
 import {ActionError} from '../../controllers';
@@ -106,6 +106,7 @@ export class ExpressAppBuilder {
                         //stop downstream propagation
                         //we expect that the response has ended
                         if (!res.headersSent) {
+                            this.logger.warn(`${requestInfo} [!] Filter sent headers.`)
                             next();
                         }
                     })

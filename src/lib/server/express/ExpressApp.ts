@@ -4,9 +4,9 @@ import * as http from 'http';
 import {Config} from '../../config';
 import {App} from '../../app';
 import {inject, injectable} from '../../modules';
-import {Logger} from '../../logging';
+import {Logger} from '../../logger/core';
 import {Promise} from '../../core';
-import {RouteDefinition, Router, RouteAction} from '../../router';
+import {RouteDefinition, Router, RouteAction} from '../../router/core';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
 
 @injectable()

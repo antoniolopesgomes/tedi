@@ -16,5 +16,5 @@ export interface Logger {
     info(msg: string): void;
     error(msg: string, err: any): void;
     debug(msg: any): void;
-    setLevel(leven: any);
+    setLevel(leven: LoggerLevels);
 }

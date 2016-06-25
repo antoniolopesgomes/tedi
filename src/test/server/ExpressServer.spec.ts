@@ -1,14 +1,18 @@
-import {inject, injectable, BindingContext} from '../../modules';
-import {Router} from '../../router';
-import {Logger, LoggerLevels} from '../../logging';
-import {Filter, FilterError} from '../../filters';
-import {ErrorHandler, ErrorHandlerError} from '../../errors';
-import {ActionError} from '../../controllers';
-import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
-import {ExpressApp} from './ExpressApp';
-import {ExpressServer} from './ExpressServer';
+
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
+import {
+    inject, injectable, BindingContext,
+    Filter,
+    FilterError,
+    ErrorHandler,
+    ErrorHandlerError,
+    ActionError,
+} from '../../core';
+import {Logger, LoggerLevels} from '../../logger';
+import {Router} from '../../router';
+import {ExpressApp, ExpressServer} from '../../server';
+import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 
 describe('ExpressServer', () => {
 
@@ -62,8 +66,8 @@ describe('ExpressServer', () => {
                         "$errorHandlers": ["AuthErrorHandler"],
                         "/login": {
                             "$filters": ["LoginFilter", "AfterLoginFilter"],
+                            "$errorHandlers": ["LoginErrorHandler", "AfterLoginErrorHandler"],
                             "get": ["AuthController", "login"],
-                            "$errorHandlers": ["LoginErrorHandler"],
                             "/user": {
                                 "$filters": ["UserFilter"],
                                 "post": ["AuthController", "saveUser"]
@@ -83,6 +87,7 @@ describe('ExpressServer', () => {
                 .setFilter('AdminFilter', new CustomFilter(), { context: BindingContext.VALUE })
                 .setErrorHandler('RootErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
                 .setErrorHandler('LoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
+                .setErrorHandler('AfterLoginErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE })
                 .setErrorHandler('AuthErrorHandler', new CustomErrorHandler(), { context: BindingContext.VALUE });
 
             expressApp = server.getApp();
@@ -204,15 +209,24 @@ describe('ExpressServer', () => {
                     expect(server.errorHandler('AuthErrorHandler').catch).not.toHaveBeenCalled();
                 })
             });
-            describe('and loginErrorHandler does not handle it', () => {
+            describe('and only RootErrorHandler handles it', () => {
+                let errorHandlers: string[];
                 beforeEach((done: DoneFn) => {
+                    errorHandlers = [];
+                    spyOn(server.errorHandler('AfterLoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                        errorHandlers.push('AfterLoginErrorHandler');
+                        throw error;
+                    });
                     spyOn(server.errorHandler('LoginErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                        errorHandlers.push('LoginErrorHandler');
                         throw error;
                     });
                     spyOn(server.errorHandler('AuthErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                        errorHandlers.push('AuthErrorHandler');
                         throw error;
                     });
                     spyOn(server.errorHandler('RootErrorHandler'), 'catch').and.callFake((error, req, res) => {
+                        errorHandlers.push('RootErrorHandler');
                         res.status(500).end();
                     });
 
@@ -221,11 +235,20 @@ describe('ExpressServer', () => {
                         .then(() => done())
                         .catch((error) => done.fail(error))
                 })
-                it('catch should have been called', () => {
+                it('all error handlers should be called', () => {
+                    expect(server.errorHandler('AfterLoginErrorHandler').catch).toHaveBeenCalled();
                     expect(server.errorHandler('LoginErrorHandler').catch).toHaveBeenCalled();
                     expect(server.errorHandler('AuthErrorHandler').catch).toHaveBeenCalled();
                     expect(server.errorHandler('RootErrorHandler').catch).toHaveBeenCalled();
-                })
+                });
+                it('error handlers should have been called in the right order', () => {
+                    expect(errorHandlers).toEqual([
+                        'LoginErrorHandler',
+                        'AfterLoginErrorHandler',
+                        'AuthErrorHandler',
+                        'RootErrorHandler'
+                    ]);
+                });
             });
         });
 

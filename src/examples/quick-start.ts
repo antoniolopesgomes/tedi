@@ -5,10 +5,11 @@ import {
     Config,
     Filter,
     ExpressUtils,
-    ErrorHandler
-} from '../lib';
-import {Constructor} from '../lib/core';
-import {ExpressServer} from '../lib/server';
+    ErrorHandler,
+    Constructor
+} from '../core';
+import {Logger, LoggerLevels} from '../logger';
+import {ExpressServer} from '../server';
 
 const bodyParser: any = require('body-parser');
 
@@ -101,6 +102,7 @@ server
     })
     .setRoutes({
         "/user": {
+            "$filters": [],
             "post": ["UserController", "create"],
             "get": ["UserController", "read"],
             "put": ["UserController", "update"],
@@ -108,6 +110,8 @@ server
         }
     })
     .setController('UserController', UserController)
+
+server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
 
 //Run server
 server

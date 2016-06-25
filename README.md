@@ -61,6 +61,9 @@ server
     });
 ```
 
+#Meaningfull errors
+All the concepts of express are encapsulated in a contract
+
 #Filters
 
 You can add filters to any route. Filters are classes that wrap the concept of an express middleware.
@@ -98,7 +101,7 @@ server
     .setRoutes({
         "$filters": ["JsonBodyParserFilter"],
         "/user": {
-            //you could add it here, in this case only this route would be filtered
+            //you could add it here, in this case only this segment would be filtered
             //"$filters": ["JsonBodyParserFilter"]
             "post": ["UserController", "create"],
             "get": ["UserController", "read"],
@@ -189,7 +192,7 @@ FirstFilter -> SecondFilter -> ThirdFilter -> UserController.create
 #Error Handlers
 
 You can add error handlers to any route. ErrorHandlers are classes that wrap the concept of an express middleware
-that deals with errors.
+that handles errors.
 They are responsible for managing any error that happened in a filter or controller.
 
 ```javascript
@@ -219,7 +222,7 @@ server
         "$filters": ["JsonBodyParserFilter"],
         "$errorHandlers": ["RootErrorHandler"],
         "/user": {
-            //you could add it here, in this case only the errors of this route will be handled by this ErrorHandler
+            //you could add it here, in this case only the errors of this route will be handled by RootErrorHandler
             //"$errorHandlers": ["RootErrorHandler"]
             "post": ["UserController", "create"],
             "get": ["UserController", "read"],
@@ -237,7 +240,7 @@ For example:
 {
     "$errorHandlers": ["FirstErrorHandler"],
     "/user": {
-        "$errorHandlers": ["SecondErrorHandler", "ThirdErrorHandler"],
+        "$errorHandlers": ["ThirdErrorHandler", "SecondErrorHandler"],
         "post": ["UserController", "create"],
         "/details": {
             "$errorHandlers": ["FourthErrorHandler"]
@@ -255,3 +258,12 @@ the ThirdErrorHandler would be called. If this handler does not rethrow an error
 handler would need to send a response back or else the connection would become pending and eventually the client
 would disconnect. 
 
+#Dependency Injection
+
+tedi uses [inversify.io](http://inversify.io/) as the di engine.
+
+The concept is pretty straightforward, all the dependencies (filters, controllers, error handlers, components) that 
+are registered in a module (ExpressServer is a module), become available as dependencies to each other.
+
+This means that if I need to access a filter inside a controller I only need to define that dependency on the 
+controller constructor.

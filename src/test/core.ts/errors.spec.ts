@@ -1,5 +1,5 @@
 
-import {CustomError} from './errors';
+import {CustomError} from '../../core';
 
 class TestError extends CustomError {
     constructor(msg: string, error: any) {

@@ -1,9 +1,14 @@
-import {App} from '../app';
-import {Filter} from '../filters';
-import {Logger} from '../logging';
-import {Module, BindingContext, inject, injectable} from '../modules';
-import {ExpressServer, ExpressApp} from '../server/express';
 
+import {ExpressServer, ExpressApp} from '../../server';
+import {
+    Filter,
+    App,
+    Module,
+    BindingContext,
+    inject,
+    injectable
+} from '../../core'
+import {Logger} from '../../logger';
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
 

@@ -2,12 +2,11 @@ import * as express from 'express';
 import * as http from 'http';
 import {Router} from '../../router';
 import {App} from '../../app';
-import {Logger} from '../../logging';
+import {Logger, WinstonLoggerFactory} from '../../logger';
 import {Module, BindingContext, injectable} from '../../modules';
 import {Config} from '../../config';
 import {Promise} from '../../core';
-import {WinstonLoggerFactory} from '../../logging/winston';
-import {DefaultRouter} from '../../router/default';
+import {DefaultRouter} from '../../router';
 import {ExpressApp} from '../../server/express';
 
 @injectable()

@@ -1,15 +1,18 @@
 import * as express from 'express';
-import {BindingContext, injectable} from '../../modules';
-import {Filter} from '../../filters';
-import {ErrorHandler} from '../../errors';
 import {
     RouteDefinition,
-    Router,
     RouteAction,
-    RoutesDefinition
+    RoutesDefinition,
+    Router
 } from '../../router';
-import {DefaultRouter} from '../../router/default';
-import {ExpressServer} from '../../server/express';
+import {
+    BindingContext,
+    injectable,
+    Filter,
+    ErrorHandler,
+} from '../../core';
+import {ExpressServer} from '../../server';
+import {DefaultRouter} from '../../router';
 
 describe('DefaultRouter', () => {
 

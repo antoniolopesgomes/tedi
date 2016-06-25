@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var gTs = require('gulp-typescript');
+var gCopy = require('gulp-copy');
 var gSeq = require('gulp-sequence');
 var gCopy = require('gulp-copy');
 var merge = require('merge2');
@@ -10,11 +11,11 @@ var mkdirp = require('mkdirp');
 
 const TSCONFIG = '../../tsconfig.json'
 const PACKAGE_JSON = '../../package.json'
-const BUILD_PATH = 'dist/npm';
+const BUILD_PATH = 'dist';
 
 gulp.task('npm:clean', function () {
     return del([
-        BUILD_PATH + '/**'
+        BUILD_PATH + '/**',
     ]);
 })
 
@@ -28,20 +29,20 @@ gulp.task('npm:typescript', function () {
     //compile
     var tsResult = gulp
         .src([
-            'src/lib/**/*.ts',
+            'src/**/*.ts',
             'typings/**/*.ts',
             'node_modules/inversify-dts/inversify/**/*.ts'
         ])
         .pipe(gTs(tsconfig));
 
     return merge([
-        tsResult.dts.pipe(gulp.dest(BUILD_PATH + '/definitions')),
-        tsResult.js.pipe(gulp.dest(BUILD_PATH + '/js'))
+        tsResult.dts.pipe(gulp.dest(BUILD_PATH)),
+        tsResult.js.pipe(gulp.dest(BUILD_PATH))
     ]);
 });
 
 gulp.task('npm:package.json', function () {
-    var packageJson = require(PACKAGE_JSON);
+    /*var packageJson = require(PACKAGE_JSON);
     //
     var buildPackageJson = {
         name: packageJson.name,
@@ -55,9 +56,9 @@ gulp.task('npm:package.json', function () {
         author: packageJson.author,
         license: packageJson.license,
         dependencies: packageJson.dependencies
-    };
+    };*/
     //save
-    fs.writeFileSync(BUILD_PATH + '/package.json', JSON.stringify(buildPackageJson, null, 2));
+    fs.writeFileSync(BUILD_PATH + '/package.json', JSON.stringify(require(PACKAGE_JSON), null, 2));
 });
 
 gulp.task('npm:jasmine.json', function () {
@@ -83,6 +84,13 @@ gulp.task('npm:copy-files', function () {
         ])
         .pipe(gCopy(BUILD_PATH));
 });
+
+gulp.task('npm:copy', function () {
+    return gSeq(
+        //del(['node_modules/tedi/**']), 
+        gulp.src('dist/**').pipe(gCopy('node_modules/tedi'))
+    );
+})
 
 gulp.task('npm:build', gSeq(
     'npm:clean', 

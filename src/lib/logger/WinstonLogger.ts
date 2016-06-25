@@ -1,7 +1,6 @@
 import * as winston from 'winston';
-import {Logger, LoggerLevels} from '../core';
-import {injectable} from '../../modules';
-
+import {Logger, LoggerLevels} from './core';
+import {injectable} from '../modules';
 
 export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args) => Logger {
 
@@ -24,7 +23,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
         }
 
         warn(msg: string): void {
-            this._logger.warn(msg);
+            this._logger.log('warning', msg);
         }
 
         info(msg: string): void {

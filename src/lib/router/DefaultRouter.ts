@@ -6,11 +6,11 @@ import {
     RouteFilter,
     RouteErrorHandler,
     ROUTE_KEYS,
-} from '../core';
-import {Filter} from '../../filters';
-import {ErrorHandler} from '../../errors';
-import {Logger} from '../../logging';
-import {Module, inject, injectable} from '../../modules';
+} from './core';
+import {Filter} from '../filters';
+import {ErrorHandler} from '../errors';
+import {Logger} from '../logger';
+import {Module, inject, injectable} from '../modules';
 
 @injectable()
 export class DefaultRouter implements Router {
@@ -89,7 +89,7 @@ export class RouteBuilder {
                 this.buildRouteDefinition(rawRouteDefinition, childRouteConfig, module);
             }
             else if (['$filters', '$errorHandlers', 'get', 'post', 'put', 'delete'].indexOf(key) < 0) {
-                this._logger.debug(`Routing key: '${key}', will be ignored`);
+                this._logger.debug(`Routing key: '${key}' of ${routeConfig.path}, will be ignored`);
             }
         })
     }
