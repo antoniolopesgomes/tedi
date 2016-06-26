@@ -78,17 +78,10 @@ The controller class must be annotated with the **@injectable()** decorator. It 
 ```typescript
 import {ExpressServer} from 'tedi/server';
 import {Logger, LoggerLevels} from 'tedi/logger';
-import {CRUDController} from './controllers';
-
-//TODO remove constructor args
-let server = new ExpressServer();
-//Configure server
-import {ExpressServer} from 'tedi/server';
-import {Logger, LoggerLevels} from 'tedi/logger';
 import {CRUDController, InfoController} from './controllers';
 import {FlowService} from './services';
 
-//TODO remove constructor args
+//instantiate a server
 let server = new ExpressServer();
 //Configure server
 server
@@ -157,4 +150,10 @@ Has you can see, all server components that we used (services, controllers), are
 But there is more! We still need to cover other components that will be useful when building a server.  
 
 Check the [wiki](https://github.com/antoniolopesgomes/tedi/wiki) for more information.  
-Check the [tests](https://github.com/antoniolopesgomes/tedi/tree/master/src/test) if you want to understand more about **tedi**.
+Check the [tests](https://github.com/antoniolopesgomes/tedi/tree/master/src/test) if you want to understand more about **tedi**.  
+
+You need to have **jasmine** installed to run the tests:  
+```bash
+$ npm i jasmine -g
+$ npm test
+```

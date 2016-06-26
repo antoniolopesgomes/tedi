@@ -1,6 +1,6 @@
 {
   "name": "tedi",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "description": "Express wrappper written in typescript with dependency injection capabilities",
   "keywords": [
     "express",
@@ -13,7 +13,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node jasmine"
+    "test": "jasmine"
   },
   "author": "António Gomes",
   "license": "MIT",
