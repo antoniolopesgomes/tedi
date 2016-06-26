@@ -1,335 +1,158 @@
-#tedi
+#Wiki
+For more detailed information, check the [wiki](https://github.com/antoniolopesgomes/tedi/wiki).
 
-typescript, express, dependency injection
-
-Comprehensible express wrapper, written in typescript, that uses dependency injection to manage an express server.
-
-##Typescript  
-Your tsconfig.json must have the following properties (these are used by the di engine):
-```javascript
-"compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-},
-```
-
-##Typings
-install and initialize typings 
-```bash 
-$ npm install typings -g
-$ typings init
-```
-install node definitions  
-```bash 
-typings install dt~node --global
-```
-install express definitions
-```bash
-typings install dt~express --global
-typings install dt~express-serve-static-core --global
-typings install dt~serve-static --global
-```
+[Prepare a **tedi** project](https://github.com/antoniolopesgomes/tedi/wiki/2.-Installation).
 
 ##Quick start
 
-```javascript
-import * as express from 'express';
-import * as http from 'http';
-import {injectable, Config} from 'tedi/core';
-import {ExpressServer} from 'tedi/server';
-
-/* INFO
-Create a controller class:
-- Controller methods receive express objects as parameters (req, res)
-- 'req' and 'res' are pure express objects and you can use them as such.
-- Every Server component (Controller, Filter, ErrorHandler, Service) must be decorated with @injectable.
-  The dependency injection framework uses this decoration to keep track of the dependencies.
-*/
+###services.ts  
+```typescript
+import {injectable} from 'tedi/core';
+//we will inject this service in the server, don't forget the @injectable() decorator
 @injectable()
-class UserController {
-    create(req: express.Request, res: express.Response) {
-        res.status(200).send('create user');
+export class FlowService {
+    private _flow: any[] = [];
+    add(info: string): void {
+        this._flow.push(info);
     }
-    read(req: express.Request, res: express.Response) {
-        res.status(200).send('read user');
+    readAll(): any[] {
+        return this._flow;
     }
-    update(req: express.Request, res: express.Response) {
-        res.status(200).send('update user');
+}
+```
+
+###controllers.ts  
+```typescript
+import * as express from 'express';
+import {injectable} from 'tedi/core';
+import {FlowService} from './services';
+
+//we will inject this controller in the server, don't forget the @injectable() decorator
+@injectable()
+export class CRUDController {
+    constructor(
+        //di engine will be responsible for intantiating this class
+        //and to inject the FlowService dependency
+        private _flowService: FlowService
+    ) {}
+    create(req: express.Request, res: express.Response): void {
+        let info = 'CRUDController: create was called';
+        this._flowService.add(info);
+        res.send(info);
     }
-    delete(req: express.Request, res: express.Response) {
-        res.status(200).send('delete user');
+    read(req: express.Request, res: express.Response): void {
+        let info = 'CRUDController: read was called';
+        this._flowService.add(info);
+        res.send(info);
+    }
+    update(req: express.Request, res: express.Response): void {
+        let info = 'CRUDController: update was called';
+        this._flowService.add(info);
+        res.send(info);
+    }
+    delete(req: express.Request, res: express.Response): void {
+        let info = 'CRUDController: delete was called';
+        this._flowService.add(info);
+        res.send(info);
     }
 }
 
-//Create server
-let server = new ExpressServer();
+//we will inject this controller in the server, don't forget the @injectable() decorator
+@injectable()
+export class InfoController {
+    constructor(
+        //di engine will be responsible for intantiating this class
+        //and to inject the FlowService dependency
+        private _flowService: FlowService
+    ) {}
+    getInfo(req: express.Request, res: express.Response): void {
+        res.json({
+            info: this._flowService.readAll()
+        });
+    } 
+}
+```  
+The controller class must be annotated with the **@injectable()** decorator. It will be used by the DI engine during the dependency resolving stage.
 
+###server.ts  
+```typescript
+import {ExpressServer} from 'tedi/server';
+import {Logger, LoggerLevels} from 'tedi/logger';
+import {CRUDController} from './controllers';
+
+//TODO remove constructor args
+let server = new ExpressServer();
+//Configure server
+import {ExpressServer} from 'tedi/server';
+import {Logger, LoggerLevels} from 'tedi/logger';
+import {CRUDController, InfoController} from './controllers';
+import {FlowService} from './services';
+
+//TODO remove constructor args
+let server = new ExpressServer();
 //Configure server
 server
     .setConfig({
         port: 8080
     })
     .setRoutes({
-        "/user": {
-            "post": ["UserController", "create"],
-            "get": ["UserController", "read"],
-            "put": ["UserController", "update"],
-            "delete": ["UserController", "delete"],
+        "/resources": {
+            "/user": {
+                "post": ["CRUDController", "create"],
+                "put": ["CRUDController", "update"],
+                "get": ["CRUDController", "read"],
+                "delete": ["CRUDController", "delete"]
+            },
+            "/info": {
+                "get": [InfoController, "getInfo"]
+            }
         }
     })
-    .setController('UserController', UserController);
+    .setComponent(FlowService, FlowService)
+    //When we registered the routes we used a class to define the InfoController dependency
+    .setController(InfoController, InfoController)
+    //When we registered the routes we used a string to define the CRUDController dependency
+    .setController("CRUDController", CRUDController);
 
-//Run server
-server
-    .run()
-    .then((httpServer: http.Server) => {
-        console.log(`Server running at port ${server.getConfig().port}`);
-    });
-```
+//set log level to debug to get some output
+server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
+//run
+server.run();
+```  
+```bash
+#compile
+$ node_modules/.bin/tsc
+``` 
+Compilation can throw the following errors:  
+```bash
+node_modules/tedi/lib/modules/Module.d.ts(10,14): error TS1005: '=' expected.
+node_modules/tedi/lib/modules/Module.d.ts(10,26): error TS1005: ';' expected.
+```  
+**You can ignore these errors** or you can update your typescript package:  
+```bash
+$ npm i typescript@next --save
+```  
+The next Typescript release (2.0) will solve this issue.
 
-#Meaningfull errors
-All flow is controlled internally by the ExpressServer instance. If anything fails you'll have 
-meaningful errors so you can quickly check which component is failing. 
+###Run  
+```bash
+$ node server.js
+debug: Server running on port: 8080...
+```  
+Now you can call:  
+**http://localhost:8080/resources/user** with any method (POST, PUT, GET, DELETE)  
+Any times you want.  
 
-#Filters
+Then try:  
+GET **http://localhost:8080/resources/info**  
 
-You can add filters to any route. Filters are classes that wrap the concept of an express middleware.
-They are responsible for changing the state of a request or a reponse, according to it's functionality.
-You should avoid sending data from a filter (e.g. res.send()), that's the controller responsability.
+You should get (if you called GET two times):  
+```json
+{"info":["CRUDController: read was called","CRUDController: read was called"]}
+```  
 
-##Filter examples
+##Notes
+Has you can see, all server components that we used (services, controllers), are available to each other and you can require them in your component constructor (be aware of [circular dependencies](http://misko.hevery.com/2008/08/01/circular-dependency-in-constructors-and-dependency-injection/)).  
 
-We can make use of the various express middleware modules that already exist:
-```javascript
-import {injectable, Filter} from 'tedi/core';
-import {ExpressUtils} from 'tedi/utils';
-//npm install body-parser --save
-let bodyParser = require('body-parser');
-/* INFO
-- Filters must implement the Filter<T> interface.
-- Like any other component they must be decorated with @injectable()
-*/
-@injectable()
-class JsonBodyParserFilter implements Filter<any> {
-    jsonBodyParser: any = bodyParser.json();
-    apply(req: express.Request, res: express.Response): any {
-        return ExpressUtils.runMiddleware(jsonBodyParser, req, res);
-    }
-    //this is an auxiliary method and it's not mandatory
-    //it is used to get data from the request that could be added by the apply method
-    //as we know the bodyParser middleware adds the body property to the request
-    getDataFromRequest(req: express.Request): any {
-        return req.body;
-    }
-}
-```
-And then you can add it to the server:
-```javascript
-server
-    .setRoutes({
-        "$filters": ["JsonBodyParserFilter"],
-        "/user": {
-            //you could add it here, in this case only this segment would be filtered
-            //"$filters": ["JsonBodyParserFilter"]
-            "post": ["UserController", "create"],
-            "get": ["UserController", "read"],
-            "put": ["UserController", "update"],
-            "delete": ["UserController", "delete"]
-        }
-    })
-    .setFilter("JsonBodyParserFilter", JsonBodyParserFilter)
-    .setController('UserController', UserController);
-```
-If you want a more genreal body parser you can create a scoped filter class:
-```javascript
-import * as express from 'express';
-import {Constructor, Filter} from 'tedi/core';
-import {ExpressUtils} from 'tedi/utils';
-
-let bodyParser = require('body-parser');
-
-function BodyParserFilterFactory(type: string, opts: any): Constructor<Filter<any>> {
-
-    let bodyParserMiddleware: any;
-    switch(type.toUpperCase()) {
-        case 'JSON':
-            bodyParserMiddleware = bodyParser.json(opts);
-        break;
-        case 'RAW':
-            bodyParserMiddleware = bodyParser.raw(opts);
-        break;
-        case 'TEXT':
-            bodyParserMiddleware = bodyParser.text(opts);
-        break;
-        case 'URLENCODED':
-            bodyParserMiddleware = bodyParser.urlencoded(opts);
-        break;
-    }
-
-    @injectable()
-    class BodyParserFilter implements Filter<any> {
-        apply(req: express.Request, res: express.Response): any {
-            return ExpressUtils.runMiddleware(bodyParserMiddleware, req, res);
-        }
-        getDataFromRequest(req: express.Request): any {
-            return req.body;
-        }
-    }
-
-    return BodyParserFilter;
-}
-```
-And use it like this:
-```javascript
-server
-    .setRoutes({
-        "/user": {
-            "$filters": ["JsonBodyParserFilter"],
-            "post": ["UserController", "create"],
-            "get": ["UserController", "read"],
-            "put": ["UserController", "update"],
-            "delete": ["UserController", "delete"]
-        }
-    })
-    .setFilter("JsonBodyParserFilter", BodyParserFilterFactory('json', { inflate: false }))
-    .setController('UserController', UserController);
-```
-Filters are always called in an ascending order, from root to node.
-For example:
-```javascript
-{
-    "$filters": ["FirstFilter"],
-    "/user": {
-        "$filters": ["SecondFilter", "ThirdFilter"],
-        "post": ["UserController", "create"],
-        "/details": {
-            "$filters": ["FourthFilter"]
-            "get": ["UserDetailsController", "read"]
-        }
-    }
-}
-```
-If we call -> GET: /user/details - the component order would be:
-
-FirstFilter -> SecondFilter -> ThirdFilter -> FourthFilter -> UserDetailsController.read
-
-If we call -> POST: /user - the component order would be:
-
-FirstFilter -> SecondFilter -> ThirdFilter -> UserController.create
-
-#Error Handlers
-
-You can add error handlers to any route. ErrorHandlers are classes that wrap the concept of an express middleware
-that handles errors.
-They are responsible for managing any error that happened in a filter or controller.
-
-```javascript
-import * as express from 'express';
-import {injectable, ErrorHandler} from 'tedi/core';
-/* INFO
-- ErrorHandlers must implement the ErrorHandler interface.
-- Like any other component they must be decorated with @injectable()
-*/
-@injectable()
-class CustomErrorHandler implements ErrorHandler {
-    catch(error:any, req: express.Request, res: express.Response): void {
-        //deal with the error
-        console.log(error);
-        res.status(500).send('Error: ' + error.message);
-        //if you want the error to bubble up just throw it again
-        //throw error;
-        //or wrap it in a custom error before bubbling up
-        //throw new CustomError(error);
-    }
-}
-```
-And then you can add it to the server:
-```javascript
-server
-    .setRoutes({
-        "$filters": ["JsonBodyParserFilter"],
-        "$errorHandlers": ["RootErrorHandler"],
-        "/user": {
-            //you could add it here, in this case only the errors of this route will be handled by RootErrorHandler
-            //"$errorHandlers": ["RootErrorHandler"]
-            "post": ["UserController", "create"],
-            "get": ["UserController", "read"],
-            "put": ["UserController", "update"],
-            "delete": ["UserController", "delete"],
-        }
-    })
-    .setFilter("JsonBodyParserFilter", JsonBodyParserFilter)
-    .setController('UserController', UserController)
-    .setErrorHandler('RootErrorHandler', CustomErrorHandler);
-```
-ErrorHandlers are always called in an descending order, from node to root.
-For example:
-```javascript
-{
-    "$errorHandlers": ["FirstErrorHandler"],
-    "/user": {
-        "$errorHandlers": ["ThirdErrorHandler", "SecondErrorHandler"],
-        "post": ["UserController", "create"],
-        "/details": {
-            "$errorHandlers": ["FourthErrorHandler"]
-            "get": ["UserDetailsController", "read"]
-        }
-    }
-}
-```
-If we call -> GET: /user/details - and UserDetailsController.read throws an error, the order will be like this: 
-
-FourthErrorHandler -> ThirdErrorHandler -> SecondErrorHandler -> FirstErrorHandler
-
-It is the responsability of the error handler to deal with the error, so if the FourthErrorHandler threw an an error
-the ThirdErrorHandler would be called. If this handler does not rethrow an error then the flow would end here. This
-handler would need to send a response back or else the connection would become pending and eventually the client
-would disconnect. 
-
-#Dependency Injection
-
-tedi uses [inversify.io](http://inversify.io/) as the di engine.
-
-The concept is pretty straightforward, all the dependencies (filters, controllers, error handlers, components) that 
-are registered in a module (ExpressServer is a module), become available as dependencies to each other.
-
-This means that if I need to access a filter inside a controller I only need to define that dependency on the 
-controller constructor. And you also can register other components (services, DataAccess, etc...) 
-that will be available as dependencies.
-
-```javascript
-
-@injectable
-class ClickCountService {
-    private _click: number = 0;
-    click(): number {
-        this._click++;
-        return this._click;
-    }
-    count(): number {
-        return this._click;
-    }
-}
-
-@injectable
-class UserInteraction {
-    constructor(
-        @inject('clickCountService') private clickCountService: ClickCountService
-    ) { }
-
-    click(req, res): void {
-        this.clickCountService.click();
-        res.status(200).end();
-    } 
-    getStats(): void {
-        res.json({
-            clicks: this.clickCountService.count()
-        })
-    }
-}
-
-server
-    .setRoutes()
-    .setController('UserInteraction', UserInteractionm)
-    .setComponent('clickCountService'. ClickCountService);
-```
+But there is more! We still need to cover other components that will be useful when building a server.  
+Check the next section for more information about that.
