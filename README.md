@@ -294,4 +294,42 @@ The concept is pretty straightforward, all the dependencies (filters, controller
 are registered in a module (ExpressServer is a module), become available as dependencies to each other.
 
 This means that if I need to access a filter inside a controller I only need to define that dependency on the 
-controller constructor.
+controller constructor. And you also can register other components (services, DataAccess, etc...) 
+that will be available as dependencies.
+
+```javascript
+
+@injectable
+class ClickCountService {
+    private _click: number = 0;
+    click(): number {
+        this._click++;
+        return this._click;
+    }
+    count(): number {
+        return this._click;
+    }
+}
+
+@injectable
+class UserInteraction {
+    constructor(
+        @inject('clickCountService') private clickCountService: ClickCountService
+    ) { }
+
+    click(req, res): void {
+        this.clickCountService.click();
+        res.status(200).end();
+    } 
+    getStats(): void {
+        res.json({
+            clicks: this.clickCountService.count()
+        })
+    }
+}
+
+server
+    .setRoutes()
+    .setController('UserInteraction', UserInteractionm)
+    .setComponent('clickCountService'. ClickCountService);
+```
