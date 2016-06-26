@@ -154,5 +154,5 @@ You should get (if you called GET two times):
 ##Notes
 Has you can see, all server components that we used (services, controllers), are available to each other and you can require them in your component constructor (be aware of [circular dependencies](http://misko.hevery.com/2008/08/01/circular-dependency-in-constructors-and-dependency-injection/)).  
 
-But there is more! We still need to cover other components that will be useful when building a server.  
-Check the next section for more information about that.
+But there is more! We still need to cover other components that will be useful when building a server. 
+Check the [wiki](https://github.com/antoniolopesgomes/tedi/wiki) for more information.
