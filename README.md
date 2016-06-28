@@ -101,10 +101,10 @@ server
             }
         }
     })
-    .setComponent(FlowService, FlowService)
-    //When we registered the routes we used a class to define the InfoController dependency
-    .setController(InfoController, InfoController)
-    //When we registered the routes we used a string to define the CRUDController dependency
+    .setComponent(FlowService)
+    //direct dependency class definition
+    .setController(InfoController)
+    //using string as abstraction for dependency class
     .setController("CRUDController", CRUDController);
 
 //set log level to debug to get some output
