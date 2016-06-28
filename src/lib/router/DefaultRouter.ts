@@ -184,7 +184,7 @@ export class RoutingTableBuilder {
     ) { }
 
     getRoutingTable(route: RouteDefinition): {[key: string]: RouteDefinition} {
-        let routingTable = {};
+        let routingTable: {[key: string]: RouteDefinition} = {};
         let currentPath = '';
         this.setRoutingTableForRoute(currentPath, route, routingTable);
         return routingTable;

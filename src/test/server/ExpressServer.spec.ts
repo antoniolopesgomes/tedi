@@ -67,19 +67,19 @@ describe('ExpressServer', () => {
                         "/login": {
                             "$filters": ["LoginFilter", "AfterLoginFilter"],
                             "$errorHandlers": ["LoginErrorHandler", "AfterLoginErrorHandler"],
-                            "get": ["AuthController", "login"],
+                            "get": [AuthController, "login"],
                             "/user": {
                                 "$filters": ["UserFilter"],
-                                "post": ["AuthController", "saveUser"]
+                                "post": [AuthController, "saveUser"]
                             },
                             "/admin": {
                                 "$filters": ["AdminFilter"],
-                                "post": ["AuthController", "saveAdmin"]
+                                "post": [AuthController, "saveAdmin"]
                             }
                         }
                     }
                 })
-                .setController('AuthController', AuthController)
+                .setController(AuthController)
                 .setFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE })
                 .setFilter('LoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
                 .setFilter('AfterLoginFilter', new CustomFilter(), { context: BindingContext.VALUE })
@@ -97,8 +97,8 @@ describe('ExpressServer', () => {
         describe('GET /auth/login', () => {
 
             beforeEach((done: DoneFn) => {
-                spyOn(server.controller('AuthController'), 'saveUser').and.callThrough();
-                spyOn(server.controller('AuthController'), 'login').and.callThrough();
+                spyOn(server.controller(AuthController), 'saveUser').and.callThrough();
+                spyOn(server.controller(AuthController), 'login').and.callThrough();
                 spyOn(server.filter('UserFilter'), 'apply').and.callThrough();
                 spyOn(server.filter('RootFilter'), 'apply').and.callThrough();
                 spyOn(server.filter('LoginFilter'), 'apply').and.callThrough();
@@ -114,8 +114,8 @@ describe('ExpressServer', () => {
             })
 
             it('should have called the right controllers', () => {
-                expect(server.controller<AuthController>('AuthController').login).toHaveBeenCalled();
-                expect(server.controller<AuthController>('AuthController').saveUser).not.toHaveBeenCalled();
+                expect(server.controller<AuthController>(AuthController).login).toHaveBeenCalled();
+                expect(server.controller<AuthController>(AuthController).saveUser).not.toHaveBeenCalled();
             })
 
             it('should have called the right filters', () => {
@@ -131,8 +131,8 @@ describe('ExpressServer', () => {
         describe('POST /auth/login/user', () => {
 
             beforeEach((done: DoneFn) => {
-                spyOn(server.controller('AuthController'), 'saveUser').and.callThrough();
-                spyOn(server.controller('AuthController'), 'login').and.callThrough();
+                spyOn(server.controller(AuthController), 'saveUser').and.callThrough();
+                spyOn(server.controller(AuthController), 'login').and.callThrough();
                 spyOn(server.filter('RootFilter'), 'apply').and.callThrough();
                 spyOn(server.filter('UserFilter'), 'apply').and.callThrough();
                 spyOn(server.filter('LoginFilter'), 'apply').and.callThrough();
@@ -145,8 +145,8 @@ describe('ExpressServer', () => {
             })
 
             it('should have called the right controllers', () => {
-                expect(server.controller<AuthController>('AuthController').saveUser).toHaveBeenCalled();
-                expect(server.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
+                expect(server.controller<AuthController>(AuthController).saveUser).toHaveBeenCalled();
+                expect(server.controller<AuthController>(AuthController).login).not.toHaveBeenCalled();
             })
 
             it('should have called the right filters', () => {
@@ -184,7 +184,7 @@ describe('ExpressServer', () => {
 
         describe('and a controller throws an error', () => {
             beforeEach(() => {
-                spyOn(server.controller('AuthController'), 'login').and.throwError('Error on controller.');
+                spyOn(server.controller(AuthController), 'login').and.throwError('Error on controller.');
             });
             describe('and loginErrorHandler handles it', () => {
                 let catchedError: any;
@@ -275,7 +275,7 @@ describe('ExpressServer', () => {
         describe('and a login filter responds', () => {
             let response: request.Response;
             beforeEach((done) => {
-                spyOn(server.controller('AuthController'), 'login');
+                spyOn(server.controller(AuthController), 'login');
                 spyOn(server.filter('LoginFilter'), 'apply').and.callFake((req, res) => {
                     res.status(200).send('HIJACKED');
                 });
@@ -294,7 +294,7 @@ describe('ExpressServer', () => {
                 expect(response.text).toEqual('HIJACKED');
             });
             it('controller should have not been called', () => {
-                expect(server.controller<AuthController>('AuthController').login).not.toHaveBeenCalled();
+                expect(server.controller<AuthController>(AuthController).login).not.toHaveBeenCalled();
             });
         });
     })

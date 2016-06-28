@@ -29,7 +29,7 @@ export abstract class Module implements IModule {
 
     setController<T>(
         abstraction: string | Constructor<T>,
-        concretion: Constructor<T> | T,
+        concretion?: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -38,7 +38,7 @@ export abstract class Module implements IModule {
 
     setFilter<T>(
         abstraction: string | Constructor<Filter<T>>,
-        concretion: Constructor<Filter<T>> | Filter<T>,
+        concretion?: Constructor<Filter<T>> | Filter<T>,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -47,7 +47,7 @@ export abstract class Module implements IModule {
 
     setErrorHandler(
         abstraction: string | Constructor<ErrorHandler>,
-        concretion: Constructor<ErrorHandler> | ErrorHandler,
+        concretion?: Constructor<ErrorHandler> | ErrorHandler,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -56,7 +56,7 @@ export abstract class Module implements IModule {
 
     setComponent<T>(
         abstraction: string | Constructor<T>,
-        concretion: Constructor<T> | T | typeof Object,
+        concretion?: Constructor<T> | T | typeof Object,
         options?: BindingOptions
     ): Module {
         //TODO check for this any casts
@@ -153,7 +153,7 @@ function getBinding<T>(
     kernel: inversify.interfaces.Kernel,
     abstraction: string | Constructor<T>
 ): T {
-    return kernel.get<T>(<any> abstraction);
+    return kernel.get<T>(<any>abstraction);
 }
 
 function hasBinding(
@@ -197,6 +197,10 @@ function setBinding<T>(
     concretion: Constructor<T> | T,
     options?: BindingOptions
 ): void {
+    //if no concretion was defined assume that this abstraction binding is a class and register it as the concretion
+    if (!concretion) {
+        concretion = <Constructor<T>> abstraction;
+    }
     if (hasBinding(kernel, abstraction)) {
         unbindFromKernel(kernel, abstraction);
     }
