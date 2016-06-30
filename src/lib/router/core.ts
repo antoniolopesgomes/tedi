@@ -19,6 +19,7 @@ export interface RouteErrorHandler {
 
 export class RouteDefinition {
     path: string;
+    fullPath: string;
     filters: RouteFilter[];
     errorHandlers: RouteErrorHandler[];
     children: RouteDefinition[];

@@ -65,6 +65,9 @@ export class RouteBuilder {
     getRoutesConfiguration(routesDefinition: any, module: Module): RouteDefinition {
         //create and setup root (add filters and errorHandlers)
         let root = new RouteDefinition('/');
+        //root fullPath is equal to path
+        root.fullPath = root.path;
+        //root RouteDefinition only has Filters and ErrorHandlers
         root.filters = this.getFilters(routesDefinition[ROUTE_KEYS.FILTERS], module);
         root.errorHandlers = this.getErrorHandlers(routesDefinition[ROUTE_KEYS.ERROR_HANDLERS], module)
         //build routing tree
@@ -84,9 +87,10 @@ export class RouteBuilder {
                     rawRouteDefinition = module.getRoutes();
                 }
                 let childRouteConfig = new RouteDefinition(key);
-                routeConfig.children.push(childRouteConfig);
+                childRouteConfig.fullPath = normalizePath(routeConfig.fullPath + key);
                 this.fillRouteDefinition(rawRouteDefinition, childRouteConfig, module);
                 this.buildRouteDefinition(rawRouteDefinition, childRouteConfig, module);
+                routeConfig.children.push(childRouteConfig);
             }
             else if (['$filters', '$errorHandlers', 'get', 'post', 'put', 'delete'].indexOf(key) < 0) {
                 this._logger.debug(`Routing key: '${key}' of ${routeConfig.path}, will be ignored`);
@@ -193,12 +197,17 @@ export class RoutingTableBuilder {
     setRoutingTableForRoute(currentPath: string, route: RouteDefinition, routingTable: {[key: string]: RouteDefinition}) {
         currentPath += route.path;
         //remove double slashes
-        currentPath = currentPath.replace('//', '/');
+        currentPath = normalizePath(currentPath);
         routingTable[currentPath] = route;
         route.children.forEach((childRoute: RouteDefinition) => {
             this.setRoutingTableForRoute(currentPath, childRoute, routingTable);
         });
     }
+}
+
+//UTILS
+function normalizePath(path: string): string {
+    return path.replace('//', '/');
 }
 
 //ERRORS

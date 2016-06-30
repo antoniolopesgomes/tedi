@@ -8,6 +8,7 @@ import {Logger} from '../../logger/core';
 import {Promise} from '../../core';
 import {RouteDefinition, Router, RouteAction} from '../../router/core';
 import {ExpressAppBuilder} from './ExpressAppBuilder';
+import {ExpressAppBuilder_v2} from './ExpressAppBuilder_v2';
 
 @injectable()
 export class ExpressApp implements App {
@@ -21,7 +22,7 @@ export class ExpressApp implements App {
         @inject('Logger') private _logger: Logger,
         @inject('Router') private _router: Router
     ) {
-        this._appBuilder = new ExpressAppBuilder(this._logger);
+        this._appBuilder = new ExpressAppBuilder_v2(this._logger);
     }
 
     getApp(): express.Application {

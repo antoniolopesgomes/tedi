@@ -51,8 +51,8 @@ describe('DefaultRouter', () => {
 
             @injectable()
             class DummyErrorHandler implements ErrorHandler {
-                catch(error:any, req: express.Request, res: express.Response): void {}
-             }
+                catch(error: any, req: express.Request, res: express.Response): void { }
+            }
 
             beforeEach(() => {
                 server
@@ -79,10 +79,13 @@ describe('DefaultRouter', () => {
             describe('auth route', () => {
                 beforeEach(() => {
                     authRoute = routeConfig.children[0];
-                })
+                });
                 it('should be present', () => {
                     expect(authRoute.path).toEqual('/auth');
-                })
+                });
+                it('fullPath should be right', () => {
+                    expect(authRoute.fullPath).toEqual('/auth');
+                });
             })
 
             describe('login route', () => {
@@ -91,11 +94,14 @@ describe('DefaultRouter', () => {
                 })
                 it('should be present', () => {
                     expect(loginRoute.path).toEqual('/login');
-                })
+                });
+                it('fullPath should be right', () => {
+                    expect(loginRoute.fullPath).toEqual('/auth/login');
+                });
                 it('GET should be defined', () => {
                     expect(loginRoute.get.controller).toEqual(jasmine.any(AuthControllerMock));
                     expect(loginRoute.get.controllerMethod).toEqual('login');
-                })
+                });
                 it('POST should not exist', () => {
                     expect(loginRoute.post).toBeUndefined();
                 })

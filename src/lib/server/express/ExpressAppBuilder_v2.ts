@@ -7,7 +7,7 @@ import {ErrorHandler, ErrorHandlerError} from '../../errors';
 import {ActionError} from '../../controllers';
 import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 
-export class ExpressAppBuilder {
+export class ExpressAppBuilder_v2 {
 
     constructor(
         public logger: Logger
@@ -22,7 +22,8 @@ export class ExpressAppBuilder {
         //express error handlers should be attached after the routing tree is built if we want
         //the error to bubble up trough the error handlers
         rootRoute.children.forEach((childRoute: RouteDefinition) => {
-            app.use(childRoute.path, this.buildRouter(childRoute));
+            this.buildRouting(app, childRoute);
+            //app.use(childRoute.path, this.buildRouter(childRoute));
         })
         //add error handling for the app
         this.addErrorHandlers(app, rootRoute);
@@ -34,7 +35,7 @@ export class ExpressAppBuilder {
         return app;
     }
 
-    buildRouter(route: RouteDefinition): express.Router {
+    buildRouting(router: express.Router, route: RouteDefinition): express.Router {
         let expressRouter = express.Router();
         //save a reference to the express.Router, it will be used later
         //to attach the errors handlers
@@ -45,7 +46,7 @@ export class ExpressAppBuilder {
         //recursive - create the children routers and attach them to parent
         (route.children || []).forEach((childRoute: RouteDefinition) => {
             console.log('expressRouter.use: ', childRoute.path)
-            expressRouter.use(childRoute.path, this.buildRouter(childRoute));
+            expressRouter.use(childRoute.path, this.buildRouting(router, childRoute));
         });
         return expressRouter;
     }
