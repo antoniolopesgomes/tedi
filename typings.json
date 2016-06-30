@@ -8,6 +8,7 @@
     "lodash": "registry:dt/lodash#3.10.0+20160330154726",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "node": "registry:dt/node#6.0.0+20160524002506",
+    "request-promise": "registry:dt/request-promise#3.0.0+20160628092802",
     "serve-static": "registry:dt/serve-static#0.0.0+20160501131543",
     "superagent": "registry:dt/superagent#1.4.0+20160317120654",
     "supertest": "registry:dt/supertest#1.1.0+20160317120654",

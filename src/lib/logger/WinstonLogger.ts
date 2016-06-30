@@ -38,7 +38,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
             this._logger.debug(msg);
         }
 
-        setLevel(level: LoggerLevels): void {
+        setLevel(level: LoggerLevels): Logger {
             let levelStr: string = null;
             switch (level) {
                 case LoggerLevels.EMERGENCY:
@@ -70,6 +70,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
                     break;
             }
             this._logger.level = levelStr;
+            return this;
         }
     };
 

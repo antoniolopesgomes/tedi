@@ -1,15 +1,13 @@
 var gulp = require('gulp');
 var gTs = require('gulp-typescript');
 var gSeq = require('gulp-sequence');
-var gCopy = require('gulp-copy');
 var merge = require('merge2');
 var del = require('del');
 var fs = require('fs');
-var utils = require('./utils');
-var mkdirp = require('mkdirp');
+var gSym = require('gulp-sym');
 
-const TSCONFIG = '../../tsconfig.json'
-const PACKAGE_JSON = '../../package.json'
+const TSCONFIG = '../../../tsconfig.json'
+const PACKAGE_JSON = '../../../package.json'
 const BUILD_PATH = 'dist/npm';
 
 gulp.task('npm:clean', function () {
@@ -29,6 +27,7 @@ gulp.task('npm:typescript', function () {
     var tsResult = gulp
         .src([
             'src/**/*.ts',
+            '!src/examples/**',
             'typings/**/*.ts',
             'node_modules/inversify-dts/inversify/**/*.ts'
         ])
@@ -40,40 +39,24 @@ gulp.task('npm:typescript', function () {
     ]);
 });
 
-gulp.task('npm:jasmine.json', function () {
-    var jasmineJson = {
-        "spec_dir": "test",
-        "spec_files": [
-            "**/*[sS]pec.js"
-        ],
-        "stopSpecOnExpectationFailure": true,
-        "random": false
-    }
-    //
-    mkdirp.sync(BUILD_PATH + '/spec/support');
-    //save
-    fs.writeFileSync(BUILD_PATH + '/spec/support/jasmine.json', JSON.stringify(jasmineJson, null, 2));
-});
-
 gulp.task('npm:copy-files', function () {
-    return gulp.
-        src([
-            'package.json',
-            'README.md',
-            'LICENSE'
-        ])
-        .pipe(gCopy(BUILD_PATH));
+    return merge(
+        gulp.src(['package.json', 'README.md', 'LICENSE'])
+            .pipe(gulp.dest(BUILD_PATH)),
+        gulp.src(['tools/tasks/build-npm/files/spec/**/*'])
+            .pipe(gulp.dest(BUILD_PATH + '/spec'))
+    )
 });
 
-gulp.task('npm:copy', function () {
-    return gSeq(
-        //del(['node_modules/tedi/**']), 
-        gulp.src('dist/**').pipe(gCopy('node_modules/tedi'))
-    );
-})
+gulp.task('npm:symlink', function (done) {
+    return fs.symlink('d:/projects/tedi/dist/npm', 'node_modules/tedi', function (error) {
+        console.log(error);
+        return error ? done(error) : done();
+    });
+});
 
 gulp.task('npm:build', gSeq(
     'npm:clean', 
     'npm:typescript', 
-    ['npm:copy-files', 'npm:jasmine.json'])
+    'npm:copy-files')
 );

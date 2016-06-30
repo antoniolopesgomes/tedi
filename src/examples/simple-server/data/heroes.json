@@ -1,0 +1,12 @@
+{
+    "batman": {
+            "name": "Batman",
+            "email": "batman@gotham.com",
+            "age": 50
+        },
+    "flash": {
+            "name": "Flash",
+            "email": "flash@central-city.com",
+            "age": 32
+        }
+}

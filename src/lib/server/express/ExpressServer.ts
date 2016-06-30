@@ -14,6 +14,10 @@ export class ExpressServer extends Module {
 
     private _server: http.Server;
 
+    constructor() {
+        super();
+    }
+
     init(): void {
          this
             .setComponent<Module>('Server', this, { context: BindingContext.VALUE })
