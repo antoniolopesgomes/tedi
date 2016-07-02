@@ -3,7 +3,7 @@ import {ExpressServer} from '../../server';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
-xdescribe('ExpressServer params', () => {
+fdescribe('ExpressServer params', () => {
     let server = new ExpressServer();
     beforeEach(() => {
         server.snapshot();
@@ -22,8 +22,9 @@ xdescribe('ExpressServer params', () => {
             server
                 .setRoutes({
                     '/api': {
-                        '/test/:id': {
-                            '/test2/:id': {
+                        '/user/:user_id': {
+                            'get': ['TestController', 'get'],
+                            '/address/:address_id': {
                                 'get': ['TestController', 'get']
                             }
                         }
@@ -31,31 +32,44 @@ xdescribe('ExpressServer params', () => {
                 })
                 .setController('TestController', TestController);
         });
-        describe('when i call a route with params', () => {
-            let req: express.Request;
-            beforeEach((done: DoneFn) => {
-                spyOn(server.component<TestController>('TestController'), 'get').and.callFake((_req: any, res:any) => {
-                    req = _req;
-                    res.status(200).end();
+
+        describe('when I call a route with params', () => {
+            let params: any;
+            beforeEach(() => {
+                spyOn(server.component<TestController>('TestController'), 'get')
+                    .and.callFake((req: express.Request, res: express.Response) => {
+                        params = req.params;
+                        res.status(200).end();
+                    });
+            });
+            describe('/api/user/1', () => {
+                beforeEach((done: DoneFn) => {
+                    request(server.getApp())
+                        .get('/api/user/1')
+                        .expect(200)
+                        .then(() => done())
+                        .catch((error: any) => done.fail(error))
+                })
+                it('user_id parameter should be 1', () => {
+                    expect(params.user_id).toEqual('1');
                 });
-                request(server.getApp())
-                    .get('/api/test/444/test2/456')
-                    .expect(200)
-                    .then(() => {
-                        done();
-                    })
-                    .catch((error: any) => {
-                        done.fail(error);
-                    })
-            })
-            it('should have parameters', () => {
-                console.log(req.params);
+            });
+
+            describe('when i call /api/user/1/address/2', () => {
+                beforeEach((done: DoneFn) => {
+                    request(server.getApp())
+                        .get('/api/user/1/address/2')
+                        .expect(200)
+                        .then(() => done())
+                        .catch((error: any) => done.fail(error))
+                })
+                it('user_id parameter should be 1', () => {
+                    expect(params.user_id).toEqual('1');
+                });
+                it('address_id parameter should be 2', () => {
+                    expect(params.address_id).toEqual('2');
+                });
             });
         });
     });
-
-
-
-
-
 });

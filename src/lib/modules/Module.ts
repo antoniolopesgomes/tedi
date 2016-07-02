@@ -23,7 +23,7 @@ export abstract class Module implements IModule {
 
     abstract init(): void;
 
-    get parentModule(): Module {
+    getParentModule(): Module {
         return this._parentModule;
     }
 
@@ -78,7 +78,7 @@ export abstract class Module implements IModule {
             if (hasBinding(currentModule._kernel, abstraction)) {
                 return getBinding<T>(currentModule._kernel, abstraction);
             }
-            currentModule = currentModule.parentModule;
+            currentModule = currentModule.getParentModule();
         }
         throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
     }
@@ -89,7 +89,7 @@ export abstract class Module implements IModule {
             if (hasBinding(currentModule._kernel, abstraction)) {
                 return getBinding<Filter<T>>(currentModule._kernel, abstraction);
             }
-            currentModule = currentModule.parentModule;
+            currentModule = currentModule.getParentModule();
         }
         throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
     }
@@ -100,7 +100,7 @@ export abstract class Module implements IModule {
             if (hasBinding(currentModule._kernel, abstraction)) {
                 return getBinding<ErrorHandler>(currentModule._kernel, abstraction);
             }
-            currentModule = currentModule.parentModule;
+            currentModule = currentModule.getParentModule();
         }
         throw new ModuleError(this, `Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
     }
@@ -111,7 +111,7 @@ export abstract class Module implements IModule {
             if (hasBinding(currentModule._kernel, abstraction)) {
                 return getBinding<T>(currentModule._kernel, abstraction);
             }
-            currentModule = currentModule.parentModule;
+            currentModule = currentModule.getParentModule();
         }
         throw new ModuleError(this, `Could not find component '${(abstraction || '?').toString()}' in the module tree`, null);
     }

@@ -1,13 +1,15 @@
 {
-  "name": "fullstack-ts-seed",
+  "name": "tedi",
   "dependencies": {},
   "globalDependencies": {
     "body-parser": "registry:dt/body-parser#0.0.0+20160317120654",
     "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160322035842",
+    "form-data": "registry:dt/form-data#0.0.0+20160316155526",
     "lodash": "registry:dt/lodash#3.10.0+20160330154726",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "node": "registry:dt/node#6.0.0+20160524002506",
+    "request": "registry:dt/request#0.0.0+20160524135346",
     "request-promise": "registry:dt/request-promise#3.0.0+20160628092802",
     "serve-static": "registry:dt/serve-static#0.0.0+20160501131543",
     "superagent": "registry:dt/superagent#1.4.0+20160317120654",

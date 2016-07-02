@@ -14,56 +14,41 @@ export class ExpressAppBuilder_v2 {
     ) {
     }
 
-    buildApp(rootRoute: RouteDefinition): express.Application {
+    buildApp(route: RouteDefinition): express.Application {
         let app = express();
-        //add app filters, this should be done before defining the app/router methods
-        this.addFilters(app, rootRoute);
-        //
-        
+        //add app filters, this should be done before defining the action methods
+        this._addFilters(app, route);        
         //Create routes first, do not attach error handlers just yet
         //express error handlers should be attached after the routing tree is built if we want
         //the error to bubble up trough the error handlers
-        rootRoute.children.forEach((childRoute: RouteDefinition) => {
-            this.buildRouting(app, childRoute);
-            //app.use(childRoute.path, this.buildRouter(childRoute));
+        route.children.forEach((childRoute: RouteDefinition) => {
+            this._buildRouting(app, childRoute);
         })
-        this.addErrorHandlers(app, rootRoute);
-        //add error handling for the app
-        //this.addErrorHandlers(app, rootRoute);
-        //add error handlers to all the children
-        //rootRoute.children.forEach((childRoute: RouteDefinition) => {
-        //    this.attachErrorHandlersToRoute(app, childRoute);
-        //})
-
+        this._addErrorHandlers(app, route);
         return app;
     }
 
-    buildRouting(app: express.Application, route: RouteDefinition): void {
-        //let expressRouter = express.Router();
-        //save a reference to the express.Router, it will be used later
-        //to attach the errors handlers
-        //route.data.expressRouter = expressRouter;
+    private _buildRouting(app: express.Application, route: RouteDefinition): void {
         //do not forget: always add filters before setting the actions
-        this.addFilters(app, route);
-        this.addActions(app, route);
+        this._addFilters(app, route);
+        this._addActions(app, route);
         //recursive - create the children routers and attach them to parent
         (route.children || []).forEach((childRoute: RouteDefinition) => {
-            this.buildRouting(app, childRoute);
+            this._buildRouting(app, childRoute);
         });
-        this.addErrorHandlers(app, route);
+        //errorHandlers are setted in the end
+        this._addErrorHandlers(app, route);
     }
 
-    addActions(app: express.Application, route: RouteDefinition): void {
-        //define route
-        //let expressRoute = expressRouter.route('/');
+    private _addActions(app: express.Application, route: RouteDefinition): void {
         //set actions
-        this.addAction('get', app, route.fullPath, route.get);
-        this.addAction('post', app, route.fullPath, route.post);
-        this.addAction('put', app, route.fullPath, route.put);
-        this.addAction('delete', app, route.fullPath, route.delete);
+        this._addAction('get', app, route.fullPath, route.get);
+        this._addAction('post', app, route.fullPath, route.post);
+        this._addAction('put', app, route.fullPath, route.put);
+        this._addAction('delete', app, route.fullPath, route.delete);
     }
 
-    addAction(method: string, app: express.Application, fullPath: string, routeAction: RouteAction): void {
+    private _addAction(method: string, app: express.Application, fullPath: string, routeAction: RouteAction): void {
         //if there is no route action do nothing
         if (!routeAction) {
             return;
@@ -92,7 +77,7 @@ export class ExpressAppBuilder_v2 {
         })
     }
 
-    addFilters(app: express.Application, route: RouteDefinition): void {
+    private _addFilters(app: express.Application, route: RouteDefinition): void {
         let filters  = route.filters.map<express.RequestHandler>((routeFilter: RouteFilter) => {
             let filter = routeFilter.filter;
             let filterName = routeFilter.name;
@@ -127,14 +112,7 @@ export class ExpressAppBuilder_v2 {
         }
     }
 
-    attachErrorHandlersToRoute(app: express.Application, route: RouteDefinition): void {
-        this.addErrorHandlers(app, route);
-        route.children.forEach((childrenRoute: RouteDefinition) => {
-            this.attachErrorHandlersToRoute(app, childrenRoute);
-        });
-    }
-
-    addErrorHandlers(app: express.Application, route: RouteDefinition): void {
+    private _addErrorHandlers(app: express.Application, route: RouteDefinition): void {
         let errorHandlers = route.errorHandlers.map<express.ErrorRequestHandler>((routeErrorHandler: RouteErrorHandler) => {
             let errorHandlerInfo = `ErrorHandler: ${routeErrorHandler.name}`;
             let errorHandler = routeErrorHandler.errorHandler;
