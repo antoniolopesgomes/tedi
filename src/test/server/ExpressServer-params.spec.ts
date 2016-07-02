@@ -22,7 +22,7 @@ xdescribe('ExpressServer params', () => {
             server
                 .setRoutes({
                     '/api': {
-                        '/test': {
+                        '/test/:id': {
                             '/test2/:id': {
                                 'get': ['TestController', 'get']
                             }
@@ -39,7 +39,7 @@ xdescribe('ExpressServer params', () => {
                     res.status(200).end();
                 });
                 request(server.getApp())
-                    .get('/api/test/test2/456')
+                    .get('/api/test/444/test2/456')
                     .expect(200)
                     .then(() => {
                         done();

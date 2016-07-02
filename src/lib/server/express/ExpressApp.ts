@@ -15,7 +15,7 @@ export class ExpressApp implements App {
 
     private _app: express.Application;
     private _server: http.Server;
-    private _appBuilder: ExpressAppBuilder;
+    private _appBuilder: ExpressAppBuilder_v2;
 
     constructor(
         @inject('Config') private _config: Config,
