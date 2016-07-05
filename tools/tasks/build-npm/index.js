@@ -10,19 +10,26 @@ const TSCONFIG = '../../../tsconfig.json'
 const PACKAGE_JSON = '../../../package.json'
 const BUILD_PATH = 'dist/npm';
 
+//CLEAN
+
 gulp.task('npm:clean', function () {
     return del([
         BUILD_PATH + '/**',
     ]);
 })
 
+//TYPESCRIPT COMPILATION
+
+var tsconfig = require(TSCONFIG).compilerOptions;
+//emit declaration files (.d.ts)
+tsconfig.declaration = true;
+tsconfig.module = 'commonjs';
+//TODO Don't forget to change to typescript 2.0 when it is released
+tsconfig.typescript = require('typescript');
+
+var tsProject = gTs.createProject(tsconfig);
+
 gulp.task('npm:typescript', function () {
-    var tsconfig = require(TSCONFIG).compilerOptions;
-    //emit declaration files (.d.ts)
-    tsconfig.declaration = true;
-    tsconfig.module = 'commonjs';
-    //TODO Don't forget to change to typescript 2.0 when it is released
-    tsconfig.typescript = require('typescript');
     //compile
     var tsResult = gulp
         .src([
@@ -31,13 +38,15 @@ gulp.task('npm:typescript', function () {
             'typings/**/*.ts',
             'node_modules/inversify-dts/inversify/**/*.ts'
         ])
-        .pipe(gTs(tsconfig));
+        .pipe(gTs(tsProject));
 
     return merge([
         tsResult.dts.pipe(gulp.dest(BUILD_PATH)),
         tsResult.js.pipe(gulp.dest(BUILD_PATH))
     ]);
 });
+
+//COPY FILES
 
 gulp.task('npm:copy-files', function () {
     return merge(
@@ -56,7 +65,14 @@ gulp.task('npm:symlink', function (done) {
 });
 
 gulp.task('npm:build', gSeq(
-    'npm:clean', 
-    'npm:typescript', 
+    'npm:clean',
+    'npm:typescript',
     'npm:copy-files')
 );
+
+gulp.task('build', ['npm:build'], function () {
+    gulp.watch(
+        ['src/**/*.ts', '!src/examples/**'],
+        ['npm:typescript']
+    );
+});

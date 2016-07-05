@@ -3,7 +3,7 @@ import {ExpressServer} from '../../server';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
-fdescribe('ExpressServer params', () => {
+describe('ExpressServer params', () => {
     let server = new ExpressServer();
     beforeEach(() => {
         server.snapshot();
