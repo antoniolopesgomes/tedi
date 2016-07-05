@@ -13,7 +13,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "postinstall": "typings install && gulp build"
   },
   "author": "António Gomes",
   "license": "MIT",
