@@ -69,47 +69,35 @@ export abstract class Module implements IModule {
     }
 
     controller<T>(abstraction: string | Constructor<T>): T {
-        let currentModule: Module = this;
-        while (currentModule) {
-            if (currentModule._di.hasBinding(abstraction)) {
-                return currentModule._di.getBinding<T>(abstraction);
-            }
-            currentModule = currentModule.getParentModule();
+        let controller = this._getBindingRecursively<T>(abstraction);
+        if (!controller) {
+            throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
         }
-        throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
+        return controller;
     }
 
     filter<T>(abstraction: string | Constructor<IFilter<T>>): IFilter<T> {
-        let currentModule: Module = this;
-        while (currentModule) {
-            if (currentModule._di.hasBinding(abstraction)) {
-                return currentModule._di.getBinding<IFilter<T>>(abstraction);
-            }
-            currentModule = currentModule.getParentModule();
+        let filter = this._getBindingRecursively<IFilter<T>>(abstraction);
+        if (!filter) {
+            throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
         }
-        throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
+        return filter;
     }
 
     errorHandler(abstraction: string | Constructor<IErrorHandler>): IErrorHandler {
-        let currentModule: Module = this;
-        while (currentModule) {
-            if (currentModule._di.hasBinding(abstraction)) {
-                return currentModule._di.getBinding<IErrorHandler>(abstraction);
-            }
-            currentModule = currentModule.getParentModule();
+        let errorHandler = this._getBindingRecursively<IErrorHandler>(abstraction);
+        if (!errorHandler) {
+            throw new ModuleError(this, `Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
         }
-        throw new ModuleError(this, `Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
+        return errorHandler;
     }
 
     component<T>(abstraction: string | Constructor<T>): T {
-        let currentModule: Module = this;
-        while (currentModule) {
-            if (currentModule._di.hasBinding(abstraction)) {
-                return currentModule._di.getBinding<T>(abstraction);
-            }
-            currentModule = currentModule.getParentModule();
+        let component = this._getBindingRecursively<T>(abstraction);
+        if (!component) {
+            throw new ModuleError(this, `Could not find component '${(abstraction || '?').toString()}' in the module tree`, null);
         }
-        throw new ModuleError(this, `Could not find component '${(abstraction || '?').toString()}' in the module tree`, null);
+        return component;
     }
 
     childModule(name: string): Module {
@@ -141,6 +129,18 @@ export abstract class Module implements IModule {
 
     getRoutes(): any {
         return this._di.getBinding<any>('RoutesDefinition');
+    }
+
+
+    _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
+        let currentModule: Module = this;
+        while (currentModule) {
+            if (currentModule._di.hasBinding(abstraction)) {
+                return currentModule._di.getBinding<T>(abstraction);
+            }
+            currentModule = currentModule.getParentModule();
+        }
+        return null;
     }
 
 }
