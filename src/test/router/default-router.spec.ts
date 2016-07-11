@@ -10,8 +10,8 @@ import {
     Controller,
     Filter,
     ErrorHandler,
-    IFilter,
-    IErrorHandler,
+    BaseFilter,
+    BaseErrorHandler,
 } from '../../core';
 import {ExpressServer} from '../../server';
 import {DefaultRouter} from '../../router';
@@ -46,13 +46,13 @@ describe('DefaultRouter', () => {
             }
 
             @Filter()
-            class DummyFilterMock implements IFilter<any> {
+            class DummyFilterMock implements BaseFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
                 getDataFromRequest(req: express.Request): any { }
             }
 
             @ErrorHandler()
-            class DummyErrorHandler implements IErrorHandler {
+            class DummyErrorHandler implements BaseErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
             }
 
@@ -141,7 +141,7 @@ describe('DefaultRouter', () => {
                             "$filters": ["InvalidFilter"]
                         }
                     })
-                    .setFilter<IFilter<any>>('InvalidFilter', <any>InvalidFilter);
+                    .setFilter<BaseFilter<any>>('InvalidFilter', <any>InvalidFilter);
             })
 
             it('should throw a FilterError', () => {

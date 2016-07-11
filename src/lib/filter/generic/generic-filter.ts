@@ -1,9 +1,9 @@
 
 import * as express from 'express';
 import * as Promise from 'bluebird';
-import {IFilter} from '../../filter';
+import {BaseFilter} from '../../filter';
 
-export class GenericFilter implements IFilter<any> {
+export class GenericFilter implements BaseFilter<any> {
 
     constructor(
         private _requestHandler: express.RequestHandler

@@ -1,19 +1,19 @@
 import * as inversify from 'inversify';
 import * as _ from 'lodash';
-import {IFilter, FilterMetadata} from '../filter';
+import {BaseFilter, FilterMetadata} from '../filter';
 import {ControllerMetadata} from '../controller';
-import {IErrorHandler, ErrorHandlerMetadata} from '../error-handler';
+import {BaseErrorHandler, ErrorHandlerMetadata} from '../error-handler';
 import {DIModule, BindingContext, BindingOptions} from '../di';
 import {Constructor, CustomError} from '../core';
-import {IModule, ModuleError} from './core';
+import {BaseModule, ModuleError} from './core';
 import {ControllerValidator, FilterValidator, ErrorHandlerValidator, ModuleValidator} from './validators';
 
-export abstract class BaseModule implements IModule {
+export abstract class TediModule implements BaseModule {
 
-    private _parentModule: BaseModule;
+    private _parentModule: TediModule;
     private _di: DIModule;
 
-    constructor(parentModule?: BaseModule) {
+    constructor(parentModule?: TediModule) {
         this._parentModule = parentModule;
         this._di = new DIModule();
         //initialize
@@ -22,7 +22,7 @@ export abstract class BaseModule implements IModule {
 
     abstract init(): void;
 
-    getParentModule(): BaseModule {
+    getParentModule(): TediModule {
         return this._parentModule;
     }
 
@@ -30,7 +30,7 @@ export abstract class BaseModule implements IModule {
         abstraction: string | Constructor<T>,
         concretion?: Constructor<T> | T,
         options?: BindingOptions
-    ): BaseModule {
+    ): TediModule {
         concretion = this._normalizeConcretion<T>(abstraction, concretion);
         options = this._normalizeOptions(options);
         ControllerValidator.validate(concretion, options);
@@ -39,11 +39,11 @@ export abstract class BaseModule implements IModule {
     }
 
     setFilter<T>(
-        abstraction: string | Constructor<IFilter<T>>,
-        concretion?: Constructor<IFilter<T>> | IFilter<T>,
+        abstraction: string | Constructor<BaseFilter<T>>,
+        concretion?: Constructor<BaseFilter<T>> | BaseFilter<T>,
         options?: BindingOptions
-    ): BaseModule {
-        concretion = this._normalizeConcretion<IFilter<T>>(abstraction, concretion);
+    ): TediModule {
+        concretion = this._normalizeConcretion<BaseFilter<T>>(abstraction, concretion);
         options = this._normalizeOptions(options);
         FilterValidator.validate(concretion, options);
         this._di.setBinding(abstraction, concretion, options);
@@ -51,11 +51,11 @@ export abstract class BaseModule implements IModule {
     }
 
     setErrorHandler(
-        abstraction: string | Constructor<IErrorHandler>,
-        concretion?: Constructor<IErrorHandler> | IErrorHandler,
+        abstraction: string | Constructor<BaseErrorHandler>,
+        concretion?: Constructor<BaseErrorHandler> | BaseErrorHandler,
         options?: BindingOptions
-    ): BaseModule {
-        concretion = this._normalizeConcretion<IErrorHandler>(abstraction, concretion);
+    ): TediModule {
+        concretion = this._normalizeConcretion<BaseErrorHandler>(abstraction, concretion);
         options = this._normalizeOptions(options);
         ErrorHandlerValidator.validate(concretion, options);
         this._di.setBinding(abstraction, concretion, options);
@@ -66,7 +66,7 @@ export abstract class BaseModule implements IModule {
         abstraction: string | Constructor<T>,
         concretion?: Constructor<T> | T,
         options?: BindingOptions
-    ): BaseModule {
+    ): TediModule {
         //TODO check for this any casts
         concretion = this._normalizeConcretion<T>(abstraction, concretion);
         this._di.setBinding(<any>abstraction, concretion, options);
@@ -75,9 +75,9 @@ export abstract class BaseModule implements IModule {
 
     addChildModule(
         name: string,
-        ModuleClass: Constructor<BaseModule>
-    ): BaseModule {
-        let concretion: BaseModule = new ModuleClass(this);
+        ModuleClass: Constructor<TediModule>
+    ): TediModule {
+        let concretion: TediModule = new ModuleClass(this);
         let options: BindingOptions = { context: BindingContext.VALUE }
         ModuleValidator.validate(concretion, options);
         this._di.setBinding(name, concretion, options);
@@ -92,16 +92,16 @@ export abstract class BaseModule implements IModule {
         return controller;
     }
 
-    filter<T>(abstraction: string | Constructor<IFilter<T>>): IFilter<T> {
-        let filter = this._getBindingRecursively<IFilter<T>>(abstraction);
+    filter<T>(abstraction: string | Constructor<BaseFilter<T>>): BaseFilter<T> {
+        let filter = this._getBindingRecursively<BaseFilter<T>>(abstraction);
         if (!filter) {
             throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
         }
         return filter;
     }
 
-    errorHandler(abstraction: string | Constructor<IErrorHandler>): IErrorHandler {
-        let errorHandler = this._getBindingRecursively<IErrorHandler>(abstraction);
+    errorHandler(abstraction: string | Constructor<BaseErrorHandler>): BaseErrorHandler {
+        let errorHandler = this._getBindingRecursively<BaseErrorHandler>(abstraction);
         if (!errorHandler) {
             throw new ModuleError(this, `Could not find errorHandler '${(abstraction || '?').toString()}' in the module tree`, null);
         }
@@ -116,29 +116,29 @@ export abstract class BaseModule implements IModule {
         return component;
     }
 
-    childModule(name: string): BaseModule {
+    childModule(name: string): TediModule {
         if (!this._di.hasBinding(name)) {
             throw new ModuleError(this, `Could not find module '${(name || '?').toString()}'`, null);
         }
-        return this._di.getBinding<BaseModule>(name);
+        return this._di.getBinding<TediModule>(name);
     }
 
-    clear(): BaseModule {
+    clear(): TediModule {
         this._di.unbindAll();
         return this;
     }
 
-    snapshot(): BaseModule {
+    snapshot(): TediModule {
         this._di.snapshot();
         return this;
     }
 
-    restore(): BaseModule {
+    restore(): TediModule {
         this._di.restore();
         return this;
     }
 
-    setRoutes(value: any): BaseModule {
+    setRoutes(value: any): TediModule {
         this._di.setBinding('RoutesDefinition', value, { context: BindingContext.VALUE });
         return this;
     }
@@ -148,7 +148,7 @@ export abstract class BaseModule implements IModule {
     }
 
     _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
-        let currentModule: BaseModule = this;
+        let currentModule: TediModule = this;
         while (currentModule) {
             if (currentModule._di.hasBinding(abstraction)) {
                 return currentModule._di.getBinding<T>(abstraction);

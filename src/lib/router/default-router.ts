@@ -7,10 +7,10 @@ import {
     RouteErrorHandler,
     ROUTE_KEYS,
 } from './core';
-import {IFilter} from '../filter';
-import {IErrorHandler} from '../error-handler';
+import {BaseFilter} from '../filter';
+import {BaseErrorHandler} from '../error-handler';
 import {Logger} from '../logger';
-import {BaseModule} from '../module';
+import {TediModule} from '../module';
 import {inject, injectable} from '../di';
 
 @injectable()
@@ -24,7 +24,7 @@ export class DefaultRouter implements Router {
 
     constructor(
         @inject('RoutesDefinition') routesDefinition: any,
-        @inject('Server') serverModule: BaseModule,
+        @inject('Server') serverModule: TediModule,
         @inject('Logger') logger: Logger
     ) {
         this._routesDefinition = routesDefinition;
@@ -63,7 +63,7 @@ export class RouteBuilder {
         private _logger: Logger
     ) { }
 
-    getRoutesConfiguration(routesDefinition: any, module: BaseModule): RouteDefinition {
+    getRoutesConfiguration(routesDefinition: any, module: TediModule): RouteDefinition {
         //create and setup root (add filters and errorHandlers)
         let root = new RouteDefinition('/');
         //root fullPath is equal to path
@@ -76,7 +76,7 @@ export class RouteBuilder {
         return root;
     }
 
-    buildRouteDefinition(routes: any, routeConfig: RouteDefinition, module: BaseModule): void {
+    buildRouteDefinition(routes: any, routeConfig: RouteDefinition, module: TediModule): void {
         Object.keys(routes).forEach((key: string) => {
             if (key.indexOf('/') === 0) {
                 let rawRouteDefinition = routes[key];
@@ -99,7 +99,7 @@ export class RouteBuilder {
         })
     }
 
-    fillRouteDefinition(rawRouteDefinition: any, route: RouteDefinition, module: BaseModule): void {
+    fillRouteDefinition(rawRouteDefinition: any, route: RouteDefinition, module: TediModule): void {
         route.filters = this.getFilters(rawRouteDefinition[ROUTE_KEYS.FILTERS], module);
         route.errorHandlers = this.getErrorHandlers(rawRouteDefinition[ROUTE_KEYS.ERROR_HANDLERS], module);
         route.get = this.getAction(rawRouteDefinition.get, module);
@@ -108,7 +108,7 @@ export class RouteBuilder {
         route.put = this.getAction(rawRouteDefinition.put, module);
     }
 
-    getAction(routeAction: string[], module: BaseModule): RouteAction {
+    getAction(routeAction: string[], module: TediModule): RouteAction {
 
         if (!routeAction) {
             return undefined;
@@ -132,9 +132,9 @@ export class RouteBuilder {
         }
     }
 
-    getFilters(filterNames: string[], module: BaseModule): RouteFilter[] {
+    getFilters(filterNames: string[], module: TediModule): RouteFilter[] {
 
-        function validateFilter(name: string, filter: IFilter<any>) {
+        function validateFilter(name: string, filter: BaseFilter<any>) {
             let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
             if (!hasFilterInterface) {
                 throwError(`'${name}' must implement 'Filter'`);
@@ -156,9 +156,9 @@ export class RouteBuilder {
 
     }
 
-    getErrorHandlers(errorHandlersNames: string[], module: BaseModule): RouteErrorHandler[] {
+    getErrorHandlers(errorHandlersNames: string[], module: TediModule): RouteErrorHandler[] {
 
-        function validateErrorHandler(name: string, errorHandler: IErrorHandler) {
+        function validateErrorHandler(name: string, errorHandler: BaseErrorHandler) {
             let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
             if (!hasErrorHandlerInterface) {
                 throwError(`'${name}' must implement 'ErrorHandler'`);

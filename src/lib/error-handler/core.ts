@@ -1,7 +1,7 @@
 import * as express from 'express';
 import {CustomError} from '../core';
 
-export interface IErrorHandler {
+export interface BaseErrorHandler {
     catch(error:any, req: express.Request, res: express.Response): void;
 }
 

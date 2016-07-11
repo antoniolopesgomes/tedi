@@ -3,7 +3,7 @@ import * as http from 'http';
 import {Router} from '../../router';
 import {App} from '../../app';
 import {Logger, WinstonLoggerFactory} from '../../logger';
-import {BaseModule} from '../../module';
+import {TediModule} from '../../module';
 import {BindingContext, injectable} from '../../di';
 import {Config} from '../../config';
 import {Promise} from '../../core';
@@ -11,7 +11,7 @@ import {DefaultRouter} from '../../router';
 import {ExpressApp} from '../../server/express';
 
 @injectable()
-export class ExpressServer extends BaseModule {
+export class ExpressServer extends TediModule {
 
     private _server: http.Server;
 
@@ -21,7 +21,7 @@ export class ExpressServer extends BaseModule {
 
     init(): void {
          this
-            .setComponent<BaseModule>('Server', this, { context: BindingContext.VALUE })
+            .setComponent<TediModule>('Server', this, { context: BindingContext.VALUE })
             .setComponent<App>('App', ExpressApp)
             .setComponent<Router>('Router', DefaultRouter)
             .setComponent<Logger>('Logger', WinstonLoggerFactory())

@@ -1,41 +1,41 @@
 import 'reflect-metadata';
-import {IErrorHandler} from '../error-handler';
-import {IFilter} from '../filter';
+import {BaseErrorHandler} from '../error-handler';
+import {BaseFilter} from '../filter';
 import {Constructor, CustomError} from '../core';
 import {BindingOptions} from '../di';
 
 export type Abstraction<T> = string | Constructor<T>;
 export type Concretion<T> = Constructor<T> | T;
 
-export interface IModule {
+export interface BaseModule {
 
     setController<T>(
         abstraction: string | Constructor<T>, 
         concretion: Constructor<T> | T,
         options?: BindingOptions
-    ): IModule;
+    ): BaseModule;
     
     setFilter<T>(
-        abstraction: string | Constructor<IFilter<T>>, 
-        concretion: Constructor<IFilter<T>> | IFilter<T>,
+        abstraction: string | Constructor<BaseFilter<T>>, 
+        concretion: Constructor<BaseFilter<T>> | BaseFilter<T>,
         options?: BindingOptions
-    ): IModule;
+    ): BaseModule;
 
     setErrorHandler(
-        abstraction: string | Constructor<IErrorHandler>, 
-        concretion: Constructor<IErrorHandler> | IErrorHandler,
+        abstraction: string | Constructor<BaseErrorHandler>, 
+        concretion: Constructor<BaseErrorHandler> | BaseErrorHandler,
         options?: BindingOptions
-    ): IModule;
+    ): BaseModule;
 
     setComponent<T>(
         abstraction: string | Constructor<T>, 
         concretion: Constructor<T> | T,
         options?: BindingOptions
-    ): IModule;
+    ): BaseModule;
 }
 
 export class ModuleError extends CustomError {
-    constructor(module: IModule, msg: string, error: any) {
+    constructor(module: BaseModule, msg: string, error: any) {
         super(`${(<any>module.constructor).name} - ${msg}`, error);
     }
 }

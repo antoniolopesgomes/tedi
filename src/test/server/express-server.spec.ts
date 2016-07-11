@@ -3,9 +3,9 @@ import * as request from 'supertest-as-promised';
 import * as express from 'express';
 import {
     BindingContext,
-    IFilter,
+    BaseFilter,
     FilterError,
-    IErrorHandler,
+    BaseErrorHandler,
     ErrorHandlerError,
     ActionError,
     Controller, Filter, ErrorHandler
@@ -33,13 +33,13 @@ describe('ExpressServer', () => {
     }
 
     @Filter()
-    class CustomFilter implements IFilter<any> {
+    class CustomFilter implements BaseFilter<any> {
         apply(req: express.Request, res: express.Response): any { }
         getDataFromRequest(req: express.Request): any { }
     }
 
     @ErrorHandler()
-    class CustomErrorHandler implements IErrorHandler {
+    class CustomErrorHandler implements BaseErrorHandler {
         catch(err: any) {
             throw err;
         }

@@ -1,9 +1,9 @@
 
 import {ExpressServer, ExpressApp} from '../../server';
 import {
-    IFilter,
+    BaseFilter,
     App,
-    BaseModule,
+    TediModule,
     BindingContext,
     Controller,
     Filter,
@@ -25,7 +25,7 @@ describe('Modules', () => {
     }
 
     @Filter()
-    class CustomFilter implements IFilter<any> {
+    class CustomFilter implements BaseFilter<any> {
         apply(req: express.Request, res: express.Response): any {
 
         }
@@ -35,7 +35,7 @@ describe('Modules', () => {
     }
 
     @Module()
-    class AuthModule extends BaseModule {
+    class AuthModule extends TediModule {
         init(): void {
             this
                 .setRoutes({
@@ -58,7 +58,7 @@ describe('Modules', () => {
     describe('When we got an app with a child module', () => {
 
         let app: express.Application;
-        let authModule: BaseModule;
+        let authModule: TediModule;
 
         beforeEach(() => {
             server

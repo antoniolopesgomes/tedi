@@ -1,14 +1,14 @@
-import {BaseModule, Controller, Filter, ErrorHandler, IFilter, IErrorHandler} from '../../core';
+import {TediModule, Controller, Filter, ErrorHandler, BaseFilter, BaseErrorHandler} from '../../core';
 import * as express from 'express';
 
 describe('Module bindings', () => {
 
-    class SimpleModule extends BaseModule {
+    class SimpleModule extends TediModule {
         init() { }
     }
 
     describe('when we have a module', () => {
-        let module: BaseModule;
+        let module: TediModule;
         beforeEach(() => {
             module = new SimpleModule();
         });
@@ -42,7 +42,7 @@ describe('Module bindings', () => {
         });
         describe('and we register one Filter', () => {
             @Filter()
-            class SimpleFilter implements IFilter<any> {
+            class SimpleFilter implements BaseFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
                 getDataFromRequest(req: express.Request): any { }
             }
@@ -73,7 +73,7 @@ describe('Module bindings', () => {
         });
         describe('and we register one ErrorHandler', () => {
             @ErrorHandler()
-            class SimpleErrorHandler implements IErrorHandler {
+            class SimpleErrorHandler implements BaseErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
             }
             describe('#setErrorHandler(abstraction)', () => {
