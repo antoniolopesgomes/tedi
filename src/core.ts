@@ -1,5 +1,5 @@
 export {BindingContext} from './lib/di';
-export {TediModule, Module} from './lib/module';
+export {BaseModule, Module} from './lib/module';
 export {App} from './lib/app';
 export {ActionError, Controller} from './lib/controller';
 export {BaseErrorHandler, ErrorHandlerError, ErrorHandler} from './lib/error-handler';

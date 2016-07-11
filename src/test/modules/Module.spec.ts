@@ -3,7 +3,7 @@ import {ExpressServer, ExpressApp} from '../../server';
 import {
     BaseFilter,
     App,
-    TediModule,
+    BaseModule,
     BindingContext,
     Controller,
     Filter,
@@ -35,7 +35,7 @@ describe('Modules', () => {
     }
 
     @Module()
-    class AuthModule extends TediModule {
+    class AuthModule extends BaseModule {
         init(): void {
             this
                 .setRoutes({
@@ -58,7 +58,7 @@ describe('Modules', () => {
     describe('When we got an app with a child module', () => {
 
         let app: express.Application;
-        let authModule: TediModule;
+        let authModule: BaseModule;
 
         beforeEach(() => {
             server

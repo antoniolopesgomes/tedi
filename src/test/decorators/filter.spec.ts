@@ -1,4 +1,4 @@
-import {Filter, TediModule} from '../../core';
+import {Filter, BaseModule} from '../../core';
 import {FilterMetadata} from '../../lib/filter';
 
 describe('Filter decorator', () => {

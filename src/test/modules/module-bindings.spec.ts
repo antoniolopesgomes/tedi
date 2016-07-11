@@ -1,14 +1,14 @@
-import {TediModule, Controller, Filter, ErrorHandler, BaseFilter, BaseErrorHandler} from '../../core';
+import {BaseModule, Controller, Filter, ErrorHandler, BaseFilter, BaseErrorHandler} from '../../core';
 import * as express from 'express';
 
 describe('Module bindings', () => {
 
-    class SimpleModule extends TediModule {
+    class SimpleModule extends BaseModule {
         init() { }
     }
 
     describe('when we have a module', () => {
-        let module: TediModule;
+        let module: BaseModule;
         beforeEach(() => {
             module = new SimpleModule();
         });

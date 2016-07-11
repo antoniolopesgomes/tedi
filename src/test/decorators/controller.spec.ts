@@ -1,4 +1,4 @@
-import {Controller, TediModule} from '../../core';
+import {Controller, BaseModule} from '../../core';
 import {ControllerActionDecoratorError, ControllerMetadata} from '../../lib/controller';
 
 describe('Controller decorators', () => {
