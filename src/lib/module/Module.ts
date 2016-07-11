@@ -62,7 +62,7 @@ export abstract class BaseModule {
         return this;
     }
 
-    setComponent<T>(
+    setService<T>(
         abstraction: string | Constructor<T>,
         concretion?: Constructor<T> | T,
         options?: BindingOptions

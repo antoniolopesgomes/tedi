@@ -21,18 +21,18 @@ export class ExpressServer extends BaseModule {
 
     init(): void {
          this
-            .setComponent<BaseModule>('Server', this, { context: BindingContext.VALUE })
-            .setComponent<App>('App', ExpressApp)
-            .setComponent<Router>('Router', DefaultRouter)
-            .setComponent<Logger>('Logger', WinstonLoggerFactory())
-            .setComponent<Config>('Config', {
+            .setService<BaseModule>('Server', this, { context: BindingContext.VALUE })
+            .setService<App>('App', ExpressApp)
+            .setService<Router>('Router', DefaultRouter)
+            .setService<Logger>('Logger', WinstonLoggerFactory())
+            .setService<Config>('Config', {
                 port: 8080
             }
             , { context: BindingContext.VALUE });
     }
 
     setConfig(config: Config): ExpressServer {
-        this.setComponent<Config>('Config', config, { context: BindingContext.VALUE });
+        this.setService<Config>('Config', config, { context: BindingContext.VALUE });
         return this;
     }
 

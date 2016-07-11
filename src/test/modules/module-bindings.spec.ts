@@ -106,7 +106,7 @@ describe('Module bindings', () => {
             class SimpleComponent {}
             describe('#SimpleComponent(abstraction)', () => {
                 beforeEach(() => {
-                    module.setComponent(SimpleComponent);
+                    module.setService(SimpleComponent);
                 });
                 it('should have the dependency available', () => {
                     expect(module.component<SimpleComponent>(SimpleComponent)).toEqual(jasmine.any(SimpleComponent));
