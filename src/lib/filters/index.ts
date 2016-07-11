@@ -1,1 +1,1 @@
-export {Filter, FilterError} from './core';
+export {IFilter, FilterError} from './core';

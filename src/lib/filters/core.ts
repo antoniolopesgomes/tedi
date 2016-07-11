@@ -1,7 +1,7 @@
 import * as express from 'express';
 import {CustomError} from '../core';
 
-export interface Filter<T> {
+export interface IFilter<T> {
     apply(req: express.Request, res: express.Response): any;
     getDataFromRequest(req: express.Request): T;
 }

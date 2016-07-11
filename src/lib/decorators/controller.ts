@@ -1,5 +1,5 @@
 'use strict';
-import * as inversify from 'inversify';
+import {injectable} from '../modules';
 import * as METADATA_KEYS from './constants/metadata-keys';
 import * as ERRORS from './constants/error-messages';
 import {CustomError} from '../core';
@@ -56,7 +56,7 @@ function ControllerDecorator(): ClassDecorator {
     
     return function (target: Object) {
         try {
-            inversify.injectable()(target);
+            injectable()(target);
             Reflect.defineMetadata(METADATA_KEYS.CONTROLLER, true, target);
         }
         catch (error) {

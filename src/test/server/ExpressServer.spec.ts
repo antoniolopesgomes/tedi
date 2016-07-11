@@ -3,9 +3,9 @@ import * as request from 'supertest-as-promised';
 import * as express from 'express';
 import {
     inject, injectable, BindingContext,
-    Filter,
+    IFilter,
     FilterError,
-    ErrorHandler,
+    IErrorHandler,
     ErrorHandlerError,
     ActionError,
 } from '../../core';
@@ -32,13 +32,13 @@ describe('ExpressServer', () => {
     }
 
     @injectable()
-    class CustomFilter implements Filter<any> {
+    class CustomFilter implements IFilter<any> {
         apply(req: express.Request, res: express.Response): any { }
         getDataFromRequest(req: express.Request): any { }
     }
 
     @injectable()
-    class CustomErrorHandler implements ErrorHandler {
+    class CustomErrorHandler implements IErrorHandler {
         catch(err: any) {
             throw err;
         }

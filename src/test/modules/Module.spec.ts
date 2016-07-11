@@ -1,7 +1,7 @@
 
 import {ExpressServer, ExpressApp} from '../../server';
 import {
-    Filter,
+    IFilter,
     App,
     Module,
     BindingContext,
@@ -24,7 +24,7 @@ describe('Modules', () => {
     }
 
     @injectable()
-    class CustomFilter implements Filter<any> {
+    class CustomFilter implements IFilter<any> {
         apply(req: express.Request, res: express.Response): any {
 
         }

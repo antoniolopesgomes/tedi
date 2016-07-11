@@ -1,6 +1,6 @@
 import * as inversify from 'inversify';
-import {Filter} from '../filters';
-import {ErrorHandler} from '../errors';
+import {IFilter} from '../filters';
+import {IErrorHandler} from '../errors';
 import {Constructor, CustomError} from '../core';
 import {
     IModule,
@@ -37,8 +37,8 @@ export abstract class Module implements IModule {
     }
 
     setFilter<T>(
-        abstraction: string | Constructor<Filter<T>>,
-        concretion?: Constructor<Filter<T>> | Filter<T>,
+        abstraction: string | Constructor<IFilter<T>>,
+        concretion?: Constructor<IFilter<T>> | IFilter<T>,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -46,8 +46,8 @@ export abstract class Module implements IModule {
     }
 
     setErrorHandler(
-        abstraction: string | Constructor<ErrorHandler>,
-        concretion?: Constructor<ErrorHandler> | ErrorHandler,
+        abstraction: string | Constructor<IErrorHandler>,
+        concretion?: Constructor<IErrorHandler> | IErrorHandler,
         options?: BindingOptions
     ): Module {
         setBinding(this._kernel, abstraction, concretion, options);
@@ -83,22 +83,22 @@ export abstract class Module implements IModule {
         throw new ModuleError(this, `Could not find controller '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    filter<T>(abstraction: string | Constructor<Filter<T>>): Filter<T> {
+    filter<T>(abstraction: string | Constructor<IFilter<T>>): IFilter<T> {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
-                return getBinding<Filter<T>>(currentModule._kernel, abstraction);
+                return getBinding<IFilter<T>>(currentModule._kernel, abstraction);
             }
             currentModule = currentModule.getParentModule();
         }
         throw new ModuleError(this, `Could not find filter '${(abstraction || '?').toString()}' in the module tree`, null);
     }
 
-    errorHandler(abstraction: string | Constructor<ErrorHandler>): ErrorHandler {
+    errorHandler(abstraction: string | Constructor<IErrorHandler>): IErrorHandler {
         let currentModule: Module = this;
         while (currentModule) {
             if (hasBinding(currentModule._kernel, abstraction)) {
-                return getBinding<ErrorHandler>(currentModule._kernel, abstraction);
+                return getBinding<IErrorHandler>(currentModule._kernel, abstraction);
             }
             currentModule = currentModule.getParentModule();
         }

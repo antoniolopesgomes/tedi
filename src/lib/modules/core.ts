@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import {ErrorHandler} from '../errors';
-import {Filter} from '../filters';
+import {IErrorHandler} from '../errors';
+import {IFilter} from '../filters';
 import {Constructor, CustomError} from '../core';
 
 import * as inversify from 'inversify';
@@ -26,14 +26,14 @@ export interface IModule {
     ): IModule;
     
     setFilter<T>(
-        abstraction: string | Constructor<Filter<T>>, 
-        concretion: Constructor<Filter<T>> | Filter<T>,
+        abstraction: string | Constructor<IFilter<T>>, 
+        concretion: Constructor<IFilter<T>> | IFilter<T>,
         options?: BindingOptions
     ): IModule;
 
     setErrorHandler(
-        abstraction: string | Constructor<ErrorHandler>, 
-        concretion: Constructor<ErrorHandler> | ErrorHandler,
+        abstraction: string | Constructor<IErrorHandler>, 
+        concretion: Constructor<IErrorHandler> | IErrorHandler,
         options?: BindingOptions
     ): IModule;
 

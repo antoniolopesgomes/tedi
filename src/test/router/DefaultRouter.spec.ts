@@ -8,8 +8,8 @@ import {
 import {
     BindingContext,
     injectable,
-    Filter,
-    ErrorHandler,
+    IFilter,
+    IErrorHandler,
 } from '../../core';
 import {ExpressServer} from '../../server';
 import {DefaultRouter} from '../../router';
@@ -44,13 +44,13 @@ describe('DefaultRouter', () => {
             }
 
             @injectable()
-            class DummyFilterMock implements Filter<any> {
+            class DummyFilterMock implements IFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
                 getDataFromRequest(req: express.Request): any { }
             }
 
             @injectable()
-            class DummyErrorHandler implements ErrorHandler {
+            class DummyErrorHandler implements IErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
             }
 
@@ -139,7 +139,7 @@ describe('DefaultRouter', () => {
                             "$filters": ["InvalidFilter"]
                         }
                     })
-                    .setFilter<Filter<any>>('InvalidFilter', <any>InvalidFilter);
+                    .setFilter<IFilter<any>>('InvalidFilter', <any>InvalidFilter);
             })
 
             it('should throw a FilterError', () => {

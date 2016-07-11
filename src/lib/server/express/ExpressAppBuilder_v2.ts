@@ -2,8 +2,8 @@ import * as express from 'express';
 import {inject, injectable} from '../../modules';
 import {Router} from '../../router';
 import {Logger} from '../../logger';
-import {Filter, FilterError} from '../../filters';
-import {ErrorHandler, ErrorHandlerError} from '../../errors';
+import {IFilter, FilterError} from '../../filters';
+import {IErrorHandler, ErrorHandlerError} from '../../errors';
 import {ActionError} from '../../controllers';
 import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 

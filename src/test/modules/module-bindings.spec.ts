@@ -1,4 +1,4 @@
-import {Module, injectable, Filter, ErrorHandler} from '../../core';
+import {Module, injectable, IFilter, IErrorHandler} from '../../core';
 import * as express from 'express';
 
 describe('Module bindings', () => {
@@ -42,7 +42,7 @@ describe('Module bindings', () => {
         });
         describe('and we register one Filter', () => {
             @injectable()
-            class SimpleFilter implements Filter<any> {
+            class SimpleFilter implements IFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
                 getDataFromRequest(req: express.Request): any { }
             }
@@ -73,7 +73,7 @@ describe('Module bindings', () => {
         });
         describe('and we register one ErrorHandler', () => {
             @injectable()
-            class SimpleErrorHandler implements ErrorHandler {
+            class SimpleErrorHandler implements IErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
             }
             describe('#SimpleErrorHandler(abstraction)', () => {

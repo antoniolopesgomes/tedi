@@ -1,1 +1,1 @@
-export {ErrorHandler, ErrorHandlerError} from './core';
+export {IErrorHandler, ErrorHandlerError} from './core';

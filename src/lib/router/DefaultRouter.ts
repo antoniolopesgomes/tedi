@@ -7,8 +7,8 @@ import {
     RouteErrorHandler,
     ROUTE_KEYS,
 } from './core';
-import {Filter} from '../filters';
-import {ErrorHandler} from '../errors';
+import {IFilter} from '../filters';
+import {IErrorHandler} from '../errors';
 import {Logger} from '../logger';
 import {Module, inject, injectable} from '../modules';
 
@@ -133,7 +133,7 @@ export class RouteBuilder {
 
     getFilters(filterNames: string[], module: Module): RouteFilter[] {
 
-        function validateFilter(name: string, filter: Filter<any>) {
+        function validateFilter(name: string, filter: IFilter<any>) {
             let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
             if (!hasFilterInterface) {
                 throwError(`'${name}' must implement 'Filter'`);
@@ -157,7 +157,7 @@ export class RouteBuilder {
 
     getErrorHandlers(errorHandlersNames: string[], module: Module): RouteErrorHandler[] {
 
-        function validateErrorHandler(name: string, errorHandler: ErrorHandler) {
+        function validateErrorHandler(name: string, errorHandler: IErrorHandler) {
             let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
             if (!hasErrorHandlerInterface) {
                 throwError(`'${name}' must implement 'ErrorHandler'`);
