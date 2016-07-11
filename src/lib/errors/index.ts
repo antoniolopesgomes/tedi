@@ -1,1 +1,0 @@
-export {IErrorHandler, ErrorHandlerError} from './core';

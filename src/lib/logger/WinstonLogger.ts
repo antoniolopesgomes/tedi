@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 import {Logger, LoggerLevels} from './core';
-import {injectable} from '../modules';
+import {injectable} from '../module';
 
 export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args) => Logger {
 

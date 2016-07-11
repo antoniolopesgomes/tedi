@@ -3,7 +3,7 @@ import * as http from 'http';
 import {Router} from '../../router';
 import {App} from '../../app';
 import {Logger, WinstonLoggerFactory} from '../../logger';
-import {Module, BindingContext, injectable} from '../../modules';
+import {Module, BindingContext, injectable} from '../../module';
 import {Config} from '../../config';
 import {Promise} from '../../core';
 import {DefaultRouter} from '../../router';

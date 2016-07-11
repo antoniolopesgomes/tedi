@@ -1,10 +1,10 @@
 import * as express from 'express';
-import {inject, injectable} from '../../modules';
+import {inject, injectable} from '../../module';
 import {Router} from '../../router';
 import {Logger} from '../../logger';
-import {IFilter, FilterError} from '../../filters';
-import {IErrorHandler, ErrorHandlerError} from '../../errors';
-import {ActionError} from '../../controllers';
+import {IFilter, FilterError} from '../../filter';
+import {IErrorHandler, ErrorHandlerError} from '../../error-handler';
+import {ActionError} from '../../controller';
 import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 
 export class ExpressAppBuilder {

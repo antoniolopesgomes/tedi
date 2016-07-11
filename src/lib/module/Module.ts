@@ -1,6 +1,6 @@
 import * as inversify from 'inversify';
-import {IFilter} from '../filters';
-import {IErrorHandler} from '../errors';
+import {IFilter} from '../filter';
+import {IErrorHandler} from '../error-handler';
 import {Constructor, CustomError} from '../core';
 import {
     IModule,

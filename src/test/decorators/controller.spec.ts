@@ -1,5 +1,5 @@
 import {Controller, Module} from '../../core';
-import {ControllerActionDecoratorError} from '../../lib/decorators';
+import {ControllerActionDecoratorError} from '../../lib/controller';
 
 describe('Controller decorators', () => {
 

@@ -1,6 +1,6 @@
 'use strict';
-import {IFilter} from '../filters';
-import {IErrorHandler} from '../errors';
+import {IFilter} from '../filter';
+import {IErrorHandler} from '../error-handler';
 
 export interface RouteAction {
     controller: Object;

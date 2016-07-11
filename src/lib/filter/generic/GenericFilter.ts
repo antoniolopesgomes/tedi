@@ -1,7 +1,7 @@
 
 import * as express from 'express';
 import * as Promise from 'bluebird';
-import {IFilter} from '../../filters';
+import {IFilter} from '../../filter';
 
 export class GenericFilter implements IFilter<any> {
 

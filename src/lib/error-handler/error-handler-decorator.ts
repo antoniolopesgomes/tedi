@@ -1,7 +1,7 @@
 'use strict';
-import {injectable} from '../modules';
-import * as METADATA_KEYS from './constants/metadata-keys';
-import * as ERRORS from './constants/error-messages';
+import {injectable} from '../module';
+import * as METADATA_KEYS from '../constants/metadata-keys';
+import * as ERRORS from '../constants/error-messages';
 import {CustomError} from '../core';
 
 //CUSTOM ERRORS USED BY THIS MODULE

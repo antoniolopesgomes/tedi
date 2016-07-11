@@ -7,10 +7,10 @@ import {
     RouteErrorHandler,
     ROUTE_KEYS,
 } from './core';
-import {IFilter} from '../filters';
-import {IErrorHandler} from '../errors';
+import {IFilter} from '../filter';
+import {IErrorHandler} from '../error-handler';
 import {Logger} from '../logger';
-import {Module, inject, injectable} from '../modules';
+import {Module, inject, injectable} from '../module';
 
 @injectable()
 export class DefaultRouter implements Router {

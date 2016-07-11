@@ -1,1 +1,0 @@
-export {IFilter, FilterError} from './core';

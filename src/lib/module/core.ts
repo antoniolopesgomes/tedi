@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import {IErrorHandler} from '../errors';
-import {IFilter} from '../filters';
+import {IErrorHandler} from '../error-handler';
+import {IFilter} from '../filter';
 import {Constructor, CustomError} from '../core';
 
 import * as inversify from 'inversify';
