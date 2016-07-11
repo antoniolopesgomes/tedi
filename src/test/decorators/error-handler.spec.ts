@@ -6,14 +6,14 @@ describe('Filter decorator', () => {
     describe('when we have a non decorated class', () => {
         class AnErrorHandler { };
         it('should not be decorated', () => {
-            expect(ErrorHandlerMetadata.isPresent(AnErrorHandler)).toBeFalsy();
+            expect(ErrorHandlerMetadata.isDecorated(AnErrorHandler)).toBeFalsy();
         });
     });
 
     describe('when we have a decorated class', () => {
         @ErrorHandler() class AnErrorHandler { };
         it('should be decorated', () => {
-            expect(ErrorHandlerMetadata.isPresent(AnErrorHandler)).toBeTruthy();
+            expect(ErrorHandlerMetadata.isDecorated(AnErrorHandler)).toBeTruthy();
         });
     });
 

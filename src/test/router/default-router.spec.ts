@@ -7,7 +7,9 @@ import {
 } from '../../router';
 import {
     BindingContext,
-    injectable,
+    Controller,
+    Filter,
+    ErrorHandler,
     IFilter,
     IErrorHandler,
 } from '../../core';
@@ -36,20 +38,20 @@ describe('DefaultRouter', () => {
             let authRoute: RouteDefinition;
             let loginRoute: RouteDefinition;
 
-            @injectable()
+            @Controller()
             class AuthControllerMock {
                 login() {
                     return;
                 }
             }
 
-            @injectable()
+            @Filter()
             class DummyFilterMock implements IFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
                 getDataFromRequest(req: express.Request): any { }
             }
 
-            @injectable()
+            @ErrorHandler()
             class DummyErrorHandler implements IErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
             }
@@ -129,7 +131,7 @@ describe('DefaultRouter', () => {
 
         describe('with invalid filters', () => {
 
-            @injectable()
+            @Filter()
             class InvalidFilter { }
 
             beforeEach(() => {
@@ -151,7 +153,7 @@ describe('DefaultRouter', () => {
 
         describe('with invalid errorHandlers', () => {
 
-            @injectable()
+            @ErrorHandler()
             class InvalidErrorHandler { }
 
             beforeEach(() => {
@@ -175,7 +177,7 @@ describe('DefaultRouter', () => {
 
     describe('routing table', () => {
 
-        @injectable()
+        @Controller()
         class BaseController {
             get(): void { }
             post(): void { }

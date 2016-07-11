@@ -1,4 +1,4 @@
-import {injectable} from '../../core';
+import {Controller} from '../../core';
 import {ExpressServer} from '../../server';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
@@ -13,7 +13,7 @@ describe('ExpressServer params', () => {
     });
 
     describe('given a route tree with parameters', () => {
-        @injectable()
+        @Controller()
         class TestController {
             get(): void { }
         }

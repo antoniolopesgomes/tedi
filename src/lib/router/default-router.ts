@@ -10,7 +10,7 @@ import {
 import {IFilter} from '../filter';
 import {IErrorHandler} from '../error-handler';
 import {Logger} from '../logger';
-import {Module} from '../module';
+import {BaseModule} from '../module';
 import {inject, injectable} from '../di';
 
 @injectable()
@@ -24,7 +24,7 @@ export class DefaultRouter implements Router {
 
     constructor(
         @inject('RoutesDefinition') routesDefinition: any,
-        @inject('Server') serverModule: Module,
+        @inject('Server') serverModule: BaseModule,
         @inject('Logger') logger: Logger
     ) {
         this._routesDefinition = routesDefinition;
@@ -63,7 +63,7 @@ export class RouteBuilder {
         private _logger: Logger
     ) { }
 
-    getRoutesConfiguration(routesDefinition: any, module: Module): RouteDefinition {
+    getRoutesConfiguration(routesDefinition: any, module: BaseModule): RouteDefinition {
         //create and setup root (add filters and errorHandlers)
         let root = new RouteDefinition('/');
         //root fullPath is equal to path
@@ -76,7 +76,7 @@ export class RouteBuilder {
         return root;
     }
 
-    buildRouteDefinition(routes: any, routeConfig: RouteDefinition, module: Module): void {
+    buildRouteDefinition(routes: any, routeConfig: RouteDefinition, module: BaseModule): void {
         Object.keys(routes).forEach((key: string) => {
             if (key.indexOf('/') === 0) {
                 let rawRouteDefinition = routes[key];
@@ -99,7 +99,7 @@ export class RouteBuilder {
         })
     }
 
-    fillRouteDefinition(rawRouteDefinition: any, route: RouteDefinition, module: Module): void {
+    fillRouteDefinition(rawRouteDefinition: any, route: RouteDefinition, module: BaseModule): void {
         route.filters = this.getFilters(rawRouteDefinition[ROUTE_KEYS.FILTERS], module);
         route.errorHandlers = this.getErrorHandlers(rawRouteDefinition[ROUTE_KEYS.ERROR_HANDLERS], module);
         route.get = this.getAction(rawRouteDefinition.get, module);
@@ -108,7 +108,7 @@ export class RouteBuilder {
         route.put = this.getAction(rawRouteDefinition.put, module);
     }
 
-    getAction(routeAction: string[], module: Module): RouteAction {
+    getAction(routeAction: string[], module: BaseModule): RouteAction {
 
         if (!routeAction) {
             return undefined;
@@ -132,7 +132,7 @@ export class RouteBuilder {
         }
     }
 
-    getFilters(filterNames: string[], module: Module): RouteFilter[] {
+    getFilters(filterNames: string[], module: BaseModule): RouteFilter[] {
 
         function validateFilter(name: string, filter: IFilter<any>) {
             let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
@@ -156,7 +156,7 @@ export class RouteBuilder {
 
     }
 
-    getErrorHandlers(errorHandlersNames: string[], module: Module): RouteErrorHandler[] {
+    getErrorHandlers(errorHandlersNames: string[], module: BaseModule): RouteErrorHandler[] {
 
         function validateErrorHandler(name: string, errorHandler: IErrorHandler) {
             let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);

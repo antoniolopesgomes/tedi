@@ -1,21 +1,21 @@
-import {Module, injectable, IFilter, IErrorHandler} from '../../core';
+import {BaseModule, Controller, Filter, ErrorHandler, IFilter, IErrorHandler} from '../../core';
 import * as express from 'express';
 
 describe('Module bindings', () => {
 
-    class SimpleModule extends Module {
+    class SimpleModule extends BaseModule {
         init() { }
     }
 
     describe('when we have a module', () => {
-        let module: Module;
+        let module: BaseModule;
         beforeEach(() => {
             module = new SimpleModule();
         });
         describe('and we register one Controller', () => {
-            @injectable()
+            @Controller()
             class SimpleController { }
-            describe('#setComponent(abstraction)', () => {
+            describe('#setController(abstraction)', () => {
                 beforeEach(() => {
                     module.setController(SimpleController);
                 });
@@ -23,7 +23,7 @@ describe('Module bindings', () => {
                     expect(module.component<SimpleController>(SimpleController)).toEqual(jasmine.any(SimpleController));
                 });
             });
-            describe('#setComponent(abstraction, concretion)', () => {
+            describe('#setController(abstraction, concretion)', () => {
                 beforeEach(() => {
                     module.setController(SimpleController, SimpleController);
                 });
@@ -31,7 +31,7 @@ describe('Module bindings', () => {
                     expect(module.component<SimpleController>(SimpleController)).toEqual(jasmine.any(SimpleController));
                 });
             });
-            describe('#setComponent("abstraction", concretion)', () => {
+            describe('#setController("abstraction", concretion)', () => {
                 beforeEach(() => {
                     module.setController('SimpleController', SimpleController);
                 });
@@ -41,12 +41,12 @@ describe('Module bindings', () => {
             });
         });
         describe('and we register one Filter', () => {
-            @injectable()
+            @Filter()
             class SimpleFilter implements IFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
                 getDataFromRequest(req: express.Request): any { }
             }
-            describe('#SimpleFilter(abstraction)', () => {
+            describe('#setFilter(abstraction)', () => {
                 beforeEach(() => {
                     module.setFilter(SimpleFilter);
                 });
@@ -54,17 +54,17 @@ describe('Module bindings', () => {
                     expect(module.component<SimpleFilter>(SimpleFilter)).toEqual(jasmine.any(SimpleFilter));
                 });
             });
-            describe('#SimpleFilter(abstraction, concretion)', () => {
+            describe('#setFilter(abstraction, concretion)', () => {
                 beforeEach(() => {
-                    module.setController(SimpleFilter, SimpleFilter);
+                    module.setFilter(SimpleFilter, SimpleFilter);
                 });
                 it('should have the dependency available', () => {
                     expect(module.component<SimpleFilter>(SimpleFilter)).toEqual(jasmine.any(SimpleFilter));
                 });
             });
-            describe('#SimpleFilter("abstraction", concretion)', () => {
+            describe('#setFilter("abstraction", concretion)', () => {
                 beforeEach(() => {
-                    module.setController('SimpleFilter', SimpleFilter);
+                    module.setFilter('SimpleFilter', SimpleFilter);
                 });
                 it('should have the dependency available', () => {
                     expect(module.component<SimpleFilter>('SimpleFilter')).toEqual(jasmine.any(SimpleFilter));
@@ -72,11 +72,11 @@ describe('Module bindings', () => {
             });
         });
         describe('and we register one ErrorHandler', () => {
-            @injectable()
+            @ErrorHandler()
             class SimpleErrorHandler implements IErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
             }
-            describe('#SimpleErrorHandler(abstraction)', () => {
+            describe('#setErrorHandler(abstraction)', () => {
                 beforeEach(() => {
                     module.setErrorHandler(SimpleErrorHandler);
                 });
@@ -84,17 +84,17 @@ describe('Module bindings', () => {
                     expect(module.component<SimpleErrorHandler>(SimpleErrorHandler)).toEqual(jasmine.any(SimpleErrorHandler));
                 });
             });
-            describe('#SimpleErrorHandler(abstraction, concretion)', () => {
+            describe('#setErrorHandler(abstraction, concretion)', () => {
                 beforeEach(() => {
-                    module.setController(SimpleErrorHandler, SimpleErrorHandler);
+                    module.setErrorHandler(SimpleErrorHandler, SimpleErrorHandler);
                 });
                 it('should have the dependency available', () => {
                     expect(module.component<SimpleErrorHandler>(SimpleErrorHandler)).toEqual(jasmine.any(SimpleErrorHandler));
                 });
             });
-            describe('#SimpleErrorHandler("abstraction", concretion)', () => {
+            describe('#setErrorHandler("abstraction", concretion)', () => {
                 beforeEach(() => {
-                    module.setController('SimpleErrorHandler', SimpleErrorHandler);
+                    module.setErrorHandler('SimpleErrorHandler', SimpleErrorHandler);
                 });
                 it('should have the dependency available', () => {
                     expect(module.component<SimpleErrorHandler>('SimpleErrorHandler')).toEqual(jasmine.any(SimpleErrorHandler));
@@ -102,7 +102,7 @@ describe('Module bindings', () => {
             });
         });
         describe('and we register one Component', () => {
-            @injectable()
+            @Controller()
             class SimpleComponent {}
             describe('#SimpleComponent(abstraction)', () => {
                 beforeEach(() => {

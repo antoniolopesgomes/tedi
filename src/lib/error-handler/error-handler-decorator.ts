@@ -26,7 +26,7 @@ function ErrorHandlerDecorator(): ClassDecorator {
             Reflect.defineMetadata(METADATA_KEYS.ERROR_HANDLER, true, target);
         }
         catch (error) {
-            throw new ErrorHandlerDecoratorError((<any>target).name, ERRORS.CONTROLLER_ERROR_DECORATING, error);
+            throw new ErrorHandlerDecoratorError((<any>target).name, ERRORS.ERROR_HANDLER_ERROR_DECORATING, error);
         }
     }
 }

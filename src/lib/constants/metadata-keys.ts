@@ -11,3 +11,5 @@ export const PUT: string = 'tedi:PUT';
 export const FILTER: string = 'tedi:Filter';
 
 export const ERROR_HANDLER: string = 'tedi:ErrorHandler';
+
+export const MODULE: string = 'tedi:Module';

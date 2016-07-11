@@ -1,5 +1,5 @@
-export {inject, injectable, BindingContext} from './lib/di';
-export {Module} from './lib/module';
+export {BindingContext} from './lib/di';
+export {BaseModule, Module} from './lib/module';
 export {App} from './lib/app';
 export {ActionError, Controller} from './lib/controller';
 export {IErrorHandler, ErrorHandlerError, ErrorHandler} from './lib/error-handler';

@@ -26,7 +26,7 @@ function FilterDecorator(): ClassDecorator {
             Reflect.defineMetadata(METADATA_KEYS.FILTER, true, target);
         }
         catch (error) {
-            throw new FilterDecoratorError((<any>target).name, ERRORS.CONTROLLER_ERROR_DECORATING, error);
+            throw new FilterDecoratorError((<any>target).name, ERRORS.FILTER_ERROR_DECORATING, error);
         }
     }
 }

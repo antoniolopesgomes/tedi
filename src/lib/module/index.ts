@@ -1,2 +1,3 @@
 export {IModule} from './core';
-export {Module} from './module';
+export {BaseModule} from './module';
+export {Module, ModuleDecoratorError} from './module-decorator';

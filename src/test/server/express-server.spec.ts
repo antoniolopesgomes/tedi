@@ -2,12 +2,13 @@
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
 import {
-    inject, injectable, BindingContext,
+    BindingContext,
     IFilter,
     FilterError,
     IErrorHandler,
     ErrorHandlerError,
     ActionError,
+    Controller, Filter, ErrorHandler
 } from '../../core';
 import {Logger, LoggerLevels} from '../../logger';
 import {Router} from '../../router';
@@ -18,7 +19,7 @@ describe('ExpressServer', () => {
 
     let server = new ExpressServer();
 
-    @injectable()
+    @Controller()
     class AuthController {
         login(req, res: express.Response) {
             res.send(req.$thisFilter);
@@ -31,13 +32,13 @@ describe('ExpressServer', () => {
         }
     }
 
-    @injectable()
+    @Filter()
     class CustomFilter implements IFilter<any> {
         apply(req: express.Request, res: express.Response): any { }
         getDataFromRequest(req: express.Request): any { }
     }
 
-    @injectable()
+    @ErrorHandler()
     class CustomErrorHandler implements IErrorHandler {
         catch(err: any) {
             throw err;

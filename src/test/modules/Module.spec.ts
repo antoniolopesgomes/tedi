@@ -3,10 +3,11 @@ import {ExpressServer, ExpressApp} from '../../server';
 import {
     IFilter,
     App,
-    Module,
+    BaseModule,
     BindingContext,
-    inject,
-    injectable
+    Controller,
+    Filter,
+    Module
 } from '../../core'
 import {Logger} from '../../logger';
 import * as express from 'express';
@@ -16,14 +17,14 @@ describe('Modules', () => {
 
     let server = new ExpressServer();
 
-    @injectable()
+    @Controller()
     class AuthController {
         get(req, res): void {
             res.status(200).end();
         };
     }
 
-    @injectable()
+    @Filter()
     class CustomFilter implements IFilter<any> {
         apply(req: express.Request, res: express.Response): any {
 
@@ -33,8 +34,8 @@ describe('Modules', () => {
         }
     }
 
-    @injectable()
-    class AuthModule extends Module {
+    @Module()
+    class AuthModule extends BaseModule {
         init(): void {
             this
                 .setRoutes({
@@ -57,7 +58,7 @@ describe('Modules', () => {
     describe('When we got an app with a child module', () => {
 
         let app: express.Application;
-        let authModule: Module;
+        let authModule: BaseModule;
 
         beforeEach(() => {
             server
@@ -103,7 +104,7 @@ describe('Modules', () => {
             });
 
             describe('and override an internal component', () => {
-                @injectable()
+                @Controller()
                 class CustomAuthController {
                     get(req, res): void {
                         res.status(200).end();
