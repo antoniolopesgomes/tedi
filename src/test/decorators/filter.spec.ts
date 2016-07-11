@@ -1,18 +1,19 @@
 import {Filter, Module} from '../../core';
+import {FilterMetadata} from '../../lib/filter';
 
 describe('Filter decorator', () => {
 
     describe('when we have a non decorated class', () => {
         class AFilter { };
         it('should not be decorated', () => {
-            expect(Filter.metadata.isPresent(AFilter)).toBeFalsy();
+            expect(FilterMetadata.isPresent(AFilter)).toBeFalsy();
         });
     });
 
     describe('when we have a decorated class', () => {
         @Filter() class AFilter { };
         it('should be decorated', () => {
-            expect(Filter.metadata.isPresent(AFilter)).toBeTruthy();
+            expect(FilterMetadata.isPresent(AFilter)).toBeTruthy();
         });
     });
 

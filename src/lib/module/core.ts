@@ -4,6 +4,9 @@ import {IFilter} from '../filter';
 import {Constructor, CustomError} from '../core';
 import {BindingOptions} from '../di';
 
+export type Abstraction<T> = string | Constructor<T>;
+export type Concretion<T> = Constructor<T> | T;
+
 export interface IModule {
 
     setController<T>(

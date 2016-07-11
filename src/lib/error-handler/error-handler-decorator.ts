@@ -12,19 +12,10 @@ export class ErrorHandlerDecoratorError extends CustomError {
     }
 }
 
-//ERROR HANDLER METADATA HELPER
-
-export class ErrorHandlerMetadata {
-    isPresent(target: Object): boolean {
-        return Reflect.hasMetadata(METADATA_KEYS.ERROR_HANDLER, target);
-    }
-}
-
 //ERROR HANDLER DECORATOR
 
 export interface IErrorHandlerDecorator {
     (): (target: any) => void;
-    metadata: ErrorHandlerMetadata;
 }
 
 function ErrorHandlerDecorator(): ClassDecorator {
@@ -39,7 +30,5 @@ function ErrorHandlerDecorator(): ClassDecorator {
         }
     }
 }
-
-(<IErrorHandlerDecorator> ErrorHandlerDecorator).metadata = new ErrorHandlerMetadata();
 
 export const ErrorHandler = <IErrorHandlerDecorator> ErrorHandlerDecorator;

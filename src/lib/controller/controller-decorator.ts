@@ -1,4 +1,5 @@
 'use strict';
+import {ControllerMetadata} from './controller-metadata';
 import {injectable} from '../di';
 import * as METADATA_KEYS from '../constants/metadata-keys';
 import * as ERRORS from '../constants/error-messages';
@@ -18,34 +19,10 @@ export class ControllerActionDecoratorError extends CustomError {
     }
 }
 
-//CONTROLLER METADATA HELPER
-
-export class ControllerMetadata {
-    isPresent(target: Object): boolean {
-        return Reflect.hasMetadata(METADATA_KEYS.CONTROLLER, target);
-    }
-    actionMethodName(action: string, target: Object): string {
-        return <string> Reflect.getMetadata(METADATA_KEYS[action.toUpperCase()], target);
-    }
-    GETMethodName(target: Object): string {
-        return this.actionMethodName('GET', target);
-    }
-    POSTMethodName(target: Object): string {
-        return this.actionMethodName('POST', target);
-    }
-    DELETEMethodName(target: Object): string {
-        return this.actionMethodName('DELETE', target);
-    }
-    PUTMethodName(target: Object): string {
-        return this.actionMethodName('PUT', target);
-    }
-}
-
 //CONTROLLER DECORATOR
 
-export interface IController {
-    (): (target: any) => void;
-    metadata: ControllerMetadata;
+export interface IControllerDecorator {
+    (): (target: Object) => void;
     get: () => MethodDecorator;
     post: () => MethodDecorator;
     delete: () => MethodDecorator;
@@ -53,7 +30,7 @@ export interface IController {
 }
 
 function ControllerDecorator(): ClassDecorator {
-    
+
     return function (target: Object) {
         try {
             injectable()(target);
@@ -65,33 +42,30 @@ function ControllerDecorator(): ClassDecorator {
     }
 }
 
-(<IController>ControllerDecorator).metadata = new ControllerMetadata();
-
-(<IController>ControllerDecorator).get = function (): MethodDecorator {
+(<IControllerDecorator>ControllerDecorator).get = function (): MethodDecorator {
     return ControllerActionMethodDecorator('GET');
 };
 
-(<IController>ControllerDecorator).post = function (): MethodDecorator {
+(<IControllerDecorator>ControllerDecorator).post = function (): MethodDecorator {
     return ControllerActionMethodDecorator('POST');
 };
 
-(<IController>ControllerDecorator).delete = function (): MethodDecorator {
+(<IControllerDecorator>ControllerDecorator).delete = function (): MethodDecorator {
     return ControllerActionMethodDecorator('DELETE');
 };
 
-(<IController>ControllerDecorator).put = function (): MethodDecorator {
+(<IControllerDecorator>ControllerDecorator).put = function (): MethodDecorator {
     return ControllerActionMethodDecorator('PUT');
 }
 
 function ControllerActionMethodDecorator(action: string): MethodDecorator {
     return function (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
         let targetConstructorName = (<any>target).constructor.name;
-        if (Controller.metadata.actionMethodName(action, target)) {
+        if (ControllerMetadata.actionMethodName(action, target)) {
             throw new ControllerActionDecoratorError(targetConstructorName, action.toUpperCase(), ERRORS.CONTROLLER_ACTION_DUPLICATE);
         }
         Reflect.defineMetadata(METADATA_KEYS[action.toUpperCase()], propertyKey, target);
     };
 }
 
-export const Controller = <IController>ControllerDecorator;
-
+export const Controller = <IControllerDecorator>ControllerDecorator;

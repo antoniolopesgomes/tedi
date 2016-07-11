@@ -28,6 +28,7 @@ export abstract class Module implements IModule {
         concretion?: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
+        concretion = this._normalizeConcretion<T>(abstraction, concretion);
         this._di.setBinding(abstraction, concretion, options);
         return this;
     }
@@ -37,6 +38,7 @@ export abstract class Module implements IModule {
         concretion?: Constructor<IFilter<T>> | IFilter<T>,
         options?: BindingOptions
     ): Module {
+        concretion = this._normalizeConcretion<IFilter<T>>(abstraction, concretion);
         this._di.setBinding(abstraction, concretion, options);
         return this;
     }
@@ -46,16 +48,18 @@ export abstract class Module implements IModule {
         concretion?: Constructor<IErrorHandler> | IErrorHandler,
         options?: BindingOptions
     ): Module {
+        concretion = this._normalizeConcretion<IErrorHandler>(abstraction, concretion);
         this._di.setBinding(abstraction, concretion, options);
         return this;
     }
 
     setComponent<T>(
         abstraction: string | Constructor<T>,
-        concretion?: Constructor<T> | T | typeof Object,
+        concretion?: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
         //TODO check for this any casts
+        concretion = this._normalizeConcretion<T>(abstraction, concretion);
         this._di.setBinding(<any>abstraction, concretion, options);
         return this;
     }
@@ -131,7 +135,6 @@ export abstract class Module implements IModule {
         return this._di.getBinding<any>('RoutesDefinition');
     }
 
-
     _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
         let currentModule: Module = this;
         while (currentModule) {
@@ -141,6 +144,19 @@ export abstract class Module implements IModule {
             currentModule = currentModule.getParentModule();
         }
         return null;
+    }
+
+    _normalizeConcretion<T>(
+        abstraction: string | Constructor<T>,
+        concretion: Constructor<T> | T
+    ): Constructor<T> | T {
+        /*
+            If no concretion was defined assume that this abstraction binding is a class 
+            and register it as the concretion.
+        */
+        return concretion ?
+            concretion :
+            <Constructor<T>>abstraction;
     }
 
 }

@@ -1,5 +1,5 @@
 import {Controller, Module} from '../../core';
-import {ControllerActionDecoratorError} from '../../lib/controller';
+import {ControllerActionDecoratorError, ControllerMetadata} from '../../lib/controller';
 
 describe('Controller decorators', () => {
 
@@ -7,14 +7,14 @@ describe('Controller decorators', () => {
         describe('when we have a non decorated class', () => {
             class AController { };
             it('should not be decorated', () => {
-                expect(Controller.metadata.isPresent(AController)).toBeFalsy();
+                expect(ControllerMetadata.isPresent(AController)).toBeFalsy();
             });
         });
 
         describe('when we have a decorated class', () => {
             @Controller() class AController { };
             it('should be decorated', () => {
-                expect(Controller.metadata.isPresent(AController)).toBeTruthy();
+                expect(ControllerMetadata.isPresent(AController)).toBeTruthy();
             });
         });
     });
@@ -42,7 +42,7 @@ describe('Controller decorators', () => {
             describe('GET decoration', () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = Controller.metadata.GETMethodName(controller);
+                    methodName = ControllerMetadata.GETMethodName(controller);
                 });
                 it('should have stored the GET method name', () => {
                     expect(methodName).toEqual('read');
@@ -54,7 +54,7 @@ describe('Controller decorators', () => {
             describe('POST decoration', () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = Controller.metadata.POSTMethodName(controller);
+                    methodName = ControllerMetadata.POSTMethodName(controller);
                 });
                 it('should have stored the POST method name', () => {
                     expect(methodName).toEqual('create');
@@ -66,7 +66,7 @@ describe('Controller decorators', () => {
             describe('PUT decoration', () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = Controller.metadata.PUTMethodName(controller);
+                    methodName = ControllerMetadata.PUTMethodName(controller);
                 });
                 it('should have stored the PUT method name', () => {
                     expect(methodName).toEqual('update');
@@ -78,7 +78,7 @@ describe('Controller decorators', () => {
             describe('DELETE decoration', () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = Controller.metadata.DELETEMethodName(controller);
+                    methodName = ControllerMetadata.DELETEMethodName(controller);
                 });
                 it('should have stored the DELETE method name', () => {
                     expect(methodName).toEqual('delete');

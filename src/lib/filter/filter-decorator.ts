@@ -12,19 +12,10 @@ export class FilterDecoratorError extends CustomError {
     }
 }
 
-//FILTER METADATA HELPER
-
-export class FilterMetadata {
-    isPresent(target: Object): boolean {
-        return Reflect.hasMetadata(METADATA_KEYS.FILTER, target);
-    }
-}
-
 //FILTER DECORATOR
 
 export interface IFilterDecorator {
     (): (target: any) => void;
-    metadata: FilterMetadata;
 }
 
 function FilterDecorator(): ClassDecorator {
@@ -39,7 +30,5 @@ function FilterDecorator(): ClassDecorator {
         }
     }
 }
-
-(<IFilterDecorator> FilterDecorator).metadata = new FilterMetadata();
 
 export const Filter = <IFilterDecorator> FilterDecorator;

@@ -51,10 +51,6 @@ export class DIModule {
         concretion: Constructor<T> | T,
         options?: BindingOptions
     ): void {
-        //if no concretion was defined assume that this abstraction binding is a class and register it as the concretion
-        if (!concretion) {
-            concretion = <Constructor<T>>abstraction;
-        }
         if (this.hasBinding(abstraction)) {
             this.unbindFromKernel(abstraction);
         }
