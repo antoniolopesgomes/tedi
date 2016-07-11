@@ -2,20 +2,7 @@ import 'reflect-metadata';
 import {IErrorHandler} from '../error-handler';
 import {IFilter} from '../filter';
 import {Constructor, CustomError} from '../core';
-
-import * as inversify from 'inversify';
-
-export {inject, injectable} from 'inversify';
-
-export enum BindingContext {
-    SINGLETON,
-    TRANSIENT,
-    VALUE
-}
-
-export interface BindingOptions {
-    context: BindingContext
-} 
+import {BindingOptions} from '../di';
 
 export interface IModule {
 

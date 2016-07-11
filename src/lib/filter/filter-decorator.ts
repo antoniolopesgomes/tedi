@@ -1,5 +1,5 @@
 'use strict';
-import {injectable} from '../module';
+import {injectable} from '../di';
 import * as METADATA_KEYS from '../constants/metadata-keys';
 import * as ERRORS from '../constants/error-messages';
 import {CustomError} from '../core';

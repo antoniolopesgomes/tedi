@@ -1,8 +1,2 @@
-export {
-    inject, 
-    injectable, 
-    IModule, 
-    BindingContext, 
-    BindingOptions,
-} from './core';
-export {Module} from './Module';
+export {IModule} from './core';
+export {Module} from './module';

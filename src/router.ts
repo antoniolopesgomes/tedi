@@ -1,2 +1,2 @@
-export {DefaultRouter} from './lib/router/DefaultRouter';
+export {DefaultRouter} from './lib/router/default-router';
 export * from './lib/router/core';

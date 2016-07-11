@@ -3,12 +3,12 @@ import * as express from 'express';
 import * as http from 'http';
 import {Config} from '../../config';
 import {App} from '../../app';
-import {inject, injectable} from '../../module';
+import {inject, injectable} from '../../di';
 import {Logger} from '../../logger/core';
 import {Promise} from '../../core';
 import {RouteDefinition, Router, RouteAction} from '../../router/core';
-import {ExpressAppBuilder} from './ExpressAppBuilder';
-import {ExpressAppBuilder_v2} from './ExpressAppBuilder_v2';
+import {ExpressAppBuilder} from './express-app-builder';
+import {ExpressAppBuilder_v2} from './express-app-builder-v2';
 
 @injectable()
 export class ExpressApp implements App {

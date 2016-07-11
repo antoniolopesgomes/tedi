@@ -1,22 +1,18 @@
 import * as inversify from 'inversify';
 import {IFilter} from '../filter';
 import {IErrorHandler} from '../error-handler';
+import {DIModule, BindingContext, BindingOptions} from '../di';
 import {Constructor, CustomError} from '../core';
-import {
-    IModule,
-    ModuleError,
-    BindingOptions,
-    BindingContext
-} from './core';
+import {IModule, ModuleError} from './core';
 
 export abstract class Module implements IModule {
 
     private _parentModule: Module;
-    private _kernel: inversify.interfaces.Kernel;
+    private _di: DIModule;
 
     constructor(parentModule?: Module) {
         this._parentModule = parentModule;
-        this._kernel = new inversify.Kernel();
+        this._di = new DIModule();
         //initialize
         this.init();
     }
@@ -32,7 +28,7 @@ export abstract class Module implements IModule {
         concretion?: Constructor<T> | T,
         options?: BindingOptions
     ): Module {
-        setBinding(this._kernel, abstraction, concretion, options);
+        this._di.setBinding(abstraction, concretion, options);
         return this;
     }
 
@@ -41,7 +37,7 @@ export abstract class Module implements IModule {
         concretion?: Constructor<IFilter<T>> | IFilter<T>,
         options?: BindingOptions
     ): Module {
-        setBinding(this._kernel, abstraction, concretion, options);
+        this._di.setBinding(abstraction, concretion, options);
         return this;
     }
 
@@ -50,7 +46,7 @@ export abstract class Module implements IModule {
         concretion?: Constructor<IErrorHandler> | IErrorHandler,
         options?: BindingOptions
     ): Module {
-        setBinding(this._kernel, abstraction, concretion, options);
+        this._di.setBinding(abstraction, concretion, options);
         return this;
     }
 
@@ -60,7 +56,7 @@ export abstract class Module implements IModule {
         options?: BindingOptions
     ): Module {
         //TODO check for this any casts
-        setBinding(this._kernel, <any>abstraction, concretion, options);
+        this._di.setBinding(<any>abstraction, concretion, options);
         return this;
     }
 
@@ -68,15 +64,15 @@ export abstract class Module implements IModule {
         name: string,
         ModuleClass: Constructor<Module>
     ): Module {
-        setBinding(this._kernel, name, new ModuleClass(this), { context: BindingContext.VALUE });
+        this._di.setBinding(name, new ModuleClass(this), { context: BindingContext.VALUE });
         return this;
     }
 
     controller<T>(abstraction: string | Constructor<T>): T {
         let currentModule: Module = this;
         while (currentModule) {
-            if (hasBinding(currentModule._kernel, abstraction)) {
-                return getBinding<T>(currentModule._kernel, abstraction);
+            if (currentModule._di.hasBinding(abstraction)) {
+                return currentModule._di.getBinding<T>(abstraction);
             }
             currentModule = currentModule.getParentModule();
         }
@@ -86,8 +82,8 @@ export abstract class Module implements IModule {
     filter<T>(abstraction: string | Constructor<IFilter<T>>): IFilter<T> {
         let currentModule: Module = this;
         while (currentModule) {
-            if (hasBinding(currentModule._kernel, abstraction)) {
-                return getBinding<IFilter<T>>(currentModule._kernel, abstraction);
+            if (currentModule._di.hasBinding(abstraction)) {
+                return currentModule._di.getBinding<IFilter<T>>(abstraction);
             }
             currentModule = currentModule.getParentModule();
         }
@@ -97,8 +93,8 @@ export abstract class Module implements IModule {
     errorHandler(abstraction: string | Constructor<IErrorHandler>): IErrorHandler {
         let currentModule: Module = this;
         while (currentModule) {
-            if (hasBinding(currentModule._kernel, abstraction)) {
-                return getBinding<IErrorHandler>(currentModule._kernel, abstraction);
+            if (currentModule._di.hasBinding(abstraction)) {
+                return currentModule._di.getBinding<IErrorHandler>(abstraction);
             }
             currentModule = currentModule.getParentModule();
         }
@@ -108,8 +104,8 @@ export abstract class Module implements IModule {
     component<T>(abstraction: string | Constructor<T>): T {
         let currentModule: Module = this;
         while (currentModule) {
-            if (hasBinding(currentModule._kernel, abstraction)) {
-                return getBinding<T>(currentModule._kernel, abstraction);
+            if (currentModule._di.hasBinding(abstraction)) {
+                return currentModule._di.getBinding<T>(abstraction);
             }
             currentModule = currentModule.getParentModule();
         }
@@ -117,92 +113,34 @@ export abstract class Module implements IModule {
     }
 
     childModule(name: string): Module {
-        if (!hasBinding(this._kernel, name)) {
+        if (!this._di.hasBinding(name)) {
             throw new ModuleError(this, `Could not find module '${(name || '?').toString()}'`, null);
         }
-        return this._kernel.get<Module>(name);
+        return this._di.getBinding<Module>(name);
     }
 
     clear(): Module {
-        this._kernel.unbindAll();
+        this._di.unbindAll();
         return this;
     }
 
     snapshot(): Module {
-        this._kernel.snapshot();
+        this._di.snapshot();
         return this;
     }
 
     restore(): Module {
-        this._kernel.restore();
+        this._di.restore();
         return this;
     }
 
     setRoutes(value: any): Module {
-        setBinding(this._kernel, 'RoutesDefinition', value, { context: BindingContext.VALUE });
+        this._di.setBinding('RoutesDefinition', value, { context: BindingContext.VALUE });
         return this;
     }
 
     getRoutes(): any {
-        return this._kernel.get<any>('RoutesDefinition');
+        return this._di.getBinding<any>('RoutesDefinition');
     }
 
-}
-
-function getBinding<T>(
-    kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T>
-): T {
-    return kernel.get<T>(<any>abstraction);
-}
-
-function hasBinding(
-    kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<any>
-): boolean {
-    return kernel.isBound(abstraction);
-}
-
-function unbindFromKernel(
-    kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<any>
-): void {
-    kernel.unbind(abstraction);
-}
-
-function bindToKernel<T>(
-    kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T>,
-    concretion: Constructor<T> | T,
-    options: BindingOptions = { context: BindingContext.SINGLETON }
-): void {
-    switch (options.context) {
-        case BindingContext.SINGLETON:
-            kernel.bind<T>(abstraction).to(<Constructor<T>>concretion).inSingletonScope();
-            break;
-        case BindingContext.TRANSIENT:
-            kernel.bind<T>(abstraction).to(<Constructor<T>>concretion)
-            break;
-        case BindingContext.VALUE:
-            kernel.bind<T>(abstraction).toConstantValue(<T>concretion);
-            break;
-        default:
-            throw new ModuleError(this, 'Unknown binding context', null);
-    }
-}
-
-function setBinding<T>(
-    kernel: inversify.interfaces.Kernel,
-    abstraction: string | Constructor<T>,
-    concretion: Constructor<T> | T,
-    options?: BindingOptions
-): void {
-    //if no concretion was defined assume that this abstraction binding is a class and register it as the concretion
-    if (!concretion) {
-        concretion = <Constructor<T>> abstraction;
-    }
-    if (hasBinding(kernel, abstraction)) {
-        unbindFromKernel(kernel, abstraction);
-    }
-    bindToKernel(kernel, abstraction, concretion, options)
 }

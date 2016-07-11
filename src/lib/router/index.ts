@@ -1,2 +1,2 @@
-export {DefaultRouter} from './DefaultRouter';
+export {DefaultRouter} from './default-router';
 export * from './core'; 

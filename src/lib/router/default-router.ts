@@ -10,7 +10,8 @@ import {
 import {IFilter} from '../filter';
 import {IErrorHandler} from '../error-handler';
 import {Logger} from '../logger';
-import {Module, inject, injectable} from '../module';
+import {Module} from '../module';
+import {inject, injectable} from '../di';
 
 @injectable()
 export class DefaultRouter implements Router {

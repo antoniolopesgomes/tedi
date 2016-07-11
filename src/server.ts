@@ -1,2 +1,2 @@
-export {ExpressServer} from './lib/server/express/ExpressServer';
-export {ExpressApp} from './lib/server/express/ExpressApp';
+export {ExpressServer} from './lib/server/express/express-server';
+export {ExpressApp} from './lib/server/express/express-app';
