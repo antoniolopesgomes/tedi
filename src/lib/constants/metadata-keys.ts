@@ -12,4 +12,6 @@ export const FILTER: string = 'tedi:Filter';
 
 export const ERROR_HANDLER: string = 'tedi:ErrorHandler';
 
+export const SERVICE: string = 'tedi:Service';
+
 export const MODULE: string = 'tedi:Module';

@@ -1,4 +1,4 @@
-import {BaseModule, Controller, Filter, ErrorHandler, BaseFilter, BaseErrorHandler} from '../../core';
+import {BaseModule, Controller, Filter, Service, ErrorHandler, BaseFilter, BaseErrorHandler} from '../../core';
 import * as express from 'express';
 
 describe('Module bindings', () => {
@@ -12,7 +12,7 @@ describe('Module bindings', () => {
         beforeEach(() => {
             module = new SimpleModule();
         });
-        describe('and we register one Controller', () => {
+        describe('and we register a Controller', () => {
             @Controller()
             class SimpleController { }
             describe('#setController(abstraction)', () => {
@@ -40,7 +40,7 @@ describe('Module bindings', () => {
                 });
             });
         });
-        describe('and we register one Filter', () => {
+        describe('and we register a Filter', () => {
             @Filter()
             class SimpleFilter implements BaseFilter<any> {
                 apply(req: express.Request, res: express.Response): any { }
@@ -71,7 +71,7 @@ describe('Module bindings', () => {
                 });
             });
         });
-        describe('and we register one ErrorHandler', () => {
+        describe('and we register an ErrorHandler', () => {
             @ErrorHandler()
             class SimpleErrorHandler implements BaseErrorHandler {
                 catch(error: any, req: express.Request, res: express.Response): void { }
@@ -101,31 +101,31 @@ describe('Module bindings', () => {
                 });
             });
         });
-        describe('and we register one Component', () => {
-            @Controller()
-            class SimpleComponent {}
-            describe('#SimpleComponent(abstraction)', () => {
+        describe('and we register a Service', () => {
+            @Service()
+            class SimpleService {}
+            describe('#setService(abstraction)', () => {
                 beforeEach(() => {
-                    module.setService(SimpleComponent);
+                    module.setService(SimpleService);
                 });
                 it('should have the dependency available', () => {
-                    expect(module.component<SimpleComponent>(SimpleComponent)).toEqual(jasmine.any(SimpleComponent));
+                    expect(module.component<SimpleService>(SimpleService)).toEqual(jasmine.any(SimpleService));
                 });
             });
-            describe('#SimpleComponent(abstraction, concretion)', () => {
+            describe('#setService(abstraction, concretion)', () => {
                 beforeEach(() => {
-                    module.setController(SimpleComponent, SimpleComponent);
+                    module.setService(SimpleService, SimpleService);
                 });
                 it('should have the dependency available', () => {
-                    expect(module.component<SimpleComponent>(SimpleComponent)).toEqual(jasmine.any(SimpleComponent));
+                    expect(module.component<SimpleService>(SimpleService)).toEqual(jasmine.any(SimpleService));
                 });
             });
-            describe('#SimpleComponent("abstraction", concretion)', () => {
+            describe('#setService("abstraction", concretion)', () => {
                 beforeEach(() => {
-                    module.setController('SimpleComponent', SimpleComponent);
+                    module.setService('SimpleComponent', SimpleService);
                 });
                 it('should have the dependency available', () => {
-                    expect(module.component<SimpleComponent>('SimpleComponent')).toEqual(jasmine.any(SimpleComponent));
+                    expect(module.component<SimpleService>('SimpleComponent')).toEqual(jasmine.any(SimpleService));
                 });
             });
         });

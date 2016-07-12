@@ -6,7 +6,7 @@ import {ControllerMetadata} from '../controller';
 import {BaseErrorHandler, ErrorHandlerMetadata} from '../error-handler';
 import {DIModule, BindingContext, BindingOptions} from '../di';
 import {Constructor, CustomError} from '../core';
-import {ControllerValidator, FilterValidator, ErrorHandlerValidator, ModuleValidator} from './validators';
+import {ControllerValidator, FilterValidator, ErrorHandlerValidator, ModuleValidator, ServiceValidator} from './validators';
 
 export abstract class BaseModule {
 
@@ -69,6 +69,8 @@ export abstract class BaseModule {
     ): BaseModule {
         //TODO check for this any casts
         concretion = this._normalizeConcretion<T>(abstraction, concretion);
+        options = this._normalizeOptions(options);
+        //ServiceValidator.validate(concretion, options);
         this._di.setBinding(<any>abstraction, concretion, options);
         return this;
     }

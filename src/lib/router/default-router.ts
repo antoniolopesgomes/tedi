@@ -8,12 +8,13 @@ import {
     ROUTE_KEYS,
 } from './core';
 import {BaseFilter} from '../filter';
+import {Service} from '../service';
 import {BaseErrorHandler} from '../error-handler';
 import {Logger} from '../logger';
 import {BaseModule} from '../module';
-import {inject, injectable} from '../di';
+import {inject} from '../di';
 
-@injectable()
+@Service()
 export class DefaultRouter implements Router {
 
     private _routesDefinition: any;

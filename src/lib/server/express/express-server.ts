@@ -4,13 +4,14 @@ import {Router} from '../../router';
 import {App} from '../../app';
 import {Logger, WinstonLoggerFactory} from '../../logger';
 import {BaseModule} from '../../module';
-import {BindingContext, injectable} from '../../di';
+import {Service} from '../../service';
+import {BindingContext} from '../../di';
 import {Config} from '../../config';
 import {Promise} from '../../core';
 import {DefaultRouter} from '../../router';
 import {ExpressApp} from '../../server/express';
 
-@injectable()
+@Service()
 export class ExpressServer extends BaseModule {
 
     private _server: http.Server;
