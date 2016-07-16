@@ -35,14 +35,10 @@ describe('BaseRouter', () => {
         catch(): void { }
     }
 
-    let simpleModule: BaseModule = new SimpleModule();
+    let simpleModule: BaseModule;
 
     beforeEach(() => {
-        simpleModule.snapshot();
-    });
-
-    afterEach(() => {
-        simpleModule.restore();
+        simpleModule = new SimpleModule();
     });
 
     describe('when we have valid routes', () => {
