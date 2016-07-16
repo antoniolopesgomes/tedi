@@ -149,7 +149,7 @@ export abstract class BaseModule {
         return this._di.getBinding<any>('RoutesDefinition');
     }
 
-    _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
+    private _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
         let currentModule: BaseModule = this;
         while (currentModule) {
             if (currentModule._di.hasBinding(abstraction)) {
@@ -160,7 +160,7 @@ export abstract class BaseModule {
         return null;
     }
 
-    _normalizeConcretion<T>(
+    private _normalizeConcretion<T>(
         abstraction: string | Constructor<T>,
         concretion: Constructor<T> | T
     ): Constructor<T> | T {
@@ -173,7 +173,7 @@ export abstract class BaseModule {
             <Constructor<T>>abstraction;
     }
 
-    _normalizeOptions(options: BindingOptions): BindingOptions {
+    private _normalizeOptions(options: BindingOptions): BindingOptions {
         options = options || <BindingOptions> {};
         options.context = _.isUndefined(options.context) ? BindingContext.SINGLETON : options.context;
         return options;

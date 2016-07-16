@@ -23,122 +23,137 @@ export class BaseRouter implements Router {
 
     constructor(
         @inject('Logger') private _logger: Logger
-    ) {}
+    ) { }
 
     getRootRoute(jsonRoutes: any, module: BaseModule): Route {
-        return parseJsonRoute('/', jsonRoutes, module);
+        return this._parseJsonRoute('/', jsonRoutes, module);
     }
 
-}
-
-function parseJsonRoute(path: string, jsonRoute: any, module: BaseModule): Route {
-    let route: Route = new BaseRoute(path);
-    try {
-        route.filters = parseRouteFilters(jsonRoute[ROUTE_KEYS.FILTERS], module);
-        route.errorHandlers = parseRouteErrorHandlers(jsonRoute[ROUTE_KEYS.ERROR_HANDLERS], module);
-        route.get = parseRouteAction(jsonRoute.get, module);
-        route.post = parseRouteAction(jsonRoute.post, module);
-        route.delete = parseRouteAction(jsonRoute.delete, module);
-        route.put = parseRouteAction(jsonRoute.put, module);
-        route.children = parseChildrenRoutes(jsonRoute, route, module);
-    }
-    catch (error) {
-        throw new RouteError(route, 'Error parsing route', error);
-    }
-    return route;
-}
-
-function parseRouteAction(routeAction: string[], module: BaseModule): RouteAction {
-    if (!routeAction) {
-        return undefined;
-    }
-    if (!_.isArray(routeAction) || routeAction.length < 2) {
-        throw new Error('parseRouteAction: action should have two string fields [controller, controllerMethod]');
+    private _parseJsonRoute(path: string, jsonRoute: any, module: BaseModule): Route {
+        let route: Route = new BaseRoute(path);
+        try {
+            route.filters = this._parseRouteFilters(jsonRoute[ROUTE_KEYS.FILTERS], module);
+            route.errorHandlers = this._parseRouteErrorHandlers(jsonRoute[ROUTE_KEYS.ERROR_HANDLERS], module);
+            route.get = this._parseRouteAction(jsonRoute.get, module);
+            route.post = this._parseRouteAction(jsonRoute.post, module);
+            route.delete = this._parseRouteAction(jsonRoute.delete, module);
+            route.put = this._parseRouteAction(jsonRoute.put, module);
+            route.children = this._parseChildrenRoutes(jsonRoute, route, module);
+        }
+        catch (error) {
+            throw new RouteError(route, 'Error parsing route', error);
+        }
+        return route;
     }
 
-    let controllerName = routeAction[0];
-    let methodName = routeAction[1];
-    let controller: any = module.controller(controllerName);
+    private _parseRouteAction(routeAction: string[], module: BaseModule): RouteAction {
+        if (!routeAction) {
+            return undefined;
+        }
+        if (!_.isArray(routeAction) || routeAction.length < 2) {
+            throw new Error('parseRouteAction: action should have two string fields [controller, controllerMethod]');
+        }
 
-    if (!_.isFunction(controller[methodName])) {
-        throw new Error(`parseRouteAction: invalid controller[${controllerName}] method[${methodName}]`);
-    }
+        let controllerName = routeAction[0];
+        let methodName = routeAction[1];
+        let controller: any = module.controller(controllerName);
 
-    return {
-        controller: controller,
-        controllerMethod: methodName
-    }
-}
+        if (!_.isFunction(controller[methodName])) {
+            throw new Error(`parseRouteAction: invalid controller[${controllerName}] method[${methodName}]`);
+        }
 
-function parseRouteFilters(filterNames: string[], module: BaseModule): RouteFilter[] {
-
-    function validateFilter(name: string, filter: BaseFilter<any>) {
-        let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
-        if (!hasFilterInterface) {
-            throw new Error(`parseRouteFilter: '${name}' must implement 'Filter'`);
+        return {
+            controller: controller,
+            controllerMethod: methodName
         }
     }
 
-    if (!_.isArray(filterNames)) {
-        return [];
-    }
+    private _parseRouteFilters(filterNames: string[], module: BaseModule): RouteFilter[] {
 
-    return filterNames.map<RouteFilter>((name: string) => {
-        let filter = module.filter(name);
-        validateFilter(name, filter);
-        return <RouteFilter>{
-            name: name,
-            filter: filter
-        }
-    });
-}
-
-function parseRouteErrorHandlers(errorHandlersNames: string[], module: BaseModule): RouteErrorHandler[] {
-
-    function validateErrorHandler(name: string, errorHandler: BaseErrorHandler) {
-        let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
-        if (!hasErrorHandlerInterface) {
-            throw new Error(`parseRouteErrorHandlers: '${name}' must implement 'ErrorHandler'`);
-        }
-    }
-
-    if (!_.isArray(errorHandlersNames)) {
-        return [];
-    }
-
-    return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
-        let errorHandler = module.errorHandler(name);
-        validateErrorHandler(name, errorHandler);
-        return <RouteErrorHandler>{
-            name: name,
-            errorHandler: errorHandler
-        };
-    });
-}
-
-function parseChildrenRoutes(jsonRoute: any, route: Route, module: BaseModule): Route[] {
-    let childrenRoutes: Route[] = [];
-    Object.keys(jsonRoute).forEach((key: string) => {
-        //all endpoints definitions begin with a slash
-        if (key.indexOf('/') === 0) {
-            let childJsonRoute = jsonRoute[key];
-            //if we're deling with a module (string value)
-            if (_.isString(childJsonRoute)) {
-                //load it
-                module = module.childModule(childJsonRoute);
-                //get the routerDefinition
-                childJsonRoute = module.getJsonRoutes();
+        function validateFilter(name: string, filter: BaseFilter<any>) {
+            let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
+            if (!hasFilterInterface) {
+                throw new Error(`parseRouteFilter: '${name}' must implement 'Filter'`);
             }
-            //build child router
-            let childRoutePath = normalizePath(route.path + key);
-            let childRoute = parseJsonRoute(childRoutePath, childJsonRoute, module);
-            childrenRoutes.push(childRoute);
         }
-        else if (['$filters', '$errorHandlers', 'get', 'post', 'put', 'delete'].indexOf(key) < 0) {
-            //this._logger.debug(`Routing key: '${key}' of ${route.path}, will be ignored`);
+
+        if (!_.isArray(filterNames)) {
+            return [];
         }
-    });
-    return childrenRoutes;
+
+        return filterNames.map<RouteFilter>((name: string) => {
+            let filter = module.filter(name);
+            validateFilter(name, filter);
+            return <RouteFilter>{
+                name: name,
+                filter: filter
+            }
+        });
+    }
+
+    private _parseRouteErrorHandlers(errorHandlersNames: string[], module: BaseModule): RouteErrorHandler[] {
+
+        function validateErrorHandler(name: string, errorHandler: BaseErrorHandler) {
+            let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
+            if (!hasErrorHandlerInterface) {
+                throw new Error(`parseRouteErrorHandlers: '${name}' must implement 'ErrorHandler'`);
+            }
+        }
+
+        if (!_.isArray(errorHandlersNames)) {
+            return [];
+        }
+
+        return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
+            let errorHandler = module.errorHandler(name);
+            validateErrorHandler(name, errorHandler);
+            return <RouteErrorHandler>{
+                name: name,
+                errorHandler: errorHandler
+            };
+        });
+    }
+
+    private _parseModuleRoute(path: string, module: BaseModule): Route {
+
+        function validateModule(aModule: BaseModule): void {
+
+        }
+
+        validateModule(module);
+
+        return this._parseJsonRoute(path, module.getJsonRoutes(), module);
+
+    }
+
+    private _isModule(jsonRouteValue: any): boolean {
+        return _.isString(jsonRouteValue);
+    }
+
+    private _parseChildrenRoutes(jsonRoute: any, route: Route, module: BaseModule): Route[] {
+        let childrenRoutes: Route[] = [];
+        Object.keys(jsonRoute).forEach((key: string) => {
+            //all endpoints definitions begin with a slash
+            if (key.indexOf('/') === 0) {
+                let childJsonRouteValue = jsonRoute[key];
+                let childRoutePath = normalizePath(route.path + key);
+                let childRoute: Route;
+                //if we're deling with a module (string value)
+                if (this._isModule(childJsonRouteValue)) {
+                    childRoute = this._parseModuleRoute(childRoutePath, module.childModule(childJsonRouteValue))
+                }
+                else {
+                    childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
+                }
+                childrenRoutes.push(childRoute);
+            }
+            else if (['$filters', '$errorHandlers', 'get', 'post', 'put', 'delete'].indexOf(key) < 0) {
+                this._logger.debug(`Routing key: '${key}' of ${route.path}, will be ignored`);
+            }
+        });
+        return childrenRoutes;
+    }
+
 }
 
 //UTILS
