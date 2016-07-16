@@ -4,12 +4,11 @@ import * as request from 'supertest-as-promised';
 import * as express from 'express';
 
 describe('ExpressServer params', () => {
-    let server = new ExpressServer();
+
+    let server: ExpressServer;
+
     beforeEach(() => {
-        server.snapshot();
-    });
-    afterEach(() => {
-        server.restore();
+        server = new ExpressServer();
     });
 
     describe('given a route tree with parameters', () => {
@@ -20,7 +19,7 @@ describe('ExpressServer params', () => {
         let app: express.Application;
         beforeEach(() => {
             server
-                .setRoutes({
+                .setJsonRoutes({
                     '/api': {
                         '/user/:user_id': {
                             'get': ['TestController', 'get'],

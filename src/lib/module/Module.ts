@@ -140,12 +140,12 @@ export abstract class BaseModule {
         return this;
     }
 
-    setRoutes(value: any): BaseModule {
+    setJsonRoutes(value: any): BaseModule {
         this._di.setBinding('RoutesDefinition', value, { context: BindingContext.VALUE });
         return this;
     }
 
-    getRoutes(): any {
+    getJsonRoutes(): any {
         return this._di.getBinding<any>('RoutesDefinition');
     }
 

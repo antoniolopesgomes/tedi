@@ -11,13 +11,12 @@ import {
     Controller, Filter, ErrorHandler
 } from '../../core';
 import {Logger, LoggerLevels} from '../../logger';
-import {Router} from '../../router';
-import {ExpressApp, ExpressServer} from '../../server';
-import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
+import {ExpressServer} from '../../server';
+import {Route, RouteAction, RouteFilter, RouteErrorHandler} from '../../lib/router';
 
 describe('ExpressServer', () => {
 
-    let server = new ExpressServer();
+    let server: ExpressServer;
 
     @Controller()
     class AuthController {
@@ -46,21 +45,16 @@ describe('ExpressServer', () => {
     }
 
     beforeEach(() => {
-        server.snapshot();
+        server = new ExpressServer();
     });
-
-    afterEach(() => {
-        server.restore();
-    })
 
     describe('when we have a valid app', () => {
 
-        let router: Router;
         let expressApp: express.Application;
 
         beforeEach(() => {
             server
-                .setRoutes({
+                .setJsonRoutes({
                     "$errorHandlers": ["RootErrorHandler"],
                     "$filters": ["RootFilter"],
                     "/auth": {

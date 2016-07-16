@@ -2,53 +2,55 @@ import * as express from 'express';
 import {inject, injectable} from '../../di';
 import {Router} from '../../router';
 import {Logger} from '../../logger';
+import {BaseModule} from '../../module';
 import {BaseFilter, FilterError} from '../../filter';
 import {BaseErrorHandler, ErrorHandlerError} from '../../error-handler';
 import {ActionError} from '../../controller';
-import {RouteDefinition, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
+import {Service} from '../../service';
+import {Route, RouteAction, RouteFilter, RouteErrorHandler} from '../../router';
 
+@Service()
 export class ExpressAppBuilder_v2 {
 
     constructor(
-        public logger: Logger
+        @inject('Logger') private _logger: Logger,
+        @inject('Router') private _router: Router
     ) {
     }
 
-    buildApp(route: RouteDefinition): express.Application {
+    buildApp(jsonRoutes: any, module: BaseModule): express.Application {
+        let rootRoute = this._router.getRootRoute(jsonRoutes, module);
         let app = express();
-        //add app filters, this should be done before defining the action methods
-        this._addFilters(app, route);        
-        //Create routes first, do not attach error handlers just yet
-        //express error handlers should be attached after the routing tree is built if we want
-        //the error to bubble up trough the error handlers
-        route.children.forEach((childRoute: RouteDefinition) => {
-            this._buildRouting(app, childRoute);
-        })
-        this._addErrorHandlers(app, route);
+        this._buildRouting(app, rootRoute);
         return app;
     }
 
-    private _buildRouting(app: express.Application, route: RouteDefinition): void {
-        //do not forget: always add filters before setting the actions
+    private _buildRouting(app: express.Application, route: Route): void {
+        //add app filters, this should be done before defining the action methods
         this._addFilters(app, route);
+        //Create routes first, do not attach error handlers just yet
+        //express error handlers should be attached after the routing tree is built if we want
+        //the error to bubble up trough the error handlers
         this._addActions(app, route);
         //recursive - create the children routers and attach them to parent
-        (route.children || []).forEach((childRoute: RouteDefinition) => {
+        (route.children || []).forEach((childRoute: Route) => {
             this._buildRouting(app, childRoute);
         });
         //errorHandlers are setted in the end
         this._addErrorHandlers(app, route);
     }
 
-    private _addActions(app: express.Application, route: RouteDefinition): void {
+    private _addActions(app: express.Application, route: Route): void {
         //set actions
-        this._addAction('get', app, route.fullPath, route.get);
-        this._addAction('post', app, route.fullPath, route.post);
-        this._addAction('put', app, route.fullPath, route.put);
-        this._addAction('delete', app, route.fullPath, route.delete);
+        this._logger.debug(`Adding actions for route: ${route}`);
+        this._addAction('get', app, route);
+        this._addAction('post', app, route);
+        this._addAction('put', app, route);
+        this._addAction('delete', app, route);
     }
 
-    private _addAction(method: string, app: express.Application, fullPath: string, routeAction: RouteAction): void {
+    private _addAction(method: string, app: express.Application, routeDefinition: Route): void {
+        let routeAction: RouteAction = routeDefinition[method.toLowerCase()];
         //if there is no route action do nothing
         if (!routeAction) {
             return;
@@ -58,26 +60,26 @@ export class ExpressAppBuilder_v2 {
         let methodName: string = routeAction.controllerMethod;
         let actionInfo: string = `Action: ${controllerName}#${methodName}`;
         //
-        this.logger.debug(`app.${method}(${fullPath}, action)`);
-        app[method](fullPath, (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        this._logger.debug(`app.${method}(${routeDefinition.path}, action)`);
+        app[method](routeDefinition.path, (req: express.Request, res: express.Response, next: express.NextFunction) => {
             let requestInfo = `(${req.originalUrl}) - ${actionInfo}`;
             Promise
                 .resolve(true)
                 .then(() => {
-                    this.logger.debug(`${requestInfo} [CALLING]`);
+                    this._logger.debug(`${requestInfo} [CALLING]`);
                     return controller[methodName](req, res);
                 })
                 .then(() => {
-                    this.logger.debug(`${requestInfo} [SUCCESS]`);
+                    this._logger.debug(`${requestInfo} [SUCCESS]`);
                 })
                 .catch((error) => {
-                    this.logger.error(`${requestInfo} [ERROR]`, error);
+                    this._logger.error(`${requestInfo} [ERROR]`, error);
                     next(new ActionError(controllerName, methodName, error));
                 });
         })
     }
 
-    private _addFilters(app: express.Application, route: RouteDefinition): void {
+    private _addFilters(app: express.Application, route: Route): void {
         let filters  = route.filters.map<express.RequestHandler>((routeFilter: RouteFilter) => {
             let filter = routeFilter.filter;
             let filterName = routeFilter.name;
@@ -87,32 +89,32 @@ export class ExpressAppBuilder_v2 {
                 Promise
                     .resolve(true)
                     .then(() => {
-                        this.logger.debug(`${requestInfo} [CALLING]`);
+                        this._logger.debug(`${requestInfo} [CALLING]`);
                         return filter.apply(req, res);
                     })
                     .then(() => {
-                        this.logger.debug(`${requestInfo} [SUCCESS]`);
+                        this._logger.debug(`${requestInfo} [SUCCESS]`);
                         //if the headers block was sent by this filter
                         //stop downstream propagation
                         //we expect that the response has ended
                         if (!res.headersSent) {
-                            this.logger.warn(`${requestInfo} [!] Filter sent headers.`)
+                            this._logger.warn(`${requestInfo} [!] Filter sent headers.`)
                             next();
                         }
                     })
                     .catch((error: any) => {
-                        this.logger.error(`${requestInfo} [ERROR]`, error);
+                        this._logger.error(`${requestInfo} [ERROR]`, error);
                         next(new FilterError(filterName, error));
                     });
             }
         });
         if (filters.length > 0) {
-            this.logger.debug(`app.use(${route.fullPath}, ...filters)`);
-            app.use.apply(app, (<any[]>[route.fullPath]).concat(filters));
+            this._logger.debug(`app.use(${route.path}, ...filters)`);
+            app.use.apply(app, (<any[]>[route.path]).concat(filters));
         }
     }
 
-    private _addErrorHandlers(app: express.Application, route: RouteDefinition): void {
+    private _addErrorHandlers(app: express.Application, route: Route): void {
         let errorHandlers = route.errorHandlers.map<express.ErrorRequestHandler>((routeErrorHandler: RouteErrorHandler) => {
             let errorHandlerInfo = `ErrorHandler: ${routeErrorHandler.name}`;
             let errorHandler = routeErrorHandler.errorHandler;
@@ -121,21 +123,21 @@ export class ExpressAppBuilder_v2 {
                 Promise
                     .resolve(true)
                     .then(() => {
-                        this.logger.debug(`${requestInfo} [CALLING]`);
+                        this._logger.debug(`${requestInfo} [CALLING]`);
                         return errorHandler.catch(error, req, res);
                     })
                     .then(() => {
-                        this.logger.debug(`${requestInfo} [SUCCESS]`);
+                        this._logger.debug(`${requestInfo} [SUCCESS]`);
                     })
                     .catch((error: any) => {
-                        this.logger.error(`${requestInfo} [ERROR]`, error);
+                        this._logger.error(`${requestInfo} [ERROR]`, error);
                         next(error);
                     });
             }
         });
         if (errorHandlers.length > 0) {
-            this.logger.debug(`app.use(${route.fullPath}, ...errorHandlers)`);
-            app.use.apply(app, (<any[]>[route.fullPath]).concat(errorHandlers));
+            this._logger.debug(`app.use(${route.path}, ...errorHandlers)`);
+            app.use.apply(app, (<any[]>[route.path]).concat(errorHandlers));
         }
     }
 

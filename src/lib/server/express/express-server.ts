@@ -8,23 +8,25 @@ import {Service} from '../../service';
 import {BindingContext} from '../../di';
 import {Config} from '../../config';
 import {Promise} from '../../core';
-import {DefaultRouter} from '../../router';
-import {ExpressApp} from '../../server/express';
+import {BaseRouter} from '../../router';
+import {ExpressAppBuilder_v2} from './express-app-builder-v2';
 
 @Service()
 export class ExpressServer extends BaseModule {
 
     private _server: http.Server;
+    private _app: express.Application;
 
     constructor() {
         super();
     }
 
     init(): void {
+        //set dependencies
          this
             .setService<BaseModule>('Server', this, { context: BindingContext.VALUE })
-            .setService<App>('App', ExpressApp)
-            .setService<Router>('Router', DefaultRouter)
+            .setService<App>('ExpressAppBuilder', ExpressAppBuilder_v2)
+            .setService<Router>('Router', BaseRouter)
             .setService<Logger>('Logger', WinstonLoggerFactory())
             .setService<Config>('Config', {
                 port: 8080
@@ -42,7 +44,12 @@ export class ExpressServer extends BaseModule {
     }
 
     getApp(): express.Application {
-        return this.component<ExpressApp>('App').getApp();
+        if (!this._app) {
+            let jsonRoutes = this.getJsonRoutes();
+            let appBuilder = this.component<ExpressAppBuilder_v2>('ExpressAppBuilder');
+            this._app = appBuilder.buildApp(jsonRoutes, this);
+        }
+        return this._app;
     }
 
     run(): Promise<http.Server> {

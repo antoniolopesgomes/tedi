@@ -12,6 +12,18 @@ describe('Module bindings', () => {
         beforeEach(() => {
             module = new SimpleModule();
         });
+        describe('and we register a dependency', () => {
+            @Service()
+            class SimpleService { }
+            let service: any;
+            beforeEach(() => {
+                module.setService(SimpleService);
+                service = module.component(SimpleService);
+            });
+            it('should gives us the same instance', () => {
+                expect(module.component(SimpleService)).toEqual(service);
+            });
+        });
         describe('and we register a Controller', () => {
             @Controller()
             class SimpleController { }

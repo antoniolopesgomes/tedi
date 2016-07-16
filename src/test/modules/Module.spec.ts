@@ -1,5 +1,5 @@
 
-import {ExpressServer, ExpressApp} from '../../server';
+import {ExpressServer} from '../../server';
 import {
     BaseFilter,
     App,
@@ -9,13 +9,13 @@ import {
     Filter,
     Module
 } from '../../core'
-import {Logger} from '../../logger';
+import {Logger, LoggerLevels} from '../../logger';
 import * as express from 'express';
 import * as request from 'supertest-as-promised';
 
 describe('Modules', () => {
 
-    let server = new ExpressServer();
+    let server: ExpressServer;
 
     @Controller()
     class AuthController {
@@ -25,69 +25,63 @@ describe('Modules', () => {
     }
 
     @Filter()
-    class CustomFilter implements BaseFilter<any> {
-        apply(req: express.Request, res: express.Response): any {
-
-        }
-        getDataFromRequest(req: express.Request): any {
-            
-        }
+    class CustomFilter2 implements BaseFilter<any> {
+        apply(req: express.Request, res: express.Response): any { }
+        getDataFromRequest(req: express.Request): any { }
     }
 
     @Module()
     class AuthModule extends BaseModule {
         init(): void {
             this
-                .setRoutes({
+                .setJsonRoutes({
                     '/login': {
                         '$filters': ['RootFilter'],
                         'get': ['AuthController', 'get']
                     }
                 })
                 .setController('AuthController', AuthController)
-                .setFilter('RootFilter', new CustomFilter(), { context: BindingContext.VALUE });
+                .setFilter('RootFilter', CustomFilter2);
         }
     };
 
     beforeEach(() => {
-        server.snapshot();
-    })
-    afterEach(() => {
-        server.restore();
-    })
-    describe('When we got an app with a child module', () => {
+        server = new ExpressServer();
+    });
 
+    describe('When we got an app with a child module', () => {
+        let results: any[] = [];
         let app: express.Application;
         let authModule: BaseModule;
 
         beforeEach(() => {
+            results.push('_here');
             server
-                .setRoutes({
+                .setJsonRoutes({
                     '/auth': 'AuthModule'
                 })
                 .addChildModule('AuthModule', AuthModule);
-
-            app = server.component<ExpressApp>('App').getApp();
+            
+            //server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
+            app = server.getApp();
             authModule = server.childModule('AuthModule');
         });
 
         describe('/auth/login', () => {
             beforeEach((done: DoneFn) => {
+                results.push('here');
                 spyOn(authModule.controller('AuthController'), 'get').and.callThrough();
-                spyOn(authModule.filter('RootFilter'), 'apply').and.callFake(() => {
-                    return;
-                });
+                spyOn(authModule.filter('RootFilter'), 'apply').and.callThrough();
                 request(app)
                     .get('/auth/login')
                     .expect(200)
-                    .then(() => {
-                        done();
-                    })
+                    .then(() => done())
                     .catch(done.fail)
             })
 
             it('should have called the module controller', () => {
                 expect(authModule.controller<AuthController>('AuthController').get).toHaveBeenCalled();
+                
             });
 
             it('should have called the module auth.RootFilter', () => {

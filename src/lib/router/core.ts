@@ -1,6 +1,8 @@
 'use strict';
 import {BaseFilter} from '../filter';
 import {BaseErrorHandler} from '../error-handler';
+import {BaseModule} from '../module';
+import {CustomError} from '../core';
 
 export interface RouteAction {
     controller: Object;
@@ -17,33 +19,32 @@ export interface RouteErrorHandler {
     errorHandler: BaseErrorHandler;
 }
 
-export class RouteDefinition {
+export interface Route {
     path: string;
-    fullPath: string;
     filters: RouteFilter[];
     errorHandlers: RouteErrorHandler[];
-    children: RouteDefinition[];
+    children: Route[];
     //actions
     get: RouteAction;
     post: RouteAction;
     delete: RouteAction;
     put: RouteAction;
-    //data
-    data: any;
+}
 
-    constructor(path: string) {
-        this.path = path;
-        this.filters = [];
-        this.errorHandlers = [];
-        this.children = [];
-        this.data = {};
+export class RouteError extends CustomError {
+    constructor(route: Route, msg: string, error?: any) {
+        super(`'${route.path}': ${msg}`, error);
     }
 }
 
 export interface Router {
-    getRouterRoot(): RouteDefinition;
-    getPathRoute(path: string): RouteDefinition;
-    getPathAction(path: string, method: string): RouteAction;
+    getRootRoute(jsonRoutes: any, module: BaseModule): Route;
+}
+
+export class RouterError extends CustomError {
+    constructor(msg: string, error?: any) {
+        super(`${msg}`, error);
+    }
 }
 
 export interface RoutesDefinition {
