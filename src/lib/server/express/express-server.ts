@@ -5,7 +5,7 @@ import {App} from '../../app';
 import {Logger, WinstonLoggerFactory} from '../../logger';
 import {BaseModule} from '../../module';
 import {Service} from '../../service';
-import {BindingContext} from '../../di';
+import {BindingContext, dependency} from '../../di';
 import {Config} from '../../config';
 import {Promise} from '../../core';
 import {BaseRouter} from '../../router';
@@ -24,37 +24,36 @@ export class ExpressServer extends BaseModule {
     init(): void {
         //set dependencies
          this
-            .setService<BaseModule>('Server', this, { context: BindingContext.VALUE })
-            .setService<App>('ExpressAppBuilder', ExpressAppBuilder_v2)
-            .setService<Router>('Router', BaseRouter)
-            .setService<Logger>('Logger', WinstonLoggerFactory())
-            .setService<Config>('Config', {
-                port: 8080
-            }
-            , { context: BindingContext.VALUE });
+            .dependencies(
+                dependency('Server', { value: this }),
+                dependency('ExpressAppBuilder', { class: ExpressAppBuilder_v2 }),
+                dependency('Router', { class: BaseRouter }),
+                dependency('Logger', { class: WinstonLoggerFactory() }),
+                dependency('Config', { value: { port: 8080 } })
+            );
     }
 
     setConfig(config: Config): ExpressServer {
-        this.setService<Config>('Config', config, { context: BindingContext.VALUE });
+        this.setDependency(dependency('Config', { value: config }));
         return this;
     }
 
     getConfig(): Config {
-        return this.component<Config>('Config');
+        return this.getDependency<Config>('Config');
     }
 
     getApp(): express.Application {
         if (!this._app) {
             let jsonRoutes = this.getJsonRoutes();
-            let appBuilder = this.component<ExpressAppBuilder_v2>('ExpressAppBuilder');
+            let appBuilder = this.getDependency<ExpressAppBuilder_v2>('ExpressAppBuilder');
             this._app = appBuilder.buildApp(jsonRoutes, this);
         }
         return this._app;
     }
 
     run(): Promise<http.Server> {
-        let config = this.component<Config>('Config');
-        let logger = this.component<Logger>('Logger');
+        let config = this.getDependency<Config>('Config');
+        let logger = this.getDependency<Logger>('Logger');
         return new Promise<http.Server>((resolve, reject) => {
             this._server = this.getApp().listen(config.port, (error) => {
                 return error ? reject(error) : resolve(this._server);
@@ -66,7 +65,7 @@ export class ExpressServer extends BaseModule {
     }
 
     stop(): Promise<any> {
-        let logger = this.component<Logger>('Logger');
+        let logger = this.getDependency<Logger>('Logger');
         return new Promise((resolve, reject) => {
             if (!this._server) {
                 logger.debug('#stop called but no running server exists');

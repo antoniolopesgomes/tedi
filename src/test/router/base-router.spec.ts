@@ -7,6 +7,7 @@ import {
     Filter, 
     ErrorHandler, 
     BaseErrorHandler,
+    dependency
 } from '../../core';
 
 describe('BaseRouter', () => {
@@ -46,10 +47,11 @@ describe('BaseRouter', () => {
         let router: BaseRouter;
         beforeEach(() => {
             //configure module
-            simpleModule
-                .setController('DummyController', DummyController)
-                .setFilter('SimpleFilter', SimpleFilter)
-                .setErrorHandler('SimpleErrorHandler', SimpleErrorHandler)
+            simpleModule.dependencies(
+                dependency('DummyController', { class: DummyController }),
+                dependency('SimpleFilter', { class: SimpleFilter }),
+                dependency('SimpleErrorHandler', { class: SimpleErrorHandler })
+            );
             //define routes
             let jsonRoutes = {
                 '$filters': ['SimpleFilter'],
@@ -155,7 +157,9 @@ describe('BaseRouter', () => {
 
         beforeEach(() => {
             //configure module
-            simpleModule.setFilter('InvalidFilter', <any>InvalidFilter);
+            simpleModule.dependencies(
+                dependency('InvalidFilter', { class: InvalidFilter })
+            );
             //define router
             jsonRouter = {
                 "/dummy": {
@@ -186,7 +190,9 @@ describe('BaseRouter', () => {
 
         beforeEach(() => {
             //configure module
-            simpleModule.setErrorHandler('InvalidErrorHandler', <any>InvalidErrorHandler);
+            simpleModule.dependencies(
+                dependency('InvalidErrorHandler', { class: InvalidErrorHandler })
+            );
             //define router
             jsonRouter = {
                 "/dummy": {

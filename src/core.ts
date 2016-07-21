@@ -7,3 +7,4 @@ export {BaseErrorHandler, ErrorHandlerError, ErrorHandler} from './lib/error-han
 export {CustomError, Promise, Constructor} from './lib/core';
 export {BaseFilter, FilterError, Filter} from './lib/filter';
 export {Config} from './lib/config';
+export {dependency} from './lib/di';

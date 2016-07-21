@@ -17,130 +17,14 @@ describe('Module bindings', () => {
             class SimpleService { }
             let service: any;
             beforeEach(() => {
-                module.setService(SimpleService);
-                service = module.component(SimpleService);
+                module.setDependency(SimpleService);
+                service = module.getDependency(SimpleService);
             });
             it('should gives us the same instance', () => {
-                expect(module.component(SimpleService)).toEqual(service);
+                expect(module.getDependency(SimpleService)).toEqual(service);
             });
         });
-        describe('and we register a Controller', () => {
-            @Controller()
-            class SimpleController { }
-            describe('#setController(abstraction)', () => {
-                beforeEach(() => {
-                    module.setController(SimpleController);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleController>(SimpleController)).toEqual(jasmine.any(SimpleController));
-                });
-            });
-            describe('#setController(abstraction, concretion)', () => {
-                beforeEach(() => {
-                    module.setController(SimpleController, SimpleController);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleController>(SimpleController)).toEqual(jasmine.any(SimpleController));
-                });
-            });
-            describe('#setController("abstraction", concretion)', () => {
-                beforeEach(() => {
-                    module.setController('SimpleController', SimpleController);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleController>('SimpleController')).toEqual(jasmine.any(SimpleController));
-                });
-            });
-        });
-        describe('and we register a Filter', () => {
-            @Filter()
-            class SimpleFilter implements BaseFilter<any> {
-                apply(req: express.Request, res: express.Response): any { }
-                getDataFromRequest(req: express.Request): any { }
-            }
-            describe('#setFilter(abstraction)', () => {
-                beforeEach(() => {
-                    module.setFilter(SimpleFilter);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleFilter>(SimpleFilter)).toEqual(jasmine.any(SimpleFilter));
-                });
-            });
-            describe('#setFilter(abstraction, concretion)', () => {
-                beforeEach(() => {
-                    module.setFilter(SimpleFilter, SimpleFilter);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleFilter>(SimpleFilter)).toEqual(jasmine.any(SimpleFilter));
-                });
-            });
-            describe('#setFilter("abstraction", concretion)', () => {
-                beforeEach(() => {
-                    module.setFilter('SimpleFilter', SimpleFilter);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleFilter>('SimpleFilter')).toEqual(jasmine.any(SimpleFilter));
-                });
-            });
-        });
-        describe('and we register an ErrorHandler', () => {
-            @ErrorHandler()
-            class SimpleErrorHandler implements BaseErrorHandler {
-                catch(error: any, req: express.Request, res: express.Response): void { }
-            }
-            describe('#setErrorHandler(abstraction)', () => {
-                beforeEach(() => {
-                    module.setErrorHandler(SimpleErrorHandler);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleErrorHandler>(SimpleErrorHandler)).toEqual(jasmine.any(SimpleErrorHandler));
-                });
-            });
-            describe('#setErrorHandler(abstraction, concretion)', () => {
-                beforeEach(() => {
-                    module.setErrorHandler(SimpleErrorHandler, SimpleErrorHandler);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleErrorHandler>(SimpleErrorHandler)).toEqual(jasmine.any(SimpleErrorHandler));
-                });
-            });
-            describe('#setErrorHandler("abstraction", concretion)', () => {
-                beforeEach(() => {
-                    module.setErrorHandler('SimpleErrorHandler', SimpleErrorHandler);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleErrorHandler>('SimpleErrorHandler')).toEqual(jasmine.any(SimpleErrorHandler));
-                });
-            });
-        });
-        describe('and we register a Service', () => {
-            @Service()
-            class SimpleService {}
-            describe('#setService(abstraction)', () => {
-                beforeEach(() => {
-                    module.setService(SimpleService);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleService>(SimpleService)).toEqual(jasmine.any(SimpleService));
-                });
-            });
-            describe('#setService(abstraction, concretion)', () => {
-                beforeEach(() => {
-                    module.setService(SimpleService, SimpleService);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleService>(SimpleService)).toEqual(jasmine.any(SimpleService));
-                });
-            });
-            describe('#setService("abstraction", concretion)', () => {
-                beforeEach(() => {
-                    module.setService('SimpleComponent', SimpleService);
-                });
-                it('should have the dependency available', () => {
-                    expect(module.component<SimpleService>('SimpleComponent')).toEqual(jasmine.any(SimpleService));
-                });
-            });
-        });
+        //TODO check dependencies options
     })
 
 });

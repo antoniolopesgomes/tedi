@@ -7,7 +7,8 @@ import {
     BindingContext,
     Controller,
     Filter,
-    Module
+    Module,
+    dependency
 } from '../../core'
 import {Logger, LoggerLevels} from '../../logger';
 import * as express from 'express';
@@ -40,8 +41,10 @@ describe('Modules', () => {
                         'get': ['AuthController', 'get']
                     }
                 })
-                .setController('AuthController', AuthController)
-                .setFilter('RootFilter', CustomFilter2);
+                .dependencies(
+                    dependency('AuthController', { class: AuthController}),
+                    dependency('RootFilter', { class: CustomFilter2})
+                );
         }
     };
 
@@ -60,18 +63,18 @@ describe('Modules', () => {
                 .setJsonRoutes({
                     '/auth': 'AuthModule'
                 })
-                .addChildModule('AuthModule', AuthModule);
+                .setModule('AuthModule', AuthModule);
             
             //server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
             app = server.getApp();
-            authModule = server.childModule('AuthModule');
+            authModule = server.getDependency<BaseModule>('AuthModule');
         });
 
         describe('/auth/login', () => {
             beforeEach((done: DoneFn) => {
                 results.push('here');
-                spyOn(authModule.controller('AuthController'), 'get').and.callThrough();
-                spyOn(authModule.filter('RootFilter'), 'apply').and.callThrough();
+                spyOn(authModule.getDependency('AuthController'), 'get').and.callThrough();
+                spyOn(authModule.getDependency('RootFilter'), 'apply').and.callThrough();
                 request(app)
                     .get('/auth/login')
                     .expect(200)
@@ -80,12 +83,12 @@ describe('Modules', () => {
             })
 
             it('should have called the module controller', () => {
-                expect(authModule.controller<AuthController>('AuthController').get).toHaveBeenCalled();
+                expect(authModule.getDependency<AuthController>('AuthController').get).toHaveBeenCalled();
                 
             });
 
             it('should have called the module auth.RootFilter', () => {
-                expect(authModule.filter('RootFilter').apply).toHaveBeenCalled();
+                expect(authModule.getDependency<BaseFilter<any>>('RootFilter').apply).toHaveBeenCalled();
             });
         });
 
@@ -94,7 +97,7 @@ describe('Modules', () => {
                 expect(authModule).toEqual(jasmine.any(AuthModule));
             });
             it('childModule should have access to root module dependencies', () => {
-                expect(authModule.component<Logger>('Logger')).not.toBeNull();
+                expect(authModule.getDependency<Logger>('Logger')).not.toBeNull();
             });
 
             describe('and override an internal component', () => {
@@ -105,10 +108,12 @@ describe('Modules', () => {
                     }
                 }
                 beforeEach(() => {
-                    authModule.setController('AuthController', CustomAuthController);
+                    authModule.dependencies(
+                        dependency('AuthController', { class: CustomAuthController})
+                    );
                 })
                 it('should have overrided AuthController', () => {
-                    expect(authModule.controller('AuthController')).toEqual(jasmine.any(CustomAuthController));
+                    expect(authModule.getDependency('AuthController')).toEqual(jasmine.any(CustomAuthController));
                 })
             });
         });

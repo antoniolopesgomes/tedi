@@ -1,9 +1,9 @@
 import {Constructor} from '../core';
 
 export interface DependencyProperties {
-    value?: any;
+    value?: any; 
     class?: Constructor<any>;
-    factory?: any; 
+    classIsTransient?: boolean;
 }
 
 export function dependency(token: any, properties?: DependencyProperties): Dependency {
@@ -14,8 +14,16 @@ export function dependency(token: any, properties?: DependencyProperties): Depen
 }
 
 export class Dependency {
+    token: any;
+    properties: DependencyProperties;
+    
     constructor(
-        public token: any,
-        public properties: DependencyProperties
-    ) {} 
+        token: any,
+        properties: DependencyProperties
+    ) {
+        this.token = token;
+        this.properties = properties || <DependencyProperties> {
+            class: token
+        };
+    } 
 }

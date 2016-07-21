@@ -1,5 +1,7 @@
 import {BindingContext, BindingOptions, DIModuleError} from './core';
 import {Constructor} from '../core';
+import {Logger} from '../logger';
+import {Dependency} from './dependency'; 
 import * as inversify from 'inversify';
 
 export class DIModule {
@@ -10,51 +12,31 @@ export class DIModule {
         this._kernel = new inversify.Kernel();
     }
 
-    getBinding<T>(abstraction: string | Constructor<T>): T {
-        return this._kernel.get<T>(<any>abstraction);
+    getDependency<T>(token: any): T {
+        return this._kernel.get<T>(token);
     }
 
-    hasBinding(abstraction: string | Constructor<any>): boolean {
-        return this._kernel.isBound(abstraction);
+    hasDependency(token: any): boolean {
+        return this._kernel.isBound(token);
     }
 
-    unbindFromKernel(abstraction: string | Constructor<any>): void {
-        this._kernel.unbind(abstraction);
+    removeDependency(token: any): void {
+        this._kernel.unbind(token);
     }
 
-    unbindAll(): void {
+    removeAll(): void {
         this._kernel.unbindAll();
     }
 
-    bindToKernel<T>(
-        abstraction: string | Constructor<T>,
-        concretion: Constructor<T> | T,
-        options: BindingOptions = { context: BindingContext.SINGLETON }
-    ): void {
-        switch (options.context) {
-            case BindingContext.SINGLETON:
-                this._kernel.bind<T>(abstraction).to(<Constructor<T>>concretion).inSingletonScope();
-                break;
-            case BindingContext.TRANSIENT:
-                this._kernel.bind<T>(abstraction).to(<Constructor<T>>concretion)
-                break;
-            case BindingContext.VALUE:
-                this._kernel.bind<T>(abstraction).toConstantValue(<T>concretion);
-                break;
-            default:
-                throw new DIModuleError('Unknown binding context', null);
+    setDependency<T>(dep: Dependency): void {
+        if (!(dep instanceof Dependency)) {
+            console.warn(`invalid dependency: ${dep}`);
+            return;
         }
-    }
-
-    setBinding<T>(
-        abstraction: string | Constructor<T>,
-        concretion: Constructor<T> | T,
-        options?: BindingOptions
-    ): void {
-        if (this.hasBinding(abstraction)) {
-            this.unbindFromKernel(abstraction);
+        if (this.hasDependency(dep.token)) {
+            this.removeDependency(dep.token);
         }
-        this.bindToKernel(abstraction, concretion, options)
+        this._bindDependency(dep);
     }
 
     snapshot(): void {
@@ -63,6 +45,22 @@ export class DIModule {
 
     restore(): void {
         this._kernel.restore();
+    }
+
+    private _bindDependency<T>(dep: Dependency): void {
+
+        if(dep.properties.class) {
+            let binding = this._kernel.bind<T>(dep.token).to(<Constructor<T>> dep.properties.class);
+            if (!dep.properties.classIsTransient) {
+                binding.inSingletonScope();
+            }
+        }
+        else if(dep.properties.value) {
+            this._kernel.bind<T>(dep.token).toConstantValue(<T> dep.properties.value);
+        }
+        else {
+            throw new DIModuleError(`Invalid dependency: ${dep}`, null);
+        }
     }
 
 }

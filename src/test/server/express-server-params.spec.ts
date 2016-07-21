@@ -1,4 +1,4 @@
-import {Controller} from '../../core';
+import {Controller, dependency} from '../../core';
 import {ExpressServer} from '../../server';
 import * as request from 'supertest-as-promised';
 import * as express from 'express';
@@ -29,13 +29,15 @@ describe('ExpressServer params', () => {
                         }
                     }
                 })
-                .setController('TestController', TestController);
+                .dependencies(
+                    dependency('TestController', { class: TestController })
+                );
         });
 
         describe('when I call a route with params', () => {
             let params: any;
             beforeEach(() => {
-                spyOn(server.component<TestController>('TestController'), 'get')
+                spyOn(server.getDependency<TestController>('TestController'), 'get')
                     .and.callFake((req: express.Request, res: express.Response) => {
                         params = req.params;
                         res.status(200).end();

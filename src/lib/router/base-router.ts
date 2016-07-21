@@ -56,7 +56,7 @@ export class BaseRouter implements Router {
 
         let controllerName = routeAction[0];
         let methodName = routeAction[1];
-        let controller: any = module.controller(controllerName);
+        let controller: any = module.getDependency(controllerName);
 
         if (!_.isFunction(controller[methodName])) {
             throw new Error(`parseRouteAction: invalid controller[${controllerName}] method[${methodName}]`);
@@ -82,7 +82,7 @@ export class BaseRouter implements Router {
         }
 
         return filterNames.map<RouteFilter>((name: string) => {
-            let filter = module.filter(name);
+            let filter = module.getDependency<BaseFilter<any>>(name);
             validateFilter(name, filter);
             return <RouteFilter>{
                 name: name,
@@ -105,7 +105,7 @@ export class BaseRouter implements Router {
         }
 
         return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
-            let errorHandler = module.errorHandler(name);
+            let errorHandler = module.getDependency<BaseErrorHandler>(name);
             validateErrorHandler(name, errorHandler);
             return <RouteErrorHandler>{
                 name: name,
@@ -140,7 +140,7 @@ export class BaseRouter implements Router {
                 let childRoute: Route;
                 //if we're deling with a module (string value)
                 if (this._isModule(childJsonRouteValue)) {
-                    childRoute = this._parseModuleRoute(childRoutePath, module.childModule(childJsonRouteValue))
+                    childRoute = this._parseModuleRoute(childRoutePath, module.getDependency<BaseModule>(childJsonRouteValue))
                 }
                 else {
                     childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
