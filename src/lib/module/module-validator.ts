@@ -1,6 +1,6 @@
-import {ModuleMetadata} from '../module-metadata';
-import {CustomError} from '../../core';
-import {BindingOptions, BindingContext} from '../../di';
+import {ModuleMetadata} from './module-metadata';
+import {CustomError} from '../core';
+import {BindingOptions, BindingContext} from '../di';
 
 export class ModuleValidatorError extends CustomError {
     constructor(msg: string, error?: any) {

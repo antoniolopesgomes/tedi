@@ -1,11 +1,12 @@
 import {BaseRoute, Route, RouteError, BaseRouter} from '../../lib/router';
 import {
-    Controller, 
-    Module, 
-    BaseModule, 
-    BaseFilter, 
-    Filter, 
-    ErrorHandler, 
+    Controller,
+    Module,
+    BaseModule,
+    BaseFilter,
+    Filter,
+    Service,
+    ErrorHandler,
     BaseErrorHandler,
     dependency
 } from '../../core';
@@ -148,18 +149,10 @@ describe('BaseRouter', () => {
     });
 
     describe('with invalid filters', () => {
-        @Filter()
-        class InvalidFilter { }
-
         let error: any;
         let jsonRouter: any;
         let router: BaseRouter;
-
         beforeEach(() => {
-            //configure module
-            simpleModule.dependencies(
-                dependency('InvalidFilter', { class: InvalidFilter })
-            );
             //define router
             jsonRouter = {
                 "/dummy": {
@@ -169,15 +162,42 @@ describe('BaseRouter', () => {
             router = new BaseRouter(null);
         });
 
-        it('should throw a FilterError', () => {
-            try {
-                router.getRootRoute(jsonRouter, simpleModule);
-            }
-            catch(error) {
-                expect(error).toEqual(jasmine.any(RouteError));
-            }
+        describe('when filter does not implement BaseFilter', () => {
+            @Filter()
+            class InvalidFilter { }
+            beforeEach(() => {
+                simpleModule.dependencies(dependency('InvalidFilter', { class: InvalidFilter }));
+            })
+            it('should throw a FilterError', (done: DoneFn) => {
+                try {
+                    router.getRootRoute(jsonRouter, simpleModule);
+                }
+                catch (error) {
+                    expect(error).toEqual(jasmine.any(RouteError));
+                    done();
+                }
+            });
         });
 
+        describe('when filter is wrongly decorated', () => {
+            @Service()
+            class NotDecoratedFilter implements BaseFilter<any>{ 
+                apply(): any {}
+                getDataFromRequest(): any {}
+            }
+            beforeEach(() => {
+                simpleModule.dependencies(dependency('InvalidFilter', { class: NotDecoratedFilter }));
+            })
+            it('should throw a FilterError', (done: DoneFn) => {
+                try {
+                    router.getRootRoute(jsonRouter, simpleModule);
+                }
+                catch (error) {
+                    expect(error).toEqual(jasmine.any(RouteError));
+                    done();
+                }
+            });
+        });
     });
 
     describe('with invalid errorHandlers', () => {
@@ -206,7 +226,7 @@ describe('BaseRouter', () => {
             try {
                 router.getRootRoute(jsonRouter, simpleModule);
             }
-            catch(error) {
+            catch (error) {
                 expect(error).toEqual(jasmine.any(RouteError));
             }
         })

@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import {BaseFilter, FilterMetadata} from '../filter';
 import {ControllerMetadata} from '../controller';
 import {BaseErrorHandler, ErrorHandlerMetadata} from '../error-handler';
-import {DIModule, BindingContext, BindingOptions, dependency, Dependency} from '../di';
+import {DIModule, BindingContext, BindingOptions, dependency, DependencyInfo} from '../di';
 import {Constructor, CustomError} from '../core';
 
 export abstract class BaseModule {
@@ -39,7 +39,7 @@ export abstract class BaseModule {
         if (_.isUndefined(dep) || _.isNull(dep)) {
             return this;
         }
-        if (!(dep instanceof Dependency)) {
+        if (!(dep instanceof DependencyInfo)) {
             dep = dependency(dep);
         }
         this._di.setDependency(dep);

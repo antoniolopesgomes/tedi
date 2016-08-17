@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 import {Logger, LoggerLevels} from './core';
-import {injectable} from '../di';
+import {Service} from '../service';
 
 export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args) => Logger {
 
@@ -10,7 +10,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
         ]
     };
 
-    @injectable()
+    @Service()
     class WinstonLogger implements Logger {
 
         private _logger: winston.LoggerInstance;

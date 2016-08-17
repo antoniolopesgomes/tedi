@@ -13,3 +13,6 @@ export const SERVICE_ERROR_DECORATING = 'Error decorating class with @Service';
 
 //MODULE DECORATION ERRORS
 export const MODULE_ERROR_DECORATING = 'Error decorating class with @Module';
+
+//DEPENDENCY DECORATION ERRORS
+export const DEPENDENCY_ERROR_DECORATING = 'Error decorating class with @Dependency';

@@ -1,5 +1,5 @@
 'use strict';
-import {injectable} from '../di';
+import {Dependency} from '../di';
 import * as METADATA_KEYS from '../constants/metadata-keys';
 import * as ERRORS from '../constants/error-messages';
 import {CustomError} from '../core';
@@ -22,7 +22,7 @@ function ServiceDecorator(): ClassDecorator {
 
     return function (target: Object) {
         try {
-            injectable()(target);
+            Dependency()(target);
             Reflect.defineMetadata(METADATA_KEYS.SERVICE, true, target);
         }
         catch (error) {

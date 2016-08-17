@@ -10,7 +10,7 @@ import {
     ROUTE_KEYS,
 } from './core';
 import {BaseRoute} from './base-route';
-import {BaseFilter} from '../filter';
+import {BaseFilter, FilterValidator} from '../filter';
 import {CustomError} from '../core';
 import {Service} from '../service';
 import {BaseErrorHandler} from '../error-handler';
@@ -70,20 +70,18 @@ export class BaseRouter implements Router {
 
     private _parseRouteFilters(filterNames: string[], module: BaseModule): RouteFilter[] {
 
-        function validateFilter(name: string, filter: BaseFilter<any>) {
-            let hasFilterInterface = _.isFunction(filter.apply) && _.isFunction(filter.getDataFromRequest);
-            if (!hasFilterInterface) {
-                throw new Error(`parseRouteFilter: '${name}' must implement 'Filter'`);
-            }
-        }
-
         if (!_.isArray(filterNames)) {
             return [];
         }
 
         return filterNames.map<RouteFilter>((name: string) => {
             let filter = module.getDependency<BaseFilter<any>>(name);
-            validateFilter(name, filter);
+            try {
+                FilterValidator.validate(filter);
+            }
+            catch (e) {
+                throw new RouterError(`Could not validate filter '${name}'`, e);
+            }
             return <RouteFilter>{
                 name: name,
                 filter: filter
@@ -96,7 +94,7 @@ export class BaseRouter implements Router {
         function validateErrorHandler(name: string, errorHandler: BaseErrorHandler) {
             let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
             if (!hasErrorHandlerInterface) {
-                throw new Error(`parseRouteErrorHandlers: '${name}' must implement 'ErrorHandler'`);
+                throw new Error(`parseRouteErrorHandlers: '${name}' must implement 'BaseErrorHandler'`);
             }
         }
 

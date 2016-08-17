@@ -1,5 +1,5 @@
 import * as express from 'express';
-import {inject, injectable} from '../../di';
+import {inject} from '../../di';
 import {Router} from '../../router';
 import {Logger} from '../../logger';
 import {BaseModule} from '../../module';

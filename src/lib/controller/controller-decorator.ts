@@ -1,6 +1,6 @@
 'use strict';
 import {ControllerMetadata} from './controller-metadata';
-import {injectable} from '../di';
+import {Dependency} from '../di';
 import * as METADATA_KEYS from '../constants/metadata-keys';
 import * as ERRORS from '../constants/error-messages';
 import {CustomError} from '../core';
@@ -33,7 +33,7 @@ function ControllerDecorator(): ClassDecorator {
 
     return function (target: Object) {
         try {
-            injectable()(target);
+            Dependency()(target);
             Reflect.defineMetadata(METADATA_KEYS.CONTROLLER, true, target);
         }
         catch (error) {

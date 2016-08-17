@@ -1,7 +1,8 @@
 import {BindingContext, BindingOptions, DIModuleError} from './core';
 import {Constructor} from '../core';
 import {Logger} from '../logger';
-import {Dependency} from './dependency'; 
+import {DependencyInfo} from './dependency';
+import {DependencyValidator} from './dependency-validator';
 import * as inversify from 'inversify';
 
 export class DIModule {
@@ -28,8 +29,8 @@ export class DIModule {
         this._kernel.unbindAll();
     }
 
-    setDependency<T>(dep: Dependency): void {
-        if (!(dep instanceof Dependency)) {
+    setDependency<T>(dep: DependencyInfo): void {
+        if (!(dep instanceof DependencyInfo)) {
             console.warn(`invalid dependency: ${dep}`);
             return;
         }
@@ -47,16 +48,19 @@ export class DIModule {
         this._kernel.restore();
     }
 
-    private _bindDependency<T>(dep: Dependency): void {
+    private _bindDependency<T>(dep: DependencyInfo): void {
 
         if(dep.properties.class) {
-            let binding = this._kernel.bind<T>(dep.token).to(<Constructor<T>> dep.properties.class);
+            let concretion = <Constructor<T>> dep.properties.class;
+            //DependencyValidator.validate(concretion);
+            let binding = this._kernel.bind(dep.token).to(concretion);
             if (!dep.properties.classIsTransient) {
                 binding.inSingletonScope();
             }
         }
         else if(dep.properties.value) {
-            this._kernel.bind<T>(dep.token).toConstantValue(<T> dep.properties.value);
+            let concretion = dep.properties.value;
+            this._kernel.bind(dep.token).toConstantValue(concretion);
         }
         else {
             throw new DIModuleError(`Invalid dependency: ${dep}`, null);

@@ -1,6 +1,6 @@
-import {ServiceMetadata} from '../../service';
-import {CustomError} from '../../core';
-import {BindingOptions, BindingContext} from '../../di';
+import {ServiceMetadata} from './service-metadata';
+import {CustomError} from '../core';
+import {BindingOptions, BindingContext} from '../di';
 
 export class ServiceValidatorError extends CustomError {
     constructor(msg: string, error?: any) {

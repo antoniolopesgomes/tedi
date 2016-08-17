@@ -6,14 +6,14 @@ export interface DependencyProperties {
     classIsTransient?: boolean;
 }
 
-export function dependency(token: any, properties?: DependencyProperties): Dependency {
-    return new Dependency(
+export function dependency(token: any, properties?: DependencyProperties): DependencyInfo {
+    return new DependencyInfo(
         token,
         properties
     );
 }
 
-export class Dependency {
+export class DependencyInfo {
     token: any;
     properties: DependencyProperties;
     
