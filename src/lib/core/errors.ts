@@ -9,4 +9,12 @@ export class CustomError extends NestedError {
         (<any>this).name = (<any>this.constructor).name;
     }
 
+    getRootCause(): any {
+        let rootCause: any = this;
+        while(rootCause.nested) {
+            rootCause = rootCause.nested
+        }
+        return rootCause;
+    }
+
 }
