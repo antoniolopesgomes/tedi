@@ -13,7 +13,7 @@ import {BaseRoute} from './base-route';
 import {BaseFilter, FilterValidator} from '../filter';
 import {CustomError} from '../core';
 import {Service} from '../service';
-import {BaseErrorHandler} from '../error-handler';
+import {BaseErrorHandler, ErrorHandlerValidator} from '../error-handler';
 import {Logger} from '../logger';
 import {BaseModule, Module} from '../module';
 import {inject} from '../di';
@@ -79,8 +79,8 @@ export class BaseRouter implements Router {
             try {
                 FilterValidator.validate(filter);
             }
-            catch (e) {
-                throw new RouterError(`Could not validate filter '${name}'`, e);
+            catch (error) {
+                throw new RouterError(`Could not validate filter '${name}'`, error);
             }
             return <RouteFilter>{
                 name: name,
@@ -91,20 +91,17 @@ export class BaseRouter implements Router {
 
     private _parseRouteErrorHandlers(errorHandlersNames: string[], module: BaseModule): RouteErrorHandler[] {
 
-        function validateErrorHandler(name: string, errorHandler: BaseErrorHandler) {
-            let hasErrorHandlerInterface = _.isFunction(errorHandler.catch);
-            if (!hasErrorHandlerInterface) {
-                throw new Error(`parseRouteErrorHandlers: '${name}' must implement 'BaseErrorHandler'`);
-            }
-        }
-
         if (!_.isArray(errorHandlersNames)) {
             return [];
         }
 
         return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
             let errorHandler = module.getDependency<BaseErrorHandler>(name);
-            validateErrorHandler(name, errorHandler);
+            try {
+                ErrorHandlerValidator.validate(errorHandler);
+            } catch (error) {
+                throw new RouterError(`Could not validate errorHandler '${name}'`, error);
+            }
             return <RouteErrorHandler>{
                 name: name,
                 errorHandler: errorHandler

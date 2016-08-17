@@ -18,7 +18,7 @@ export class ErrorHandlerValidator {
         return isFunction(errorHandler.catch);
     }
     static validate(errorHandler: BaseErrorHandler): void {
-        //check if it implements BaseFilter
+        //check if it implements BaseErrorHandler
         if (!this.implementsErrorHandler(errorHandler)) {
             throw new ErrorHandlerValidatorError(errorHandler, 'must implement \'BaseErrorHandler\'');
         }

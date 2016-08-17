@@ -10,8 +10,10 @@ import {
     BaseErrorHandler,
     dependency
 } from '../../core';
+import {ErrorHandlerValidatorError} from '../../lib/error-handler';
+import {FilterValidatorError} from '../../lib/filter';
 
-describe('BaseRouter', () => {
+fdescribe('BaseRouter', () => {
 
     @Controller()
     class DummyController {
@@ -174,6 +176,7 @@ describe('BaseRouter', () => {
                 }
                 catch (error) {
                     expect(error).toEqual(jasmine.any(RouteError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(FilterValidatorError));
                     done();
                 }
             });
@@ -181,19 +184,22 @@ describe('BaseRouter', () => {
 
         describe('when filter is wrongly decorated', () => {
             @Service()
-            class NotDecoratedFilter implements BaseFilter<any>{ 
-                apply(): any {}
-                getDataFromRequest(): any {}
+            class NotDecoratedFilter implements BaseFilter<any>{
+                apply(): any { }
+                getDataFromRequest(): any { }
             }
+
             beforeEach(() => {
                 simpleModule.dependencies(dependency('InvalidFilter', { class: NotDecoratedFilter }));
-            })
+            });
+
             it('should throw a FilterError', (done: DoneFn) => {
                 try {
                     router.getRootRoute(jsonRouter, simpleModule);
                 }
                 catch (error) {
                     expect(error).toEqual(jasmine.any(RouteError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(FilterValidatorError));
                     done();
                 }
             });
@@ -201,35 +207,64 @@ describe('BaseRouter', () => {
     });
 
     describe('with invalid errorHandlers', () => {
-        @ErrorHandler()
-        class InvalidErrorHandler { }
-
         let error: any;
         let jsonRouter: any;
         let router: BaseRouter;
 
         beforeEach(() => {
-            //configure module
-            simpleModule.dependencies(
-                dependency('InvalidErrorHandler', { class: InvalidErrorHandler })
-            );
-            //define router
             jsonRouter = {
                 "/dummy": {
                     "$errorHandlers": ["InvalidErrorHandler"]
                 }
             };
             router = new BaseRouter(null);
-        })
+        });
 
-        it('should throw an ErrorHandlerError', () => {
-            try {
-                router.getRootRoute(jsonRouter, simpleModule);
+        describe('when error handler doest not implement BaseErrorHandler interface', () => {
+            @ErrorHandler()
+            class InvalidErrorHandler { }
+
+            beforeEach(() => {
+                simpleModule.dependencies(
+                    dependency('InvalidErrorHandler', { class: InvalidErrorHandler })
+                );
+            });
+
+            it('should throw an ErrorHandlerError', (done: DoneFn) => {
+                try {
+                    router.getRootRoute(jsonRouter, simpleModule);
+                }
+                catch (error) {
+                    expect(error).toEqual(jasmine.any(RouteError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerValidatorError));
+                    done();
+                }
+            })
+        });
+
+        describe('when errorHandler is wrongly decorated', () => {
+            @Service()
+            class NotDecoratedErrorHandler {
+                catch(): void {}
             }
-            catch (error) {
-                expect(error).toEqual(jasmine.any(RouteError));
-            }
-        })
+
+            beforeEach(() => {
+                simpleModule.dependencies(dependency('InvalidErrorHandler', { class: NotDecoratedErrorHandler }));
+            });
+
+            it('should throw an ErrorHandlerError', (done: DoneFn) => {
+                try {
+                    router.getRootRoute(jsonRouter, simpleModule);
+                }
+                catch (error) {
+                    expect(error).toEqual(jasmine.any(RouteError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerValidatorError));
+                    done();
+                }
+            });
+        });
+
+
 
     })
 });
