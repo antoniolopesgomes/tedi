@@ -1,22 +1,29 @@
 import * as _ from 'lodash';
 import {
+    RouteMethod,
     Router,
     RouterError,
     Route,
     RouteError,
     RouteAction,
     RouteFilter,
-    RouteErrorHandler,
-    ROUTE_KEYS,
+    RouteErrorHandler
 } from './core';
 import {BaseRoute} from './base-route';
 import {BaseFilter, FilterValidator} from '../filter';
 import {CustomError} from '../core';
 import {Service} from '../service';
+import {ControllerMetadata, ControllerActionMetadata} from '../controller';
 import {BaseErrorHandler, ErrorHandlerValidator} from '../error-handler';
 import {Logger} from '../logger';
 import {BaseModule, Module} from '../module';
 import {inject} from '../di';
+
+const ROUTER_WORDS: any = {
+    'FILTERS': '$filters',
+    'ERROR_HANDLERS': '$errorHandlers',
+    'CONTROLLER': '$controller'
+}
 
 @Service()
 export class BaseRouter implements Router {
@@ -32,12 +39,12 @@ export class BaseRouter implements Router {
     private _parseJsonRoute(path: string, jsonRoute: any, module: BaseModule): Route {
         let route: Route = new BaseRoute(path);
         try {
-            route.filters = this._parseRouteFilters(jsonRoute[ROUTE_KEYS.FILTERS], module);
-            route.errorHandlers = this._parseRouteErrorHandlers(jsonRoute[ROUTE_KEYS.ERROR_HANDLERS], module);
-            route.get = this._parseRouteAction(jsonRoute.get, module);
-            route.post = this._parseRouteAction(jsonRoute.post, module);
-            route.delete = this._parseRouteAction(jsonRoute.delete, module);
-            route.put = this._parseRouteAction(jsonRoute.put, module);
+            route.filters = this._parseRouteFilters(jsonRoute[ROUTER_WORDS.FILTERS], module);
+            route.errorHandlers = this._parseRouteErrorHandlers(jsonRoute[ROUTER_WORDS.ERROR_HANDLERS], module);
+            route.get = this._parseRouteAction(RouteMethod.GET, jsonRoute, module);
+            route.post = this._parseRouteAction(RouteMethod.POST, jsonRoute, module);
+            route.delete = this._parseRouteAction(RouteMethod.DELETE, jsonRoute, module);
+            route.put = this._parseRouteAction(RouteMethod.PUT, jsonRoute, module);
             route.children = this._parseChildrenRoutes(jsonRoute, route, module);
         }
         catch (error) {
@@ -46,7 +53,28 @@ export class BaseRouter implements Router {
         return route;
     }
 
-    private _parseRouteAction(routeAction: string[], module: BaseModule): RouteAction {
+    private _parseRouteAction(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
+        return this._parseRouteActionFromArray(method, jsonRoute, module) || this._parseRouteActionFromController(method, jsonRoute, module);
+    }
+
+    private _parseRouteActionFromArray(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
+        let routeAction: string[];
+
+        switch (method) {
+            case RouteMethod.GET:
+                routeAction = jsonRoute.get;
+                break;
+            case RouteMethod.POST:
+                routeAction = jsonRoute.post;
+                break;
+            case RouteMethod.PUT:
+                routeAction = jsonRoute.put;
+                break;
+            case RouteMethod.DELETE:
+                routeAction = jsonRoute.delete;
+                break;
+        }
+
         if (!routeAction) {
             return undefined;
         }
@@ -65,6 +93,40 @@ export class BaseRouter implements Router {
         return {
             controller: controller,
             controllerMethod: methodName
+        }
+    }
+
+    private _parseRouteActionFromController(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
+        let controllerToken: any = jsonRoute[ROUTER_WORDS.CONTROLLER];
+        if (!controllerToken) {
+            return undefined;
+        }
+
+        let controller = module.getDependency(controllerToken);
+        let controllerActionMetadata: ControllerActionMetadata;
+
+        switch (method) {
+            case RouteMethod.GET:
+                controllerActionMetadata = ControllerMetadata.GET(controller);
+                break;
+            case RouteMethod.POST:
+                controllerActionMetadata = ControllerMetadata.POST(controller);
+                break;
+            case RouteMethod.PUT:
+                controllerActionMetadata = ControllerMetadata.PUT(controller);
+                break;
+            case RouteMethod.DELETE:
+                controllerActionMetadata = ControllerMetadata.DELETE(controller);
+                break;
+        }
+
+        if (!controllerActionMetadata.name) {
+            return undefined;
+        }
+
+        return {
+            controller: controller,
+            controllerMethod: controllerActionMetadata.name
         }
     }
 

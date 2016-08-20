@@ -13,7 +13,7 @@ import {
 import {ErrorHandlerValidatorError} from '../../lib/error-handler';
 import {FilterValidatorError} from '../../lib/filter';
 
-fdescribe('BaseRouter', () => {
+describe('BaseRouter', () => {
 
     @Controller()
     class DummyController {

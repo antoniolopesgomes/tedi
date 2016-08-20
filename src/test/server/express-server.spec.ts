@@ -44,6 +44,18 @@ describe('ExpressServer', () => {
         }
     }
 
+    @Controller()
+    class ControllerClass {
+        @Controller.get()
+        read(req: express.Request, res: express.Response): void {
+            res.status(200).end();
+        }
+        @Controller.post()
+        write(req: express.Request, res: express.Response): void {
+            res.status(200).end();
+        }
+    }
+
     beforeEach(() => {
         server = new ExpressServer();
     });
@@ -72,10 +84,15 @@ describe('ExpressServer', () => {
                                 "post": [AuthController, "saveAdmin"]
                             }
                         }
+                    },
+                    "/controllers": {
+                        "$controller": ControllerClass,
+                        "post": [AuthController, "saveUser"]
                     }
                 })
                 .dependencies(
                     AuthController,
+                    ControllerClass,
                     dependency('RootFilter', { class: CustomFilter }),
                     dependency('LoginFilter', { class: CustomFilter }),
                     dependency('AfterLoginFilter', { class: CustomFilter }),
@@ -123,7 +140,7 @@ describe('ExpressServer', () => {
                 expect(server.getDependency<BaseFilter<any>>('AdminFilter').apply).not.toHaveBeenCalled();
             })
 
-        })
+        });
 
         describe('POST /auth/login/user', () => {
 
@@ -153,7 +170,40 @@ describe('ExpressServer', () => {
                 expect(server.getDependency<BaseFilter<any>>('AdminFilter').apply).not.toHaveBeenCalled();
             })
 
-        })
+        });
+
+        describe('/controllers', () => {
+            describe('GET', () => {
+                beforeEach((done: DoneFn) => {
+                    spyOn(server.getDependency<ControllerClass>(ControllerClass), 'read').and.callThrough();
+                    request(expressApp)
+                        .get('/controllers')
+                        .expect(200)
+                        .then(() => done())
+                        .catch((error) => done.fail(error))
+                });
+                it('should have called read', () => {
+                    expect(server.getDependency<ControllerClass>(ControllerClass).read).toHaveBeenCalled();
+                });
+            });
+            describe('POST override', () => {
+                beforeEach((done: DoneFn) => {
+                    spyOn(server.getDependency<ControllerClass>(ControllerClass), 'write').and.callThrough();
+                    spyOn(server.getDependency<AuthController>(AuthController), 'saveUser').and.callThrough();
+                    request(expressApp)
+                        .post('/controllers')
+                        .expect(200)
+                        .then(() => done())
+                        .catch((error) => done.fail(error))
+                });
+                it('should not have called ControlClass method', () => {
+                    expect(server.getDependency<ControllerClass>(ControllerClass).write).not.toHaveBeenCalled();
+                });
+                it('should not have called AuthController method', () => {
+                    expect(server.getDependency<AuthController>(AuthController).saveUser).toHaveBeenCalled();
+                });
+            });
+        });
 
         describe('with nested filters', () => {
             let filterQueue: string[];
@@ -177,7 +227,7 @@ describe('ExpressServer', () => {
             it('filters should be called in the right order', () => {
                 expect(filterQueue).toEqual(['RootFilter', 'LoginFilter', 'AfterLoginFilter']);
             });
-        })
+        });
 
         describe('and a controller throws an error', () => {
             beforeEach(() => {

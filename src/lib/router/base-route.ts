@@ -1,4 +1,4 @@
-import {Route, RouteAction, RouteFilter, RouteErrorHandler, ROUTE_KEYS, RouteError} from './core';
+import {Route, RouteAction, RouteFilter, RouteErrorHandler, RouteError} from './core';
 import {BaseModule} from '../module';
 import {CustomError} from '../core';
 import {BaseFilter} from '../filter';

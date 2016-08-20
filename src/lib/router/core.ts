@@ -4,6 +4,13 @@ import {BaseErrorHandler} from '../error-handler';
 import {BaseModule} from '../module';
 import {CustomError} from '../core';
 
+export enum RouteMethod {
+    GET,
+    POST,
+    PUT,
+    DELETE
+}
+
 export interface RouteAction {
     controller: Object;
     controllerMethod: string;
@@ -49,11 +56,6 @@ export class RouterError extends CustomError {
 
 export interface RoutesDefinition {
 
-}
-
-export const ROUTE_KEYS: any = {
-    'FILTERS': '$filters',
-    'ERROR_HANDLERS': '$errorHandlers'
 }
 
 function throwError(message: string): void {
