@@ -1,34 +1,32 @@
-'use strict';
-import {Dependency} from '../di';
-import * as METADATA_KEYS from '../constants/metadata-keys';
-import * as ERRORS from '../constants/error-messages';
-import {CustomError} from '../core';
+"use strict";
+import {Dependency} from "../di";
+import * as METADATA_KEYS from "../constants/metadata-keys";
+import * as ERRORS from "../constants/error-messages";
+import {CustomError} from "../core";
 
-//CUSTOM ERRORS USED BY THIS MODULE
+// CUSTOM ERRORS USED BY THIS MODULE
 
 export class ErrorHandlerDecoratorError extends CustomError {
     constructor(errorHandlerName: string, msg: string, error?: any) {
-        super(`${errorHandlerName}': ${msg}`, error);
+        super(`${errorHandlerName}": ${msg}`, error);
     }
 }
 
-//ERROR HANDLER DECORATOR
+// ERROR HANDLER DECORATOR
 
-export interface IErrorHandlerDecorator {
+export interface BaseErrorHandlerDecorator {
     (): (target: any) => void;
 }
 
 function ErrorHandlerDecorator(): ClassDecorator {
-    
     return function (target: Object) {
         try {
             Dependency()(target);
             Reflect.defineMetadata(METADATA_KEYS.ERROR_HANDLER, true, target);
+        } catch (error) {
+            throw new ErrorHandlerDecoratorError((<any> target).name, ERRORS.ERROR_HANDLER_ERROR_DECORATING, error);
         }
-        catch (error) {
-            throw new ErrorHandlerDecoratorError((<any>target).name, ERRORS.ERROR_HANDLER_ERROR_DECORATING, error);
-        }
-    }
+    };
 }
 
-export const ErrorHandler = <IErrorHandlerDecorator> ErrorHandlerDecorator;
+export const ErrorHandler = <BaseErrorHandlerDecorator> ErrorHandlerDecorator;

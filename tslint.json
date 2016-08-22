@@ -1,0 +1,10 @@
+// tslint.json 
+{
+  "extends": "tslint:recommended",
+  "rules": {
+      "max-line-length": [true, 200],
+      "interface-name": [true, "never-prefix"],
+      "member-access": false,
+      "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
+  }
+}

@@ -1,18 +1,18 @@
-import {Constructor} from './interfaces';
+import {Constructor} from "./interfaces";
 
-export const NestedError: Constructor<Object> = require('nested-error-stacks');
+export const NestedError: Constructor<Object> = require("nested-error-stacks");
 
 export class CustomError extends NestedError {
 
     constructor(msg: string, error: any) {
         super(msg, error);
-        (<any>this).name = (<any>this.constructor).name;
+        (<any> this).name = (<any> this.constructor).name;
     }
 
-    getRootCause(): any {
+    public getRootCause(): any {
         let rootCause: any = this;
-        while(rootCause.nested) {
-            rootCause = rootCause.nested
+        while (rootCause.nested) {
+            rootCause = rootCause.nested;
         }
         return rootCause;
     }

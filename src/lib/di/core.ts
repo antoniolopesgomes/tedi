@@ -1,6 +1,6 @@
-import {CustomError} from '../core';
+import {CustomError} from "../core";
 
-export {inject, injectable} from 'inversify';
+export {inject, injectable} from "inversify";
 
 export enum BindingContext {
     SINGLETON,
@@ -9,7 +9,7 @@ export enum BindingContext {
 }
 
 export interface BindingOptions {
-    context: BindingContext
+    context: BindingContext;
 }
 
 export class DIModuleError extends CustomError {

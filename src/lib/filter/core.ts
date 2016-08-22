@@ -1,5 +1,5 @@
-import * as express from 'express';
-import {CustomError} from '../core';
+import * as express from "express";
+import {CustomError} from "../core";
 
 export interface BaseFilter<T> {
     apply(req: express.Request, res: express.Response): any;

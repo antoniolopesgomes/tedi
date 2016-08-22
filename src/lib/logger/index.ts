@@ -1,2 +1,2 @@
-export * from './core';
-export {WinstonLoggerFactory} from './winston-logger';
+export * from "./core";
+export {WinstonLoggerFactory} from "./winston-logger";

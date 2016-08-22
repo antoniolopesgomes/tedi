@@ -1,25 +1,21 @@
-import {Route, RouteAction, RouteFilter, RouteErrorHandler, RouteError} from './core';
-import {BaseModule} from '../module';
-import {CustomError} from '../core';
-import {BaseFilter} from '../filter';
-import {BaseErrorHandler} from '../error-handler';
+import {Route, RouteAction, RouteFilter, RouteErrorHandler} from "./core";
 
 export class BaseRoute implements Route {
-    path: string;
-    filters: RouteFilter[];
-    errorHandlers: RouteErrorHandler[];
-    children: Route[];
-    //actions
-    get: RouteAction;
-    post: RouteAction;
-    delete: RouteAction;
-    put: RouteAction;
+    public path: string;
+    public filters: RouteFilter[];
+    public errorHandlers: RouteErrorHandler[];
+    public children: Route[];
+    // actions
+    public get: RouteAction;
+    public post: RouteAction;
+    public delete: RouteAction;
+    public put: RouteAction;
 
     constructor(path: string) {
         this.path = path;
     }
 
-    toString(): string {
+    public toString(): string {
         return `route: ${this.path}`;
     }
 }

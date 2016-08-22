@@ -1,18 +1,17 @@
-import {BaseModule, Controller, Filter, Service, ErrorHandler, BaseFilter, BaseErrorHandler} from '../../core';
-import * as express from 'express';
+import {BaseModule, Service} from "../../core";
 
-describe('Module bindings', () => {
+describe("Module bindings", () => {
 
     class SimpleModule extends BaseModule {
-        init() { }
+        init() { return; }
     }
 
-    describe('when we have a module', () => {
+    describe("when we have a module", () => {
         let module: BaseModule;
         beforeEach(() => {
             module = new SimpleModule();
         });
-        describe('and we register a dependency', () => {
+        describe("and we register a dependency", () => {
             @Service()
             class SimpleService { }
             let service: any;
@@ -20,11 +19,11 @@ describe('Module bindings', () => {
                 module.setDependency(SimpleService);
                 service = module.getDependency(SimpleService);
             });
-            it('should gives us the same instance', () => {
+            it("should gives us the same instance", () => {
                 expect(module.getDependency(SimpleService)).toEqual(service);
             });
         });
-        //TODO check dependencies options
-    })
+        // TODO check dependencies options
+    });
 
 });

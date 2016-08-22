@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 import {
     RouteMethod,
     Router,
@@ -7,33 +7,32 @@ import {
     RouteError,
     RouteAction,
     RouteFilter,
-    RouteErrorHandler
-} from './core';
-import {BaseRoute} from './base-route';
-import {BaseFilter, FilterValidator} from '../filter';
-import {CustomError} from '../core';
-import {Service} from '../service';
-import {ControllerMetadata, ControllerActionMetadata} from '../controller';
-import {BaseErrorHandler, ErrorHandlerValidator} from '../error-handler';
-import {Logger} from '../logger';
-import {BaseModule, Module} from '../module';
-import {inject} from '../di';
+    RouteErrorHandler,
+} from "./core";
+import {BaseRoute} from "./base-route";
+import {BaseFilter, FilterValidator} from "../filter";
+import {Service} from "../service";
+import {ControllerMetadata, ControllerActionMetadata} from "../controller";
+import {BaseErrorHandler, ErrorHandlerValidator} from "../error-handler";
+import {Logger} from "../logger";
+import {BaseModule} from "../module";
+import {inject} from "../di";
 
 const ROUTER_WORDS: any = {
-    'FILTERS': '$filters',
-    'ERROR_HANDLERS': '$errorHandlers',
-    'CONTROLLER': '$controller'
-}
+    "FILTERS": "$filters",
+    "ERROR_HANDLERS": "$errorHandlers",
+    "CONTROLLER": "$controller",
+};
 
 @Service()
 export class BaseRouter implements Router {
 
     constructor(
-        @inject('Logger') private _logger: Logger
+        @inject("Logger") private logger: Logger
     ) { }
 
-    getRootRoute(jsonRoutes: any, module: BaseModule): Route {
-        return this._parseJsonRoute('/', jsonRoutes, module);
+    public getRootRoute(jsonRoutes: any, module: BaseModule): Route {
+        return this._parseJsonRoute("/", jsonRoutes, module);
     }
 
     private _parseJsonRoute(path: string, jsonRoute: any, module: BaseModule): Route {
@@ -46,15 +45,15 @@ export class BaseRouter implements Router {
             route.delete = this._parseRouteAction(RouteMethod.DELETE, jsonRoute, module);
             route.put = this._parseRouteAction(RouteMethod.PUT, jsonRoute, module);
             route.children = this._parseChildrenRoutes(jsonRoute, route, module);
-        }
-        catch (error) {
-            throw new RouteError(route, 'Error parsing route', error);
+        } catch (error) {
+            throw new RouteError(route, "Error parsing route", error);
         }
         return route;
     }
 
     private _parseRouteAction(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
-        return this._parseRouteActionFromArray(method, jsonRoute, module) || this._parseRouteActionFromController(method, jsonRoute, module);
+        return this._parseRouteActionFromArray(method, jsonRoute, module) ||
+            this._parseRouteActionFromController(method, jsonRoute, module);
     }
 
     private _parseRouteActionFromArray(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
@@ -73,13 +72,15 @@ export class BaseRouter implements Router {
             case RouteMethod.DELETE:
                 routeAction = jsonRoute.delete;
                 break;
+            default:
+                return undefined;
         }
 
         if (!routeAction) {
             return undefined;
         }
         if (!_.isArray(routeAction) || routeAction.length < 2) {
-            throw new Error('parseRouteAction: action should have two string fields [controller, controllerMethod]');
+            throw new Error("parseRouteAction: action should have two string fields [controller, controllerMethod]");
         }
 
         let controllerName = routeAction[0];
@@ -92,8 +93,8 @@ export class BaseRouter implements Router {
 
         return {
             controller: controller,
-            controllerMethod: methodName
-        }
+            controllerMethod: methodName,
+        };
     }
 
     private _parseRouteActionFromController(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
@@ -118,6 +119,8 @@ export class BaseRouter implements Router {
             case RouteMethod.DELETE:
                 controllerActionMetadata = ControllerMetadata.DELETE(controller);
                 break;
+            default:
+                throw new Error("Unexpected method");
         }
 
         if (!controllerActionMetadata.name) {
@@ -126,8 +129,8 @@ export class BaseRouter implements Router {
 
         return {
             controller: controller,
-            controllerMethod: controllerActionMetadata.name
-        }
+            controllerMethod: controllerActionMetadata.name,
+        };
     }
 
     private _parseRouteFilters(filterNames: string[], module: BaseModule): RouteFilter[] {
@@ -140,14 +143,13 @@ export class BaseRouter implements Router {
             let filter = module.getDependency<BaseFilter<any>>(name);
             try {
                 FilterValidator.validate(filter);
+            } catch (error) {
+                throw new RouterError(`Could not validate filter "${name}"`, error);
             }
-            catch (error) {
-                throw new RouterError(`Could not validate filter '${name}'`, error);
-            }
-            return <RouteFilter>{
+            return <RouteFilter> {
+                filter: filter,
                 name: name,
-                filter: filter
-            }
+            };
         });
     }
 
@@ -162,20 +164,18 @@ export class BaseRouter implements Router {
             try {
                 ErrorHandlerValidator.validate(errorHandler);
             } catch (error) {
-                throw new RouterError(`Could not validate errorHandler '${name}'`, error);
+                throw new RouterError(`Could not validate errorHandler "${name}"`, error);
             }
-            return <RouteErrorHandler>{
+            return <RouteErrorHandler> {
+                errorHandler: errorHandler,
                 name: name,
-                errorHandler: errorHandler
             };
         });
     }
 
     private _parseModuleRoute(path: string, module: BaseModule): Route {
 
-        function validateModule(aModule: BaseModule): void {
-
-        }
+        function validateModule(aModule: BaseModule): void { return; }
 
         validateModule(module);
 
@@ -190,22 +190,20 @@ export class BaseRouter implements Router {
     private _parseChildrenRoutes(jsonRoute: any, route: Route, module: BaseModule): Route[] {
         let childrenRoutes: Route[] = [];
         Object.keys(jsonRoute).forEach((key: string) => {
-            //all endpoints definitions begin with a slash
-            if (key.indexOf('/') === 0) {
+            // all endpoints definitions begin with a slash
+            if (key.indexOf("/") === 0) {
                 let childJsonRouteValue = jsonRoute[key];
                 let childRoutePath = normalizePath(route.path + key);
                 let childRoute: Route;
-                //if we're deling with a module (string value)
+                // if we"re deling with a module (string value)
                 if (this._isModule(childJsonRouteValue)) {
-                    childRoute = this._parseModuleRoute(childRoutePath, module.getDependency<BaseModule>(childJsonRouteValue))
-                }
-                else {
+                    childRoute = this._parseModuleRoute(childRoutePath, module.getDependency<BaseModule>(childJsonRouteValue));
+                } else {
                     childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
                 }
                 childrenRoutes.push(childRoute);
-            }
-            else if (['$filters', '$errorHandlers', 'get', 'post', 'put', 'delete'].indexOf(key) < 0) {
-                this._logger.debug(`Routing key: '${key}' of ${route.path}, will be ignored`);
+            } else if (["$filters", "$errorHandlers", "get", "post", "put", "delete"].indexOf(key) < 0) {
+                this.logger.debug(`Routing key: "${key}" of ${route.path}, will be ignored`);
             }
         });
         return childrenRoutes;
@@ -213,7 +211,7 @@ export class BaseRouter implements Router {
 
 }
 
-//UTILS
+// UTILS
 function normalizePath(path: string): string {
-    return path.replace('//', '/');
+    return path.replace("//", "/");
 }

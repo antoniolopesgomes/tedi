@@ -1,3 +1,3 @@
-import * as BluebirdPromise from 'bluebird';
+import * as BluebirdPromise from "bluebird";
 
 export const Promise = BluebirdPromise;

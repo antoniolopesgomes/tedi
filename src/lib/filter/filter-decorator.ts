@@ -1,34 +1,32 @@
-'use strict';
-import {Dependency} from '../di';
-import * as METADATA_KEYS from '../constants/metadata-keys';
-import * as ERRORS from '../constants/error-messages';
-import {CustomError} from '../core';
+"use strict";
+import {Dependency} from "../di";
+import * as METADATA_KEYS from "../constants/metadata-keys";
+import * as ERRORS from "../constants/error-messages";
+import {CustomError} from "../core";
 
-//CUSTOM ERRORS USED BY THIS MODULE
+// CUSTOM ERRORS USED BY THIS MODULE
 
 export class FilterDecoratorError extends CustomError {
     constructor(filterName: string, msg: string, error?: any) {
-        super(`${filterName}': ${msg}`, error);
+        super(`${filterName}": ${msg}`, error);
     }
 }
 
-//FILTER DECORATOR
+// FILTER DECORATOR
 
-export interface IFilterDecorator {
+export interface BaseFilterDecorator {
     (): (target: any) => void;
 }
 
 function FilterDecorator(): ClassDecorator {
-    
     return function (target: Object) {
         try {
             Dependency()(target);
             Reflect.defineMetadata(METADATA_KEYS.FILTER, true, target);
+        } catch (error) {
+            throw new FilterDecoratorError((<any> target).name, ERRORS.FILTER_ERROR_DECORATING, error);
         }
-        catch (error) {
-            throw new FilterDecoratorError((<any>target).name, ERRORS.FILTER_ERROR_DECORATING, error);
-        }
-    }
+    };
 }
 
-export const Filter = <IFilterDecorator> FilterDecorator;
+export const Filter = <BaseFilterDecorator> FilterDecorator;

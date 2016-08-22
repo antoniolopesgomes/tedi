@@ -1,5 +1,5 @@
 
-import {CustomError} from '../../core';
+import {CustomError} from "../../core";
 
 class TestError extends CustomError {
     constructor(msg: string, error: any) {
@@ -7,24 +7,22 @@ class TestError extends CustomError {
     }
 }
 
-describe('CustomError', () => {
+describe("CustomError", () => {
 
-    it('should work', (done: DoneFn) => {
+    it("should work", (done: DoneFn) => {
         try {
             try {
-                throw new Error('Test!')
+                throw new Error("Test!");
+            } catch (err) {
+                throw new TestError("Custom Error", err);
             }
-            catch (err) {
-                throw new TestError('Custom Error', err);
-            }
-        }
-        catch (err) {
+        } catch (err) {
             expect(err).toEqual(jasmine.any(TestError));
             let errorStack = (<Error> err).stack;
-            expect(errorStack).toContain('TestError: Custom Error');
-            expect(errorStack).toContain('Caused By: Error: Test!');
+            expect(errorStack).toContain("TestError: Custom Error");
+            expect(errorStack).toContain("Caused By: Error: Test!");
             done();
         }
     });
 
-})
+});

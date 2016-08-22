@@ -1,8 +1,8 @@
-'use strict';
-import {BaseFilter} from '../filter';
-import {BaseErrorHandler} from '../error-handler';
-import {BaseModule} from '../module';
-import {CustomError} from '../core';
+"use strict";
+import {BaseFilter} from "../filter";
+import {BaseErrorHandler} from "../error-handler";
+import {BaseModule} from "../module";
+import {CustomError} from "../core";
 
 export enum RouteMethod {
     GET,
@@ -31,7 +31,7 @@ export interface Route {
     filters: RouteFilter[];
     errorHandlers: RouteErrorHandler[];
     children: Route[];
-    //actions
+    // actions
     get: RouteAction;
     post: RouteAction;
     delete: RouteAction;
@@ -40,7 +40,7 @@ export interface Route {
 
 export class RouteError extends CustomError {
     constructor(route: Route, msg: string, error?: any) {
-        super(`'${route.path}': ${msg}`, error);
+        super(`"${route.path}": ${msg}`, error);
     }
 }
 
@@ -56,8 +56,4 @@ export class RouterError extends CustomError {
 
 export interface RoutesDefinition {
 
-}
-
-function throwError(message: string): void {
-    throw new Error(`Router: ${message}`);
 }

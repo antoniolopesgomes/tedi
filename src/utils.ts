@@ -1,1 +1,1 @@
-export {ExpressUtils} from './lib/core';
+export {ExpressUtils} from "./lib/core";

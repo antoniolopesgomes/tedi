@@ -1,8 +1,8 @@
-import {Promise} from '../core';
-import * as express from 'express';
+import {Promise} from "../core";
+import * as express from "express";
 
 export class ExpressUtils {
-    static runMiddleware(
+    public static runMiddleware(
         middleware: express.RequestHandler,
         req: express.Request, res: express.Response
     ): Promise<any> {
@@ -10,8 +10,6 @@ export class ExpressUtils {
             middleware(req, res, (error) => {
                 return error ? reject(error) : resolve();
             });
-        })
+        });
     }
 }
-
-//export function is

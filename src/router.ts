@@ -1,1 +1,1 @@
-export {BaseRoute, BaseRouter, RouteErrorHandler} from './lib/router';
+export {BaseRoute, BaseRouter, RouteErrorHandler} from "./lib/router";

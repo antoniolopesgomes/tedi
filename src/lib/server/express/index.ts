@@ -1,2 +1,2 @@
-export {ExpressServer} from './express-server';
-export {ExpressAppBuilder_v2} from './express-app-builder-v2';
+export {ExpressServer} from "./express-server";
+export {ExpressAppBuilder} from "./express-app-builder";

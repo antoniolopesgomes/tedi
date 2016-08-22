@@ -1,2 +1,2 @@
-export * from './lib/logger/core';
-export {WinstonLoggerFactory} from './lib/logger/winston-logger';
+export * from "./lib/logger/core";
+export {WinstonLoggerFactory} from "./lib/logger/winston-logger";

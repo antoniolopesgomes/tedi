@@ -1,11 +1,7 @@
-import 'reflect-metadata';
-import * as inversify from 'inversify';
-import * as _ from 'lodash';
-import {BaseFilter, FilterMetadata} from '../filter';
-import {ControllerMetadata} from '../controller';
-import {BaseErrorHandler, ErrorHandlerMetadata} from '../error-handler';
-import {DIModule, BindingContext, BindingOptions, dependency, DependencyInfo} from '../di';
-import {Constructor, CustomError} from '../core';
+import "reflect-metadata";
+import * as _ from "lodash";
+import {DIModule, dependency, DependencyInfo} from "../di";
+import {Constructor, CustomError} from "../core";
 
 export abstract class BaseModule {
 
@@ -15,18 +11,16 @@ export abstract class BaseModule {
     constructor(parentModule?: BaseModule) {
         this._parentModule = parentModule;
         this._di = new DIModule();
-        //initialize
+        // initialize
         this.init();
     }
 
-    abstract init(): void;
-
-    getParentModule(): BaseModule {
+    public getParentModule(): BaseModule {
         return this._parentModule;
     }
 
-    dependencies(...args: any[]): BaseModule {
-        let deps = _.isArray(args) ? args: [];
+    public dependencies(...args: any[]): BaseModule {
+        let deps = _.isArray(args) ? args : [];
 
         deps.forEach((dep: any) => {
             this.setDependency(dep);
@@ -35,7 +29,7 @@ export abstract class BaseModule {
         return this;
     }
 
-    setDependency(dep: any): BaseModule {
+    public setDependency(dep: any): BaseModule {
         if (_.isUndefined(dep) || _.isNull(dep)) {
             return this;
         }
@@ -46,37 +40,39 @@ export abstract class BaseModule {
         return this;
     }
 
-    setModule(token: any, moduleClass: Constructor<BaseModule>): BaseModule {
-        this.setDependency(dependency(token, { value: new moduleClass(this) }))
+    public setModule(token: any, moduleClass: Constructor<BaseModule>): BaseModule {
+        this.setDependency(dependency(token, { value: new moduleClass(this) }));
         return this;
     }
 
-    getDependency<T>(token: string | Constructor<T>): T {
+    public getDependency<T>(token: string | Constructor<T>): T {
         let depInstance = this._getBindingRecursively<T>(token);
         if (!depInstance) {
-            throw new ModuleError(this, `Could not find dependency '${(token || '?').toString()}' in the module tree`, null);
+            throw new ModuleError(this, `Could not find dependency "${(token || "?").toString()}" in the module tree`, null);
         }
         return depInstance;
     }
 
-    snapshot(): BaseModule {
+    public snapshot(): BaseModule {
         this._di.snapshot();
         return this;
     }
 
-    restore(): BaseModule {
+    public restore(): BaseModule {
         this._di.restore();
         return this;
     }
 
-    setJsonRoutes(value: any): BaseModule {
-        this._di.setDependency(dependency('RoutesDefinition', { value: value}));
+    public setJsonRoutes(value: any): BaseModule {
+        this._di.setDependency(dependency("RoutesDefinition", { value: value}));
         return this;
     }
 
-    getJsonRoutes(): any {
-        return this._di.getDependency<any>('RoutesDefinition');
+    public getJsonRoutes(): any {
+        return this._di.getDependency<any>("RoutesDefinition");
     }
+
+    protected abstract init(): void;
 
     private _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
         let currentModule: BaseModule = this;
@@ -93,6 +89,6 @@ export abstract class BaseModule {
 
 export class ModuleError extends CustomError {
     constructor(module: BaseModule, msg: string, error: any) {
-        super(`${(<any>module.constructor).name} - ${msg}`, error);
+        super(`${(<any> module.constructor).name} - ${msg}`, error);
     }
 }

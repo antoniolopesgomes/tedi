@@ -1,34 +1,32 @@
-'use strict';
-import {Dependency} from '../di';
-import * as METADATA_KEYS from '../constants/metadata-keys';
-import * as ERRORS from '../constants/error-messages';
-import {CustomError} from '../core';
+"use strict";
+import {Dependency} from "../di";
+import * as METADATA_KEYS from "../constants/metadata-keys";
+import * as ERRORS from "../constants/error-messages";
+import {CustomError} from "../core";
 
-//CUSTOM ERRORS USED BY THIS MODULE
+// CUSTOM ERRORS USED BY THIS MODULE
 
 export class ServiceDecoratorError extends CustomError {
     constructor(controllerName: string, msg: string, error?: any) {
-        super(`${controllerName}': ${msg}`, error);
+        super(`${controllerName}": ${msg}`, error);
     }
 }
 
-//CONTROLLER DECORATOR
+// CONTROLLER DECORATOR
 
-export interface IServiceDecorator {
+export interface BaseServiceDecorator {
     (): (target: Object) => void;
 }
 
 function ServiceDecorator(): ClassDecorator {
-
     return function (target: Object) {
         try {
             Dependency()(target);
             Reflect.defineMetadata(METADATA_KEYS.SERVICE, true, target);
+        } catch (error) {
+            throw new ServiceDecoratorError((<any> target).name, ERRORS.SERVICE_ERROR_DECORATING, error);
         }
-        catch (error) {
-            throw new ServiceDecoratorError((<any>target).name, ERRORS.SERVICE_ERROR_DECORATING, error);
-        }
-    }
+    };
 }
 
-export const Service = <IServiceDecorator> ServiceDecorator;
+export const Service = <BaseServiceDecorator> ServiceDecorator;

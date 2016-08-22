@@ -1,13 +1,13 @@
-import * as winston from 'winston';
-import {Logger, LoggerLevels} from './core';
-import {Service} from '../service';
+import * as winston from "winston";
+import {Logger, LoggerLevels} from "./core";
+import {Service} from "../service";
 
 export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args) => Logger {
 
     cfg = cfg || {
         transports: [
-            new winston.transports.Console()
-        ]
+            new winston.transports.Console(),
+        ],
     };
 
     @Service()
@@ -17,56 +17,56 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
 
         constructor() {
             this._logger = new winston.Logger(cfg);
-            //set syslog levels
-            this._logger.setLevels((<any>winston).config.syslog.levels);
+            // set syslog levels
+            this._logger.setLevels((<any> winston).config.syslog.levels);
             this.setLevel(LoggerLevels.INFO);
         }
 
-        warn(msg: string): void {
-            this._logger.log('warning', msg);
+        public warn(msg: string): void {
+            this._logger.log("warning", msg);
         }
 
-        info(msg: string): void {
+        public info(msg: string): void {
             this._logger.info(msg);
         }
 
-        error(msg: string, err: any): void {
-            this._logger.error(`${msg} \n ${(err && err.toString()) || '?'}`);
+        public error(msg: string, err: any): void {
+            this._logger.error(`${msg} \n ${(err && err.toString()) || "?"}`);
         }
 
-        debug(msg: string): void {
+        public debug(msg: string): void {
             this._logger.debug(msg);
         }
 
-        setLevel(level: LoggerLevels): Logger {
+        public setLevel(level: LoggerLevels): Logger {
             let levelStr: string = null;
             switch (level) {
                 case LoggerLevels.EMERGENCY:
-                    levelStr = 'emerg';
+                    levelStr = "emerg";
                     break;
                 case LoggerLevels.ALERT:
-                    levelStr = 'alert';
+                    levelStr = "alert";
                     break;
                 case LoggerLevels.CRITICAL:
-                    levelStr = 'crit';
+                    levelStr = "crit";
                     break;
                 case LoggerLevels.ERROR:
-                    levelStr = 'error';
+                    levelStr = "error";
                     break;
                 case LoggerLevels.WARNING:
-                    levelStr = 'warning';
+                    levelStr = "warning";
                     break;
                 case LoggerLevels.NOTICE:
-                    levelStr = 'notice';
+                    levelStr = "notice";
                     break;
                 case LoggerLevels.INFO:
-                    levelStr = 'info';
+                    levelStr = "info";
                     break;
                 case LoggerLevels.DEBUG:
-                    levelStr = 'debug';
+                    levelStr = "debug";
                     break;
                 default:
-                    levelStr = 'info';
+                    levelStr = "info";
                     break;
             }
             this._logger.level = levelStr;
@@ -75,5 +75,4 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
     };
 
     return WinstonLogger;
-
 }

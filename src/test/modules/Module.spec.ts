@@ -1,20 +1,18 @@
 
-import {ExpressServer} from '../../server';
+import {ExpressServer} from "../../server";
 import {
     BaseFilter,
-    App,
     BaseModule,
-    BindingContext,
     Controller,
     Filter,
     Module,
-    dependency
-} from '../../core'
-import {Logger, LoggerLevels} from '../../logger';
-import * as express from 'express';
-import * as request from 'supertest-as-promised';
+    dependency,
+} from "../../core";
+import {Logger} from "../../logger";
+import * as express from "express";
+import * as request from "supertest-as-promised";
 
-describe('Modules', () => {
+describe("Modules", () => {
 
     let server: ExpressServer;
 
@@ -27,8 +25,8 @@ describe('Modules', () => {
 
     @Filter()
     class CustomFilter2 implements BaseFilter<any> {
-        apply(req: express.Request, res: express.Response): any { }
-        getDataFromRequest(req: express.Request): any { }
+        apply(req: express.Request, res: express.Response): any { return; }
+        getDataFromRequest(req: express.Request): any { return; }
     }
 
     @Module()
@@ -36,71 +34,69 @@ describe('Modules', () => {
         init(): void {
             this
                 .setJsonRoutes({
-                    '/login': {
-                        '$filters': ['RootFilter'],
-                        'get': ['AuthController', 'get']
-                    }
+                    "/login": {
+                        "$filters": ["RootFilter"],
+                        "get": ["AuthController", "get"],
+                    },
                 })
                 .dependencies(
-                    dependency('AuthController', { class: AuthController}),
-                    dependency('RootFilter', { class: CustomFilter2})
+                    dependency("AuthController", { class: AuthController}),
+                    dependency("RootFilter", { class: CustomFilter2})
                 );
         }
-    };
+    }
 
     beforeEach(() => {
         server = new ExpressServer();
     });
 
-    describe('When we got an app with a child module', () => {
+    describe("When we got an app with a child module", () => {
         let results: any[] = [];
         let app: express.Application;
         let authModule: BaseModule;
 
         beforeEach(() => {
-            results.push('_here');
+            results.push("_here");
             server
                 .setJsonRoutes({
-                    '/auth': 'AuthModule'
+                    "/auth": "AuthModule",
                 })
-                .setModule('AuthModule', AuthModule);
-            
-            //server.component<Logger>('Logger').setLevel(LoggerLevels.DEBUG);
+                .setModule("AuthModule", AuthModule);
+            // server.component<Logger>("Logger").setLevel(LoggerLevels.DEBUG);
             app = server.getApp();
-            authModule = server.getDependency<BaseModule>('AuthModule');
+            authModule = server.getDependency<BaseModule>("AuthModule");
         });
 
-        describe('/auth/login', () => {
+        describe("/auth/login", () => {
             beforeEach((done: DoneFn) => {
-                results.push('here');
-                spyOn(authModule.getDependency('AuthController'), 'get').and.callThrough();
-                spyOn(authModule.getDependency('RootFilter'), 'apply').and.callThrough();
+                results.push("here");
+                spyOn(authModule.getDependency("AuthController"), "get").and.callThrough();
+                spyOn(authModule.getDependency("RootFilter"), "apply").and.callThrough();
                 request(app)
-                    .get('/auth/login')
+                    .get("/auth/login")
                     .expect(200)
                     .then(() => done())
-                    .catch(done.fail)
-            })
-
-            it('should have called the module controller', () => {
-                expect(authModule.getDependency<AuthController>('AuthController').get).toHaveBeenCalled();
-                
+                    .catch(done.fail);
             });
 
-            it('should have called the module auth.RootFilter', () => {
-                expect(authModule.getDependency<BaseFilter<any>>('RootFilter').apply).toHaveBeenCalled();
+            it("should have called the module controller", () => {
+                expect(authModule.getDependency<AuthController>("AuthController").get).toHaveBeenCalled();
+            });
+
+            it("should have called the module auth.RootFilter", () => {
+                expect(authModule.getDependency<BaseFilter<any>>("RootFilter").apply).toHaveBeenCalled();
             });
         });
 
-        describe('and we try to access the child module', () => {
-            it('should have a reference to the childModule', () => {
+        describe("and we try to access the child module", () => {
+            it("should have a reference to the childModule", () => {
                 expect(authModule).toEqual(jasmine.any(AuthModule));
             });
-            it('childModule should have access to root module dependencies', () => {
-                expect(authModule.getDependency<Logger>('Logger')).not.toBeNull();
+            it("childModule should have access to root module dependencies", () => {
+                expect(authModule.getDependency<Logger>("Logger")).not.toBeNull();
             });
 
-            describe('and override an internal component', () => {
+            describe("and override an internal component", () => {
                 @Controller()
                 class CustomAuthController {
                     get(req, res): void {
@@ -109,13 +105,13 @@ describe('Modules', () => {
                 }
                 beforeEach(() => {
                     authModule.dependencies(
-                        dependency('AuthController', { class: CustomAuthController})
+                        dependency("AuthController", { class: CustomAuthController})
                     );
-                })
-                it('should have overrided AuthController', () => {
-                    expect(authModule.getDependency('AuthController')).toEqual(jasmine.any(CustomAuthController));
-                })
+                });
+                it("should have overrided AuthController", () => {
+                    expect(authModule.getDependency("AuthController")).toEqual(jasmine.any(CustomAuthController));
+                });
             });
         });
     });
-})
+});

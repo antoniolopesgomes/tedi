@@ -1,15 +1,15 @@
-'use strict';
-import {ControllerMetadata} from './controller-metadata';
-import {Dependency} from '../di';
-import * as METADATA_KEYS from '../constants/metadata-keys';
-import * as ERRORS from '../constants/error-messages';
-import {CustomError} from '../core';
+"use strict";
+import {ControllerMetadata} from "./controller-metadata";
+import {Dependency} from "../di";
+import * as METADATA_KEYS from "../constants/metadata-keys";
+import * as ERRORS from "../constants/error-messages";
+import {CustomError} from "../core";
 
-//CUSTOM ERRORS USED BY THIS MODULE
+// CUSTOM ERRORS USED BY THIS MODULE
 
 export class ControllerDecoratorError extends CustomError {
     constructor(controllerName: string, msg: string, error?: any) {
-        super(`${controllerName}': ${msg}`, error);
+        super(`${controllerName}": ${msg}`, error);
     }
 }
 
@@ -19,9 +19,9 @@ export class ControllerActionDecoratorError extends CustomError {
     }
 }
 
-//CONTROLLER DECORATOR
+// CONTROLLER DECORATOR
 
-export interface IControllerDecorator {
+export interface BaseControllerDecorator {
     (): (target: Object) => void;
     get: () => MethodDecorator;
     post: () => MethodDecorator;
@@ -35,32 +35,31 @@ function ControllerDecorator(): ClassDecorator {
         try {
             Dependency()(target);
             Reflect.defineMetadata(METADATA_KEYS.CONTROLLER, true, target);
+        } catch (error) {
+            throw new ControllerDecoratorError((<any> target).name, ERRORS.CONTROLLER_ERROR_DECORATING, error);
         }
-        catch (error) {
-            throw new ControllerDecoratorError((<any>target).name, ERRORS.CONTROLLER_ERROR_DECORATING, error);
-        }
-    }
+    };
 }
 
-(<IControllerDecorator>ControllerDecorator).get = function (): MethodDecorator {
-    return ControllerActionMethodDecorator('GET');
+(<BaseControllerDecorator> ControllerDecorator).get = function (): MethodDecorator {
+    return ControllerActionMethodDecorator("GET");
 };
 
-(<IControllerDecorator>ControllerDecorator).post = function (): MethodDecorator {
-    return ControllerActionMethodDecorator('POST');
+(<BaseControllerDecorator> ControllerDecorator).post = function (): MethodDecorator {
+    return ControllerActionMethodDecorator("POST");
 };
 
-(<IControllerDecorator>ControllerDecorator).delete = function (): MethodDecorator {
-    return ControllerActionMethodDecorator('DELETE');
+(<BaseControllerDecorator> ControllerDecorator).delete = function (): MethodDecorator {
+    return ControllerActionMethodDecorator("DELETE");
 };
 
-(<IControllerDecorator>ControllerDecorator).put = function (): MethodDecorator {
-    return ControllerActionMethodDecorator('PUT');
-}
+(<BaseControllerDecorator> ControllerDecorator).put = function (): MethodDecorator {
+    return ControllerActionMethodDecorator("PUT");
+};
 
 function ControllerActionMethodDecorator(action: string): MethodDecorator {
     return function (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
-        let targetConstructorName = (<any>target).constructor.name;
+        let targetConstructorName = (<any> target).constructor.name;
         if (ControllerMetadata.actionMethodName(action, target)) {
             throw new ControllerActionDecoratorError(targetConstructorName, action.toUpperCase(), ERRORS.CONTROLLER_ACTION_DUPLICATE);
         }
@@ -68,4 +67,4 @@ function ControllerActionMethodDecorator(action: string): MethodDecorator {
     };
 }
 
-export const Controller = <IControllerDecorator>ControllerDecorator;
+export const Controller = <BaseControllerDecorator> ControllerDecorator;
