@@ -1,0 +1,11 @@
+"use strict";
+exports.CONTROLLER = "tedi:Controller";
+exports.GET = "tedi:GET";
+exports.POST = "tedi:POST";
+exports.DELETE = "tedi:DELETE";
+exports.PUT = "tedi:PUT";
+exports.FILTER = "tedi:Filter";
+exports.ERROR_HANDLER = "tedi:ErrorHandler";
+exports.SERVICE = "tedi:Service";
+exports.MODULE = "tedi:Module";
+exports.DEPENDENCY = "tedi:Dependency";

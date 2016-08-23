@@ -1,0 +1,10 @@
+export declare const CONTROLLER: string;
+export declare const GET: string;
+export declare const POST: string;
+export declare const DELETE: string;
+export declare const PUT: string;
+export declare const FILTER: string;
+export declare const ERROR_HANDLER: string;
+export declare const SERVICE: string;
+export declare const MODULE: string;
+export declare const DEPENDENCY: string;

@@ -1,0 +1,54 @@
+{
+  "name": "tedi",
+  "version": "0.1.0",
+  "description": "Express wrappper written in typescript with dependency injection capabilities",
+  "keywords": [
+    "tedi",
+    "express",
+    "typescript",
+    "di"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antoniolopesgomes/tedi"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine",
+    "postinstall": "node_modules/.bin/gulp build"
+  },
+  "author": "António Gomes",
+  "license": "MIT",
+  "devDependencies": {
+    "del": "^2.2.1",
+    "gulp": "^3.9.1",
+    "gulp-sequence": "^0.4.5",
+    "gulp-sym": "0.0.14",
+    "gulp-typescript": "^2.13.6",
+    "jasmine": "^2.4.1",
+    "jasmine-spec-reporter": "^2.5.0",
+    "merge2": "^1.0.2",
+    "request-promise": "^3.0.0",
+    "typescript": "^2.0.0"
+  },
+  "dependencies": {
+    "@types/bluebird": "^3.0.31",
+    "@types/body-parser": "0.0.31",
+    "@types/es6-promise": "0.0.30",
+    "@types/inversify": "^2.0.29",
+    "@types/jasmine": "^2.2.32",
+    "@types/lodash": "^4.14.33",
+    "@types/supertest-as-promised": "^2.0.30",
+    "@types/winston": "0.0.27",
+    "bluebird": "^3.4.0",
+    "express": "^4.13.4",
+    "inversify": "^2.0.0-beta.6",
+    "jasmine-promises": "^0.4.1",
+    "lodash": "^4.13.1",
+    "nested-error-stacks": "^1.0.2",
+    "reflect-metadata": "^0.1.3",
+    "supertest": "^1.2.0",
+    "supertest-as-promised": "^3.1.0",
+    "winston": "^2.2.0"
+  }
+}
