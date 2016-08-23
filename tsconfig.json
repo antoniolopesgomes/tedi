@@ -7,7 +7,11 @@
         "sourceMap": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "outDir": "./dist/build"
+        "outDir": "./dist/build",
+        "types": [
+            "jasmine",
+            "es6-promise"
+        ]
     },
     "exclude": [
         "node_modules",
