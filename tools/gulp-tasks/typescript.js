@@ -4,7 +4,7 @@ var gTs = require('gulp-typescript');
 var merge = require('merge2');
 
 //CONFIG
-var config = require('./config');
+var config = require('./_config');
 
 const TSCONFIG = '../../tsconfig.json'
 
