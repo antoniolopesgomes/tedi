@@ -10,7 +10,11 @@ export abstract class BaseModule {
 
     constructor(parentModule?: BaseModule) {
         this._parentModule = parentModule;
-        this._di = new DIModule();
+        if (parentModule instanceof BaseModule) {
+            this._di = new DIModule((parentModule instanceof BaseModule) ? parentModule._di : null);
+        } else {
+            this._di = new DIModule(null);
+        }
         // initialize
         this.init();
     }
@@ -46,7 +50,8 @@ export abstract class BaseModule {
     }
 
     public getDependency<T>(token: string | Constructor<T>): T {
-        let depInstance = this._getBindingRecursively<T>(token);
+        // let depInstance = this._getBindingRecursively<T>(token);
+        let depInstance = this._getBinding<T>(token);
         if (!depInstance) {
             throw new ModuleError(this, `Could not find dependency "${(token || "?").toString()}" in the module tree`, null);
         }
@@ -74,15 +79,10 @@ export abstract class BaseModule {
 
     protected abstract init(): void;
 
-    private _getBindingRecursively<T>(abstraction: string | Constructor<T>): T {
-        let currentModule: BaseModule = this;
-        while (currentModule) {
-            if (currentModule._di.hasDependency(abstraction)) {
-                return currentModule._di.getDependency<T>(abstraction);
-            }
-            currentModule = currentModule.getParentModule();
-        }
-        return null;
+    private _getBinding<T>(abstraction: string | Constructor<T>): T {
+        return this._di.hasDependency(abstraction) ?
+            this._di.getDependency<T>(abstraction) :
+            null;
     }
 
 }

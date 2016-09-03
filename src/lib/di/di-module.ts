@@ -7,8 +7,11 @@ export class DIModule {
 
     private _kernel: inversify.interfaces.Kernel;
 
-    constructor() {
+    constructor(parentDIModule: DIModule) {
         this._kernel = new inversify.Kernel();
+        if (parentDIModule instanceof DIModule) {
+            (<any> this._kernel).parent = parentDIModule._kernel;
+        }
     }
 
     public getDependency<T>(token: any): T {
@@ -17,6 +20,11 @@ export class DIModule {
 
     public hasDependency(token: any): boolean {
         return this._kernel.isBound(token);
+    }
+
+    public hasOwnDependency(token: any): boolean {
+        // TODO check this!!! 
+        return (<any> this._kernel)._bindingDictionary.hasKey(token);
     }
 
     public removeDependency(token: any): void {
@@ -32,7 +40,7 @@ export class DIModule {
             console.warn(`invalid dependency: ${dep}`);
             return;
         }
-        if (this.hasDependency(dep.token)) {
+        if (this.hasOwnDependency(dep.token)) {
             this.removeDependency(dep.token);
         }
         this._bindDependency(dep);

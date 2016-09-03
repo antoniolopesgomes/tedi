@@ -202,7 +202,7 @@ export class BaseRouter implements Router {
                     childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
                 }
                 childrenRoutes.push(childRoute);
-            } else if (["$filters", "$errorHandlers", "get", "post", "put", "delete"].indexOf(key) < 0) {
+            } else if ([...(_.values(ROUTER_WORDS)), "get", "post", "put", "delete"].indexOf(key) < 0) {
                 this.logger.debug(`Routing key: "${key}" of ${route.path}, will be ignored`);
             }
         });
