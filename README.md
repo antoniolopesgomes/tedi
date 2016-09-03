@@ -4,7 +4,8 @@
 
 ###Typescript
 **tedi** tries to give a new approach about how we write web applications in node.
-It favors the typescript language to leverage the power of javascript into new heights. Typescript is a superset of javascript that allows us to use the ES6 (and some of the ES7) spec, today. It also gives us types - we can work in a strongly typed environment.  
+It favors the typescript language to leverage the power of javascript into new heights. Typescript is a superset of javascript that allows us to use the ES6 (and some of the ES7) spec, today. It also gives us types - we can work in a strongly typed environment.
+(**tedi** will only work with a typescript version >= 2.0.0)  
 [Typescript](https://www.typescriptlang.org/)
 
 ###Express  
