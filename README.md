@@ -1,6 +1,8 @@
+##version **0.1.0** is out! It has several breaking changes regarding the previous versions.
+
 #Overview
 
-####Check the [wiki](https://github.com/antoniolopesgomes/tedi/wiki) (under development)
+####[Check the wiki](https://github.com/antoniolopesgomes/tedi/wiki)
 
 ###Typescript
 **tedi** tries to give a new approach about how we write web applications in node.
