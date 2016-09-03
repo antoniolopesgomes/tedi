@@ -96,10 +96,10 @@ export class ExpressAppBuilder {
                         // if the headers block was sent by this filter
                         // stop downstream propagation
                         // we expect that the response has ended
-                        if (!res.headersSent) {
+                        if (res.headersSent) {
                             this._logger.warn(`${requestInfo} [!] Filter sent headers.`);
-                            next();
                         }
+                        next();
                     })
                     .catch((error: any) => {
                         this._logger.error(`${requestInfo} [ERROR]`, error);

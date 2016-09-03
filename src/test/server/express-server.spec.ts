@@ -322,6 +322,7 @@ describe("ExpressServer", () => {
         describe("and a login filter responds", () => {
             let response: request.Response;
             beforeEach((done) => {
+                spyOn(server.getDependency<Logger>("Logger"), "warn").and.callThrough();
                 spyOn(server.getDependency(AuthController), "login");
                 spyOn(server.getDependency("LoginFilter"), "apply").and.callFake((req, res) => {
                     res.status(200).send("HIJACKED");
@@ -340,8 +341,8 @@ describe("ExpressServer", () => {
                 expect(server.getDependency<BaseFilter<any>>("LoginFilter").apply).toHaveBeenCalled();
                 expect(response.text).toEqual("HIJACKED");
             });
-            it("controller should have not been called", () => {
-                expect(server.getDependency<AuthController>(AuthController).login).not.toHaveBeenCalled();
+            it("server logger should warn about it", () => {
+                expect(server.getDependency<Logger>("Logger").warn).toHaveBeenCalled();
             });
         });
     });

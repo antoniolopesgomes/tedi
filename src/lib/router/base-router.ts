@@ -52,8 +52,8 @@ export class BaseRouter implements Router {
     }
 
     private _parseRouteAction(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
-        return this._parseRouteActionFromArray(method, jsonRoute, module) ||
-            this._parseRouteActionFromController(method, jsonRoute, module);
+        return  this._parseRouteActionFromArray(method, jsonRoute, module) ||
+                this._parseRouteActionFromController(method, jsonRoute, module);
     }
 
     private _parseRouteActionFromArray(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
@@ -73,7 +73,7 @@ export class BaseRouter implements Router {
                 routeAction = jsonRoute.delete;
                 break;
             default:
-                return undefined;
+                routeAction = undefined;
         }
 
         if (!routeAction) {
