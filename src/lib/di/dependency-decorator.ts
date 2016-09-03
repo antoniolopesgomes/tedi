@@ -2,11 +2,11 @@
 import {injectable} from "./core";
 import * as METADATA_KEYS from "../constants/metadata-keys";
 import * as ERRORS from "../constants/error-messages";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
-export class DependencyDecoratorError extends CustomError {
+export class DependencyDecoratorError extends TediError {
     constructor(dependencyName: string, msg: string, error?: any) {
         super(`${dependencyName}": ${msg}`, error);
     }

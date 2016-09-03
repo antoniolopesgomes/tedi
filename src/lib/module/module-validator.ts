@@ -1,8 +1,8 @@
 import {ModuleMetadata} from "./module-metadata";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 import {BindingOptions, BindingContext} from "../di";
 
-export class ModuleValidatorError extends CustomError {
+export class ModuleValidatorError extends TediError {
     constructor(msg: string, error?: any) {
         super(msg, error);
     }

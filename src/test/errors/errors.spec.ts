@@ -1,7 +1,7 @@
 
-import {CustomError} from "../../core";
+import {TediError} from "../../core";
 
-class TestError extends CustomError {
+class TestError extends TediError {
     constructor(msg: string, error: any) {
         super(msg, error);
     }

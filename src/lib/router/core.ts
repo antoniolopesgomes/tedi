@@ -2,7 +2,7 @@
 import {BaseFilter} from "../filter";
 import {BaseErrorHandler} from "../error-handler";
 import {BaseModule} from "../module";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 
 export enum RouteMethod {
     GET,
@@ -38,7 +38,7 @@ export interface Route {
     put: RouteAction;
 }
 
-export class RouteError extends CustomError {
+export class RouteError extends TediError {
     constructor(route: Route, msg: string, error?: any) {
         super(`"${route.path}": ${msg}`, error);
     }
@@ -48,7 +48,7 @@ export interface Router {
     getRootRoute(jsonRoutes: any, module: BaseModule): Route;
 }
 
-export class RouterError extends CustomError {
+export class RouterError extends TediError {
     constructor(msg: string, error?: any) {
         super(`${msg}`, error);
     }

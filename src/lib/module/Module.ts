@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import * as _ from "lodash";
 import {DIModule, dependency, DependencyInfo} from "../di";
-import {Constructor, CustomError} from "../core";
+import {Constructor, TediError} from "../core";
 
 export abstract class BaseModule {
 
@@ -87,7 +87,7 @@ export abstract class BaseModule {
 
 }
 
-export class ModuleError extends CustomError {
+export class ModuleError extends TediError {
     constructor(module: BaseModule, msg: string, error: any) {
         super(`${(<any> module.constructor).name} - ${msg}`, error);
     }

@@ -1,7 +1,7 @@
 import {ControllerMetadata} from "./controller-metadata";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 
-export class ControllerValidatorError extends CustomError {
+export class ControllerValidatorError extends TediError {
     constructor(controller: any, msg: string, error?: any) {
         super(`${(<any> controller).constructor.name}: ${msg}`, error);
     }

@@ -1,9 +1,9 @@
 import {FilterMetadata} from "./filter-metadata";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 import {BaseFilter} from "./core";
 import {isFunction} from "lodash";
 
-export class FilterValidatorError extends CustomError {
+export class FilterValidatorError extends TediError {
     constructor(filter: BaseFilter<any>, msg: string, error?: any) {
         super(`${(<any> filter).constructor.name}: ${msg}`, error);
     }

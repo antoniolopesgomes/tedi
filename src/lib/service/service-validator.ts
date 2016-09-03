@@ -1,8 +1,8 @@
 import {ServiceMetadata} from "./service-metadata";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 import {BindingOptions, BindingContext} from "../di";
 
-export class ServiceValidatorError extends CustomError {
+export class ServiceValidatorError extends TediError {
     constructor(msg: string, error?: any) {
         super(msg, error);
     }

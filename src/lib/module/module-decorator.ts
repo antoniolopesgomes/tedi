@@ -2,11 +2,11 @@
 import {Dependency} from "../di";
 import * as METADATA_KEYS from "../constants/metadata-keys";
 import * as ERRORS from "../constants/error-messages";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
-export class ModuleDecoratorError extends CustomError {
+export class ModuleDecoratorError extends TediError {
     constructor(moduleName: string, msg: string, error?: any) {
         super(`${moduleName}": ${msg}`, error);
     }

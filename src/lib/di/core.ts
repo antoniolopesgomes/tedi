@@ -1,4 +1,4 @@
-import {CustomError} from "../core";
+import {TediError} from "../core";
 
 export {inject, injectable} from "inversify";
 
@@ -12,7 +12,7 @@ export interface BindingOptions {
     context: BindingContext;
 }
 
-export class DIModuleError extends CustomError {
+export class DIModuleError extends TediError {
     constructor(msg: string, error: any) {
         super(`${msg}`, error);
     }

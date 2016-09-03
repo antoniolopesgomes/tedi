@@ -1,9 +1,9 @@
 import {ErrorHandlerMetadata} from "./error-handler-metadata";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 import {BaseErrorHandler} from "./core";
 import {isFunction} from "lodash";
 
-export class ErrorHandlerValidatorError extends CustomError {
+export class ErrorHandlerValidatorError extends TediError {
     constructor(errorHandler: BaseErrorHandler, msg: string, error?: any) {
         super(`${(<any> errorHandler).constructor.name}: ${msg}`, error);
     }

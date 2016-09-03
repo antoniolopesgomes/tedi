@@ -1,8 +1,8 @@
 import {DependencyMetadata} from "./dependency-metadata";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 import {BindingOptions, BindingContext} from "../di";
 
-export class DependencyValidatorError extends CustomError {
+export class DependencyValidatorError extends TediError {
     constructor(msg: string, error?: any) {
         super(msg, error);
     }

@@ -3,17 +3,17 @@ import {ControllerMetadata} from "./controller-metadata";
 import {Dependency} from "../di";
 import * as METADATA_KEYS from "../constants/metadata-keys";
 import * as ERRORS from "../constants/error-messages";
-import {CustomError} from "../core";
+import {TediError} from "../core";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
-export class ControllerDecoratorError extends CustomError {
+export class ControllerDecoratorError extends TediError {
     constructor(controllerName: string, msg: string, error?: any) {
         super(`${controllerName}": ${msg}`, error);
     }
 }
 
-export class ControllerActionDecoratorError extends CustomError {
+export class ControllerActionDecoratorError extends TediError {
     constructor(controllerName: string, actionName: string, msg: string, error?: any) {
         super(`${controllerName}#${actionName}: ${msg}`, error);
     }
