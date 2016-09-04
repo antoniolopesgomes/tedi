@@ -17,27 +17,28 @@ express is a great web framework that is already well established in the communi
 ###Dependency injection  
 [wikipedia] dependency injection is a software pattern that implements inversion of control for resolving dependencies.
 
-
 This is a great way to increase modularity and testability right from the start, as **tedi** forces this pattern to be used. **tedi** uses [inversify.io](http://inversify.io/) as the DI engine. It is a great framework that is actively maintained and I'll be glad to incorporate new functionalities that may arise with new releases.  
 [Inversify.io](http://inversify.io/)  
 
-###Create a project folder
+Installation
+---
+Create a project folder.
 ```bash
 $ mkdir tedi-project
 $ cd tedi-project
 ```
-###Initialize npm  
+Initialize npm.  
 ```bash
 $ npm init
 ```
-###Install tedi and other dependencies
+Install tedi and other dependencies.
 ```bash
 $ npm i --save tedi
 $ npm i --save-dev typescript@">=2.0.0"
 ```
-typescript version must be greater or equal to 2.0
+typescript version must be greater or equal to 2.0.
 ___
-**tsconfig.json**  
+**tsconfig.json**  (put it in the project root folder)
 ```json
 {
     "compilerOptions": {
@@ -53,13 +54,13 @@ ___
     ]
 }
 ```
-This file must be in the project root folder.
-___
-You can now compile your .ts files using:
+Compile
+---
+You can now compile your .ts files.
 ```bash
 $ node_modules/.bin/tsc
 ```
-Or you can define a npm script:
+Or you can define a npm script.
 
 **package.json**
 ```json
@@ -67,7 +68,7 @@ Or you can define a npm script:
   "compile": "node_modules/.bin/tsc"
 },
 ```
-Use the command to compile:
+Use the command to compile.
 ```bash
 $ npm run compile
 ```
