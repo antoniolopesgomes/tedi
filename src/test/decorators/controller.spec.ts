@@ -7,14 +7,14 @@ describe("Controller decorators", () => {
         describe("when we have a non decorated class", () => {
             class AController { };
             it("should not be decorated", () => {
-                expect(ControllerMetadata.isDecorated(AController)).toBeFalsy();
+                expect(ControllerMetadata.isDecoratedWithController(AController)).toBeFalsy();
             });
         });
 
         describe("when we have a decorated class", () => {
             @Controller() class AController { };
             it("should be decorated", () => {
-                expect(ControllerMetadata.isDecorated(AController)).toBeTruthy();
+                expect(ControllerMetadata.isDecoratedWithController(AController)).toBeTruthy();
             });
         });
     });
@@ -39,22 +39,22 @@ describe("Controller decorators", () => {
                 }
                 controller = new AController();
             });
-            describe("GET decoration", () => {
+            describe("'get' decoration", () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = ControllerMetadata.GET(controller).name;
+                    methodName = ControllerMetadata.getHttpMethodMetadata("get", controller).name;
                 });
-                it("should have stored the GET method name", () => {
+                it("should have stored the 'get' method name", () => {
                     expect(methodName).toEqual("read");
                 });
-                it("we should be able to call the GET method", () => {
+                it("we should be able to call the 'get' method", () => {
                     expect(controller[methodName]()).toEqual("READ");
                 });
             });
-            describe("POST decoration", () => {
+            describe("'post' decoration", () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = ControllerMetadata.POST(controller).name;
+                    methodName = ControllerMetadata.getHttpMethodMetadata("post", controller).name;
                 });
                 it("should have stored the POST method name", () => {
                     expect(methodName).toEqual("create");
@@ -63,27 +63,27 @@ describe("Controller decorators", () => {
                     expect(controller[methodName]()).toEqual("CREATE");
                 });
             });
-            describe("PUT decoration", () => {
+            describe("'put' decoration", () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = ControllerMetadata.PUT(controller).name;
+                    methodName = ControllerMetadata.getHttpMethodMetadata("put", controller).name;
                 });
-                it("should have stored the PUT method name", () => {
+                it("should have stored the 'put' method name", () => {
                     expect(methodName).toEqual("update");
                 });
-                it("we should be able to call the PUT method", () => {
+                it("we should be able to call the 'put' method", () => {
                     expect(controller[methodName]()).toEqual("UPDATE");
                 });
             });
-            describe("DELETE decoration", () => {
+            describe("'delete' decoration", () => {
                 let methodName: string;
                 beforeEach(() => {
-                    methodName = ControllerMetadata.DELETE(controller).name;
+                    methodName = ControllerMetadata.getHttpMethodMetadata("delete", controller).name;
                 });
-                it("should have stored the DELETE method name", () => {
+                it("should have stored the 'delete' method name", () => {
                     expect(methodName).toEqual("delete");
                 });
-                it("we should be able to call the DELETE method", () => {
+                it("we should be able to call the 'delete' method", () => {
                     expect(controller[methodName]()).toEqual("DELETE");
                 });
             });

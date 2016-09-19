@@ -9,7 +9,7 @@ export class ControllerValidatorError extends TediError {
 
 export class ControllerValidator {
     public static hasValidMetadata(controller: any): boolean {
-        return ControllerMetadata.isDecorated(controller.constructor);
+        return ControllerMetadata.isDecoratedWithController(controller.constructor);
     }
     public static validate(controller: any): void {
         // check if it was valid metadata

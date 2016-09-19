@@ -3,6 +3,7 @@ import {BaseFilter} from "../filter";
 import {BaseErrorHandler} from "../error-handler";
 import {BaseModule} from "../module";
 import {TediError} from "../core";
+import {HttpMethods} from "../core/http";
 
 export enum RouteMethod {
     GET,
@@ -15,6 +16,8 @@ export interface RouteAction {
     controller: Object;
     controllerMethod: string;
 }
+
+export interface RouteActions extends HttpMethods<RouteAction> {}
 
 export interface RouteFilter {
     name: string;

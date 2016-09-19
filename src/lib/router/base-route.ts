@@ -1,4 +1,4 @@
-import {Route, RouteAction, RouteFilter, RouteErrorHandler} from "./core";
+import { Route, RouteAction, RouteFilter, RouteErrorHandler } from "./core";
 
 export class BaseRoute implements Route {
     public path: string;

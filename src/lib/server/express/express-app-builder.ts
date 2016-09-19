@@ -42,14 +42,13 @@ export class ExpressAppBuilder {
     private _addActions(app: express.Application, route: Route): void {
         // set actions
         this._logger.debug(`Adding actions for route: ${route}`);
-        this._addAction("get", app, route);
-        this._addAction("post", app, route);
-        this._addAction("put", app, route);
-        this._addAction("delete", app, route);
+        ["get", "post", "put", "delete"].forEach((method) => {
+            this._addAction(method, app, route);
+        });
     }
 
     private _addAction(method: string, app: express.Application, routeDefinition: Route): void {
-        let routeAction: RouteAction = routeDefinition[method.toLowerCase()];
+        let routeAction = <RouteAction> routeDefinition[method.toLowerCase()];
         // if there is no route action do nothing
         if (!routeAction) {
             return;
@@ -93,9 +92,8 @@ export class ExpressAppBuilder {
                     })
                     .then(() => {
                         this._logger.debug(`${requestInfo} [SUCCESS]`);
-                        // if the headers block was sent by this filter
-                        // stop downstream propagation
-                        // we expect that the response has ended
+                        // Middleware can, sometimes, end the request-response cycle
+                        // BIt is normal but I decided to treat it as an exception, as such a warning is logged
                         if (res.headersSent) {
                             this._logger.warn(`${requestInfo} [!] Filter sent headers.`);
                         }
@@ -109,7 +107,7 @@ export class ExpressAppBuilder {
         });
         if (filters.length > 0) {
             this._logger.debug(`app.use(${route.path}, ...filters)`);
-            app.use.apply(app, (<any[]> [route.path]).concat(filters));
+            app.use.apply(app, [route.path].concat(<any> filters));
         }
     }
 

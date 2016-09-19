@@ -2,8 +2,8 @@ import * as _ from "lodash";
 import {
     RouteMethod,
     Router,
-    RouterError,
     Route,
+    RouterError,
     RouteError,
     RouteAction,
     RouteFilter,
@@ -83,12 +83,12 @@ export class BaseRouter implements Router {
             throw new Error("parseRouteAction: action should have two string fields [controller, controllerMethod]");
         }
 
-        let controllerName = routeAction[0];
+        let controllerToken = routeAction[0];
         let methodName = routeAction[1];
-        let controller: any = module.getDependency(controllerName);
+        let controller: any = module.getDependency(controllerToken);
 
         if (!_.isFunction(controller[methodName])) {
-            throw new Error(`parseRouteAction: invalid controller[${controllerName}] method[${methodName}]`);
+            throw new Error(`parseRouteAction: invalid controller[${controllerToken}] method[${methodName}]`);
         }
 
         return {
@@ -108,16 +108,16 @@ export class BaseRouter implements Router {
 
         switch (method) {
             case RouteMethod.GET:
-                controllerActionMetadata = ControllerMetadata.GET(controller);
+                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("get", controller);
                 break;
             case RouteMethod.POST:
-                controllerActionMetadata = ControllerMetadata.POST(controller);
+                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("post", controller);
                 break;
             case RouteMethod.PUT:
-                controllerActionMetadata = ControllerMetadata.PUT(controller);
+                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("put", controller);
                 break;
             case RouteMethod.DELETE:
-                controllerActionMetadata = ControllerMetadata.DELETE(controller);
+                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("delete", controller);
                 break;
             default:
                 throw new Error("Unexpected method");
@@ -180,7 +180,6 @@ export class BaseRouter implements Router {
         validateModule(module);
 
         return this._parseJsonRoute(path, module.getJsonRoutes(), module);
-
     }
 
     private _isModule(jsonRouteValue: any): boolean {

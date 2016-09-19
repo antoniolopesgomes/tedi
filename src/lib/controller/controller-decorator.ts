@@ -1,9 +1,10 @@
 "use strict";
-import {ControllerMetadata} from "./controller-metadata";
-import {Dependency} from "../di";
 import * as METADATA_KEYS from "../constants/metadata-keys";
 import * as ERRORS from "../constants/error-messages";
-import {TediError} from "../core";
+import { ControllerMetadata } from "./controller-metadata";
+import { Dependency } from "../di";
+import { TediError } from "../core";
+import { HttpMethods, HTTP_METHODS } from "../core/http";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
@@ -21,16 +22,11 @@ export class ControllerActionDecoratorError extends TediError {
 
 // CONTROLLER DECORATOR
 
-export interface BaseControllerDecorator {
+export interface BaseControllerDecorator extends HttpMethods<() => MethodDecorator> {
     (): (target: Object) => void;
-    get: () => MethodDecorator;
-    post: () => MethodDecorator;
-    delete: () => MethodDecorator;
-    put: () => MethodDecorator;
 }
 
 function ControllerDecorator(): ClassDecorator {
-
     return function (target: Object) {
         try {
             Dependency()(target);
@@ -41,30 +37,17 @@ function ControllerDecorator(): ClassDecorator {
     };
 }
 
-(<BaseControllerDecorator> ControllerDecorator).get = function (): MethodDecorator {
-    return ControllerActionMethodDecorator("GET");
-};
-
-(<BaseControllerDecorator> ControllerDecorator).post = function (): MethodDecorator {
-    return ControllerActionMethodDecorator("POST");
-};
-
-(<BaseControllerDecorator> ControllerDecorator).delete = function (): MethodDecorator {
-    return ControllerActionMethodDecorator("DELETE");
-};
-
-(<BaseControllerDecorator> ControllerDecorator).put = function (): MethodDecorator {
-    return ControllerActionMethodDecorator("PUT");
-};
-
-function ControllerActionMethodDecorator(action: string): MethodDecorator {
-    return function (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
-        let targetConstructorName = (<any> target).constructor.name;
-        if (ControllerMetadata.actionMethodName(action, target)) {
-            throw new ControllerActionDecoratorError(targetConstructorName, action.toUpperCase(), ERRORS.CONTROLLER_ACTION_DUPLICATE);
-        }
-        Reflect.defineMetadata(METADATA_KEYS[action.toUpperCase()], propertyKey, target);
+HTTP_METHODS.forEach(httpMethodName => {
+    ControllerDecorator[httpMethodName] = function (): MethodDecorator {
+        return function (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
+            let targetConstructorName = (<any> target).constructor.name;
+            if (ControllerMetadata.isDecoratedWithHttpMethod(httpMethodName, target)) {
+                throw new ControllerActionDecoratorError(targetConstructorName, httpMethodName, ERRORS.CONTROLLER_ACTION_DUPLICATE);
+            }
+            ControllerMetadata.decorateWithHttpMethod(httpMethodName, propertyKey, target);
+        };
     };
-}
-
+});
+/* tslint:disable */
 export const Controller = <BaseControllerDecorator> ControllerDecorator;
+/* tslint:enable */

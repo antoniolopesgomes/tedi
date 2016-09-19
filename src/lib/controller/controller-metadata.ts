@@ -5,30 +5,18 @@ export interface ControllerActionMetadata {
 }
 
 export class ControllerMetadata {
-    public static isDecorated(target: Object): boolean {
+    public static isDecoratedWithController(target: Object): boolean {
         return Reflect.hasMetadata(METADATA_KEYS.CONTROLLER, target);
     }
-    public static actionMethodName(action: string, target: Object): string {
-        return <string> Reflect.getMetadata(METADATA_KEYS[action.toUpperCase()], target);
+    public static isDecoratedWithHttpMethod(httpMethodName: string, target: Object): boolean {
+        return Reflect.hasMetadata(httpMethodName, target);
     }
-    public static GET(target: Object): ControllerActionMetadata {
-        return {
-            name: this.actionMethodName("GET", target),
-        };
+    public static decorateWithHttpMethod(httpMethodName: string, propertyKey: string, target: Object): void {
+        Reflect.defineMetadata(httpMethodName, propertyKey, target);
     }
-    public static POST(target: Object): ControllerActionMetadata {
+    public static getHttpMethodMetadata(httpMethodName: string, target: Object): ControllerActionMetadata {
         return {
-            name: this.actionMethodName("POST", target),
-        };
-    }
-    public static DELETE(target: Object): ControllerActionMetadata {
-        return {
-            name: this.actionMethodName("DELETE", target),
-        };
-    }
-    public static PUT(target: Object): ControllerActionMetadata {
-        return {
-            name: this.actionMethodName("PUT", target),
+            name: <string> Reflect.getMetadata(httpMethodName, target),
         };
     }
 }
