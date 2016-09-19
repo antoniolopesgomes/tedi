@@ -1,37 +1,15 @@
-import {RouteAction, RouteActions} from "./core";
+import * as _ from "lodash";
+import {RouteAction, RouteActions, RouteActionsBuilder} from "./core";
 import {BaseModule} from "../module";
-import {HttpMethods} from "../core/http";
+import {Service} from "../service";
+import {HTTP_METHODS_NAMES} from "../core/http";
 import {ControllerMetadata} from "../controller";
 
-const JSON_HTTP_METHOD_KEYS: HttpMethods<string> = {
-    checkout: "checkout",
-    copy: "copy",
-    delete: "delete",
-    get: "get",
-    head: "head",
-    lock: "lock",
-    merge: "merge",
-    mkactivity: "mkactivity",
-    mkcol: "mkcol",
-    move: "move",
-    "m-search": "m-search",
-    notify: "notify",
-    options: "options",
-    patch: "patch",
-    post: "post",
-    purge: "purge",
-    put: "put",
-    report: "report",
-    search: "search",
-    subscribe: "subscribe",
-    trace: "trace",
-    unlock: "unlock",
-    unsubscribe: "unsubscribe",
-};
-
+const JSON_HTTP_METHOD_KEYS = HTTP_METHODS_NAMES;
 const JSON_CONTROLLER_KEY = "$controller";
 
-export class RouteActionsBuilder {
+@Service()
+export class BaseRouteActionsBuilder implements RouteActionsBuilder {
 
     public build(jsonRoute: any, module: BaseModule): RouteActions {
         let routeActions = <RouteActions> {};

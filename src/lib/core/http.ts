@@ -10,7 +10,7 @@ export interface HttpMethods<T> {
     mkactivity: T;
     mkcol: T;
     move: T;
-    "m-search": T;
+    mSearch: T;
     notify: T;
     options: T;
     patch: T;
@@ -25,28 +25,28 @@ export interface HttpMethods<T> {
     unsubscribe: T;
 }
 
-export const HTTP_METHODS: string[] = [
-    "checkout",
-    "copy",
-    "delete",
-    "get",
-    "head",
-    "lock",
-    "merge",
-    "mkactivity",
-    "mkcol",
-    "move",
-    "m-search",
-    "notify",
-    "options",
-    "patch",
-    "post",
-    "purge",
-    "put",
-    "report",
-    "search",
-    "subscribe",
-    "trace",
-    "unlock",
-    "unsubscribe",
-];
+export const HTTP_METHODS_NAMES: HttpMethods<string> = {
+    checkout: "checkout",
+    copy: "copy",
+    delete: "delete",
+    get: "get",
+    head: "head",
+    lock: "lock",
+    merge: "merge",
+    mkactivity: "mkactivity",
+    mkcol: "mkcol",
+    move: "move",
+    mSearch: "m-search",
+    notify: "notify",
+    options: "options",
+    patch: "patch",
+    post: "post",
+    purge: "purge",
+    put: "put",
+    report: "report",
+    search: "search",
+    subscribe: "subscribe",
+    trace: "trace",
+    unlock: "unlock",
+    unsubscribe: "unsubscribe",
+};

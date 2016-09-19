@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as express from "express";
 import {inject} from "../../di";
 import {Router} from "../../router";
@@ -6,6 +7,7 @@ import {BaseModule} from "../../module";
 import {FilterError} from "../../filter";
 import {ActionError} from "../../controller";
 import {Service} from "../../service";
+import {HTTP_METHODS_NAMES} from "../../core/http";
 import {Route, RouteAction, RouteFilter, RouteErrorHandler} from "../../router";
 
 @Service()
@@ -42,13 +44,13 @@ export class ExpressAppBuilder {
     private _addActions(app: express.Application, route: Route): void {
         // set actions
         this._logger.debug(`Adding actions for route: ${route}`);
-        ["get", "post", "put", "delete"].forEach((method) => {
-            this._addAction(method, app, route);
+        _.values<string>(HTTP_METHODS_NAMES).forEach((httpMethodName) => {
+            this._addAction(app, httpMethodName, route);
         });
     }
 
-    private _addAction(method: string, app: express.Application, routeDefinition: Route): void {
-        let routeAction = <RouteAction> routeDefinition[method.toLowerCase()];
+    private _addAction(app: express.Application, httpMethodName: string, route: Route): void {
+        let routeAction = <RouteAction> route.actions[httpMethodName];
         // if there is no route action do nothing
         if (!routeAction) {
             return;
@@ -58,8 +60,8 @@ export class ExpressAppBuilder {
         let methodName: string = routeAction.controllerMethod;
         let actionInfo: string = `Action: ${controllerName}#${methodName}`;
         //
-        this._logger.debug(`app.${method}(${routeDefinition.path}, action)`);
-        app[method](routeDefinition.path, (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        this._logger.debug(`app.${httpMethodName}(${route.path}, action)`);
+        app[httpMethodName](route.path, (req: express.Request, res: express.Response, next: express.NextFunction) => {
             let requestInfo = `(${req.originalUrl}) - ${actionInfo}`;
             Promise
                 .resolve(true)

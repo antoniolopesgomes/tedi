@@ -1,18 +1,16 @@
 import * as _ from "lodash";
 import {
-    RouteMethod,
     Router,
     Route,
+    RouteActionsBuilder,
     RouterError,
     RouteError,
-    RouteAction,
     RouteFilter,
     RouteErrorHandler,
 } from "./core";
 import {BaseRoute} from "./base-route";
 import {BaseFilter, FilterValidator} from "../filter";
 import {Service} from "../service";
-import {ControllerMetadata, ControllerActionMetadata} from "../controller";
 import {BaseErrorHandler, ErrorHandlerValidator} from "../error-handler";
 import {Logger} from "../logger";
 import {BaseModule} from "../module";
@@ -20,15 +18,15 @@ import {inject} from "../di";
 
 const ROUTER_WORDS: any = {
     "FILTERS": "$filters",
-    "ERROR_HANDLERS": "$errorHandlers",
-    "CONTROLLER": "$controller",
+    "ERROR_HANDLERS": "$errorHandlers"
 };
 
 @Service()
 export class BaseRouter implements Router {
 
     constructor(
-        @inject("Logger") private logger: Logger
+        @inject("Logger") private logger: Logger,
+        @inject("RouteActionsBuilder") private _routeActionsBuilder: RouteActionsBuilder
     ) { }
 
     public getRootRoute(jsonRoutes: any, module: BaseModule): Route {
@@ -40,97 +38,12 @@ export class BaseRouter implements Router {
         try {
             route.filters = this._parseRouteFilters(jsonRoute[ROUTER_WORDS.FILTERS], module);
             route.errorHandlers = this._parseRouteErrorHandlers(jsonRoute[ROUTER_WORDS.ERROR_HANDLERS], module);
-            route.get = this._parseRouteAction(RouteMethod.GET, jsonRoute, module);
-            route.post = this._parseRouteAction(RouteMethod.POST, jsonRoute, module);
-            route.delete = this._parseRouteAction(RouteMethod.DELETE, jsonRoute, module);
-            route.put = this._parseRouteAction(RouteMethod.PUT, jsonRoute, module);
+            route.actions = this._routeActionsBuilder.build(jsonRoute, module);
             route.children = this._parseChildrenRoutes(jsonRoute, route, module);
         } catch (error) {
             throw new RouteError(route, "Error parsing route", error);
         }
         return route;
-    }
-
-    private _parseRouteAction(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
-        return  this._parseRouteActionFromArray(method, jsonRoute, module) ||
-                this._parseRouteActionFromController(method, jsonRoute, module);
-    }
-
-    private _parseRouteActionFromArray(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
-        let routeAction: string[];
-
-        switch (method) {
-            case RouteMethod.GET:
-                routeAction = jsonRoute.get;
-                break;
-            case RouteMethod.POST:
-                routeAction = jsonRoute.post;
-                break;
-            case RouteMethod.PUT:
-                routeAction = jsonRoute.put;
-                break;
-            case RouteMethod.DELETE:
-                routeAction = jsonRoute.delete;
-                break;
-            default:
-                routeAction = undefined;
-        }
-
-        if (!routeAction) {
-            return undefined;
-        }
-        if (!_.isArray(routeAction) || routeAction.length < 2) {
-            throw new Error("parseRouteAction: action should have two string fields [controller, controllerMethod]");
-        }
-
-        let controllerToken = routeAction[0];
-        let methodName = routeAction[1];
-        let controller: any = module.getDependency(controllerToken);
-
-        if (!_.isFunction(controller[methodName])) {
-            throw new Error(`parseRouteAction: invalid controller[${controllerToken}] method[${methodName}]`);
-        }
-
-        return {
-            controller: controller,
-            controllerMethod: methodName,
-        };
-    }
-
-    private _parseRouteActionFromController(method: RouteMethod, jsonRoute: any, module: BaseModule): RouteAction {
-        let controllerToken: any = jsonRoute[ROUTER_WORDS.CONTROLLER];
-        if (!controllerToken) {
-            return undefined;
-        }
-
-        let controller = module.getDependency(controllerToken);
-        let controllerActionMetadata: ControllerActionMetadata;
-
-        switch (method) {
-            case RouteMethod.GET:
-                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("get", controller);
-                break;
-            case RouteMethod.POST:
-                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("post", controller);
-                break;
-            case RouteMethod.PUT:
-                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("put", controller);
-                break;
-            case RouteMethod.DELETE:
-                controllerActionMetadata = ControllerMetadata.getHttpMethodMetadata("delete", controller);
-                break;
-            default:
-                throw new Error("Unexpected method");
-        }
-
-        if (!controllerActionMetadata.name) {
-            return undefined;
-        }
-
-        return {
-            controller: controller,
-            controllerMethod: controllerActionMetadata.name,
-        };
     }
 
     private _parseRouteFilters(filterNames: string[], module: BaseModule): RouteFilter[] {

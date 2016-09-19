@@ -1,4 +1,4 @@
-import {BaseRoute, Route, RouteError, BaseRouter} from "../../lib/router";
+import {BaseRoute, Route, RouteError, BaseRouter, BaseRouteActionsBuilder} from "../../lib/router";
 import {
     Controller,
     Module,
@@ -40,6 +40,7 @@ describe("BaseRouter", () => {
     }
 
     let simpleModule: BaseModule;
+    let baseRouteActionsBuilder = new BaseRouteActionsBuilder();
 
     beforeEach(() => {
         simpleModule = new SimpleModule();
@@ -67,7 +68,7 @@ describe("BaseRouter", () => {
                     "/two": {},
                 },
             };
-            router = new BaseRouter(null);
+            router = new BaseRouter(null, baseRouteActionsBuilder);
             // build route
             route = router.getRootRoute(jsonRoutes, simpleModule);
         });
@@ -88,10 +89,10 @@ describe("BaseRouter", () => {
                 expect(route.errorHandlers.length).toEqual(0);
             });
             it("should have no actions", () => {
-                expect(route.get).toBeUndefined();
-                expect(route.post).toBeUndefined();
-                expect(route.put).toBeUndefined();
-                expect(route.delete).toBeUndefined();
+                expect(route.actions.get).toBeUndefined();
+                expect(route.actions.post).toBeUndefined();
+                expect(route.actions.put).toBeUndefined();
+                expect(route.actions.delete).toBeUndefined();
             });
             it("should have one child route", () => {
                 expect(route.children).toEqual(jasmine.any(Array));
@@ -111,20 +112,20 @@ describe("BaseRouter", () => {
                 expect(childRoute).toEqual(jasmine.any(BaseRoute));
             });
             it("should have get action defined", () => {
-                expect(childRoute.get.controller).toEqual(jasmine.any(DummyController));
-                expect(childRoute.get.controllerMethod).toEqual("get");
+                expect(childRoute.actions.get.controller).toEqual(jasmine.any(DummyController));
+                expect(childRoute.actions.get.controllerMethod).toEqual("get");
             });
             it("should have post action defined", () => {
-                expect(childRoute.post.controller).toEqual(jasmine.any(DummyController));
-                expect(childRoute.post.controllerMethod).toEqual("post");
+                expect(childRoute.actions.post.controller).toEqual(jasmine.any(DummyController));
+                expect(childRoute.actions.post.controllerMethod).toEqual("post");
             });
             it("should have put action defined", () => {
-                expect(childRoute.put.controller).toEqual(jasmine.any(DummyController));
-                expect(childRoute.put.controllerMethod).toEqual("put");
+                expect(childRoute.actions.put.controller).toEqual(jasmine.any(DummyController));
+                expect(childRoute.actions.put.controllerMethod).toEqual("put");
             });
             it("should have delete action defined", () => {
-                expect(childRoute.delete.controller).toEqual(jasmine.any(DummyController));
-                expect(childRoute.delete.controllerMethod).toEqual("delete");
+                expect(childRoute.actions.delete.controller).toEqual(jasmine.any(DummyController));
+                expect(childRoute.actions.delete.controllerMethod).toEqual("delete");
             });
             it("should have one errorHandler", () => {
                 expect(childRoute.errorHandlers).toEqual(jasmine.any(Array));
@@ -160,7 +161,7 @@ describe("BaseRouter", () => {
                     "$filters": ["InvalidFilter"],
                 },
             };
-            router = new BaseRouter(null);
+            router = new BaseRouter(null, baseRouteActionsBuilder);
         });
 
         describe("when filter does not implement BaseFilter", () => {
@@ -213,7 +214,7 @@ describe("BaseRouter", () => {
                     "$errorHandlers": ["InvalidErrorHandler"],
                 },
             };
-            router = new BaseRouter(null);
+            router = new BaseRouter(null, baseRouteActionsBuilder);
         });
 
         describe("when error handler doest not implement BaseErrorHandler interface", () => {

@@ -5,6 +5,7 @@
       "max-line-length": [true, 200],
       "interface-name": [true, "never-prefix"],
       "member-access": false,
-      "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
+      "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+      "object-literal-sort-keys": false
   }
 }

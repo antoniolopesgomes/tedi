@@ -19,6 +19,10 @@ export interface RouteAction {
 
 export interface RouteActions extends HttpMethods<RouteAction> {}
 
+export interface RouteActionsBuilder {
+    build(jsonRoute: any, module: BaseModule): RouteActions;
+}
+
 export interface RouteFilter {
     name: string;
     filter: BaseFilter<any>;
@@ -33,12 +37,8 @@ export interface Route {
     path: string;
     filters: RouteFilter[];
     errorHandlers: RouteErrorHandler[];
+    actions: RouteActions;
     children: Route[];
-    // actions
-    get: RouteAction;
-    post: RouteAction;
-    delete: RouteAction;
-    put: RouteAction;
 }
 
 export class RouteError extends TediError {

@@ -1,10 +1,11 @@
 "use strict";
+import * as _ from "lodash";
 import * as METADATA_KEYS from "../constants/metadata-keys";
 import * as ERRORS from "../constants/error-messages";
 import { ControllerMetadata } from "./controller-metadata";
 import { Dependency } from "../di";
 import { TediError } from "../core";
-import { HttpMethods, HTTP_METHODS } from "../core/http";
+import { HttpMethods, HTTP_METHODS_NAMES } from "../core/http";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
@@ -37,7 +38,7 @@ function ControllerDecorator(): ClassDecorator {
     };
 }
 
-HTTP_METHODS.forEach(httpMethodName => {
+_.keys(HTTP_METHODS_NAMES).forEach(httpMethodName => {
     ControllerDecorator[httpMethodName] = function (): MethodDecorator {
         return function (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
             let targetConstructorName = (<any> target).constructor.name;
