@@ -18,7 +18,7 @@ import {inject} from "../di";
 
 const ROUTER_WORDS: any = {
     "FILTERS": "$filters",
-    "ERROR_HANDLERS": "$errorHandlers"
+    "ERROR_HANDLERS": "$errorHandlers",
 };
 
 @Service()

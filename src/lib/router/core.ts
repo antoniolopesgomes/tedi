@@ -5,13 +5,6 @@ import {BaseModule} from "../module";
 import {TediError} from "../core";
 import {HttpMethods} from "../core/http";
 
-export enum RouteMethod {
-    GET,
-    POST,
-    PUT,
-    DELETE
-}
-
 export interface RouteAction {
     controller: Object;
     controllerMethod: string;
@@ -55,8 +48,4 @@ export class RouterError extends TediError {
     constructor(msg: string, error?: any) {
         super(`${msg}`, error);
     }
-}
-
-export interface RoutesDefinition {
-
 }
