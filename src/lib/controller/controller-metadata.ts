@@ -1,22 +1,49 @@
-import * as METADATA_KEYS from "../constants/metadata-keys";
+import {getClassName} from "../core/utils";
 
-export interface ControllerActionMetadata {
-    name: string;
+const CONTROLLER_METADATA_KEY = "tedi:controller";
+const ACTIONS_METADATA_KEY = "tedi:action";
+
+function getActionMetadataKey(httpMethodName: string) {
+    return `${ACTIONS_METADATA_KEY}:${httpMethodName}`;
 }
 
-export class ControllerMetadata {
-    public static isDecoratedWithController(target: Object): boolean {
-        return Reflect.hasMetadata(METADATA_KEYS.CONTROLLER, target);
-    }
-    public static isDecoratedWithHttpMethod(httpMethodName: string, target: Object): boolean {
-        return Reflect.hasMetadata(httpMethodName, target);
-    }
-    public static decorateWithHttpMethod(httpMethodName: string, propertyKey: string, target: Object): void {
-        Reflect.defineMetadata(httpMethodName, propertyKey, target);
-    }
-    public static getHttpMethodMetadata(httpMethodName: string, target: Object): ControllerActionMetadata {
-        return {
-            name: <string> Reflect.getMetadata(httpMethodName, target),
+export interface ControllerMetadata {
+    className: string;
+};
+
+export interface ActionMetadata {
+    methodName: string;
+}
+
+export class ControllerMetadataManager {
+
+    public static setControllerMetadata(target: Object): void {
+        let className = getClassName(target);
+        if (this.getControllerMetadata(target)) {
+            throw new Error(`Metadata for ${className} already exists`);
+        }
+        let controllerMetadata = <ControllerMetadata> {
+            className: className,
         };
+        Reflect.defineMetadata(CONTROLLER_METADATA_KEY, controllerMetadata, target);
     }
+
+    public static getControllerMetadata(target: Object): ControllerMetadata {
+        return <ControllerMetadata> Reflect.getMetadata(CONTROLLER_METADATA_KEY, target);
+    }
+
+    public static setActionMetadata(httpMethodName: string, targetMethodName: string, target: Object): void {
+        if (this.getActionMetadata(httpMethodName, target)) {
+            throw new Error(`Metadata for '${httpMethodName}' already exists`);
+        }
+        let actionMetadata = <ActionMetadata> {
+            methodName: targetMethodName,
+        };
+        Reflect.defineMetadata(getActionMetadataKey(httpMethodName), actionMetadata, target);
+    }
+
+    public static getActionMetadata(httpMethodName: string, target: Object): ActionMetadata {
+        return <ActionMetadata> Reflect.getMetadata(getActionMetadataKey(httpMethodName), target);
+    }
+
 }

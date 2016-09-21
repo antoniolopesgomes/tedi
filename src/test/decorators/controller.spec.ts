@@ -1,116 +1,85 @@
-import {Controller} from "../../core";
-import {ControllerActionDecoratorError, ControllerMetadata} from "../../lib/controller";
+import * as _ from "lodash";
+import { Controller } from "../../core";
+import { HTTP_METHODS_NAMES } from "../../http";
+import {
+    ActionDecoratorError,
+    ControllerMetadataManager,
+    ControllerMetadata,
+    ActionMetadata,
+} from "../../lib/controller";
 
-describe("Controller decorators", () => {
+describe("@Controller() decorator:", () => {
 
-    describe("Controller decorations", () => {
-        describe("when we have a non decorated class", () => {
-            class AController { };
-            it("should not be decorated", () => {
-                expect(ControllerMetadata.isDecoratedWithController(AController)).toBeFalsy();
-            });
-        });
-
-        describe("when we have a decorated class", () => {
-            @Controller() class AController { };
-            it("should be decorated", () => {
-                expect(ControllerMetadata.isDecoratedWithController(AController)).toBeTruthy();
-            });
+    describe("when we have a non decorated class", () => {
+        class AController { };
+        it("metadata should not exist", () => {
+            expect(ControllerMetadataManager.getControllerMetadata(AController)).toBeUndefined();
         });
     });
 
-    describe("Controller actions decorations", () => {
-        describe("when we have a valid decoration", () => {
-            let controller: any;
-            beforeEach(() => {
-                @Controller()
+    describe("when we have a decorated class, without action decorators,", () => {
+        @Controller()
+        class AController { }
+        let ctrlMetadata: ControllerMetadata;
+        beforeEach(() => {
+            ctrlMetadata = ControllerMetadataManager.getControllerMetadata(AController);
+        });
+        it("metadata should exist", () => {
+            expect(ctrlMetadata).toBeDefined();
+        });
+        it("metadata should have the right class name", () => {
+            expect(ctrlMetadata.className).toEqual("AController");
+        });
+    });
+
+});
+
+// TODO document this stuff
+_.keys(HTTP_METHODS_NAMES).forEach(httpMethodName => {
+    describe(`when we have an @Controller.${httpMethodName} decorator`, () => {
+        class AController {
+            @(Controller[httpMethodName])()
+            aMethod(): string {
+                return httpMethodName.toUpperCase();
+            }
+        }
+        let controller: any;
+
+        beforeEach(() => {
+            controller = new AController();
+        });
+        describe(`${httpMethodName} metadata,`, () => {
+            let actionMetadata: ActionMetadata;
+            beforeEach(() => actionMetadata = ControllerMetadataManager.getActionMetadata(httpMethodName, controller));
+            it("should exist", () => expect(actionMetadata).toBeDefined());
+            it(`should have the '${httpMethodName}' method name`, () => expect(actionMetadata.methodName).toEqual("aMethod"));
+            it(`'${httpMethodName}' method name should be right`, () => expect(controller[actionMetadata.methodName]()).toEqual(httpMethodName.toUpperCase()));
+        });
+    });
+});
+
+describe("Invalid decorations:", () => {
+    describe("duplicate decorations,", () => {
+        let error: any;
+        beforeEach(() => {
+            try {
                 class AController {
                     @Controller.get()
-                    read(): string { return "READ"; }
+                    read(): void { return; }
 
-                    @Controller.post()
-                    create(): string { return "CREATE"; }
-
-                    @Controller.put()
-                    update(): string { return "UPDATE"; }
-
-                    @Controller.delete()
-                    delete(): string { return "DELETE"; }
+                    @Controller.get()
+                    anotherRead(): void { return; }
                 }
-                controller = new AController();
-            });
-            describe("'get' decoration", () => {
-                let methodName: string;
-                beforeEach(() => {
-                    methodName = ControllerMetadata.getHttpMethodMetadata("get", controller).name;
-                });
-                it("should have stored the 'get' method name", () => {
-                    expect(methodName).toEqual("read");
-                });
-                it("we should be able to call the 'get' method", () => {
-                    expect(controller[methodName]()).toEqual("READ");
-                });
-            });
-            describe("'post' decoration", () => {
-                let methodName: string;
-                beforeEach(() => {
-                    methodName = ControllerMetadata.getHttpMethodMetadata("post", controller).name;
-                });
-                it("should have stored the POST method name", () => {
-                    expect(methodName).toEqual("create");
-                });
-                it("we should be able to call the POST method", () => {
-                    expect(controller[methodName]()).toEqual("CREATE");
-                });
-            });
-            describe("'put' decoration", () => {
-                let methodName: string;
-                beforeEach(() => {
-                    methodName = ControllerMetadata.getHttpMethodMetadata("put", controller).name;
-                });
-                it("should have stored the 'put' method name", () => {
-                    expect(methodName).toEqual("update");
-                });
-                it("we should be able to call the 'put' method", () => {
-                    expect(controller[methodName]()).toEqual("UPDATE");
-                });
-            });
-            describe("'delete' decoration", () => {
-                let methodName: string;
-                beforeEach(() => {
-                    methodName = ControllerMetadata.getHttpMethodMetadata("delete", controller).name;
-                });
-                it("should have stored the 'delete' method name", () => {
-                    expect(methodName).toEqual("delete");
-                });
-                it("we should be able to call the 'delete' method", () => {
-                    expect(controller[methodName]()).toEqual("DELETE");
-                });
-            });
+            } catch (err) {
+                error = err;
+            }
+        });
+        it("should throw an error", () => {
+            expect(error).toEqual(jasmine.any(ActionDecoratorError))
+        });
+        it("error should have the right message", () => {
+            expect(error.message).toEqual("AController#get: Failed to decorate method");
         });
     });
 
-    describe("Invalid decorations", () => {
-        describe("when we have duplicate action decorations", () => {
-            let error: any;
-            beforeEach(() => {
-                try {
-                    @Controller()
-                    class AController {
-
-                        @Controller.get()
-                        read(): void { return; }
-
-                        @Controller.get()
-                        anotherRead(): void { return; }
-                    }
-                } catch (err) {
-                    error = err;
-                }
-            });
-            it("should throw an error", () => {
-                expect(error).toEqual(jasmine.any(ControllerActionDecoratorError));
-            });
-        });
-    });
 });

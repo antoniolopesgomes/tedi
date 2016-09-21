@@ -1,4 +1,4 @@
-import {ControllerMetadata} from "./controller-metadata";
+import {ControllerMetadataManager} from "./controller-metadata";
 import {TediError} from "../core";
 
 export class ControllerValidatorError extends TediError {
@@ -8,13 +8,10 @@ export class ControllerValidatorError extends TediError {
 }
 
 export class ControllerValidator {
-    public static hasValidMetadata(controller: any): boolean {
-        return ControllerMetadata.isDecoratedWithController(controller.constructor);
-    }
-    public static validate(controller: any): void {
+    public static validate(target: any): void {
         // check if it was valid metadata
-        if (!this.hasValidMetadata(controller)) {
-            throw new ControllerValidatorError(controller, "must be decorated with @Controller");
+        if (!ControllerMetadataManager.getControllerMetadata(target)) {
+            throw new ControllerValidatorError(target, "must be decorated with @Controller");
         }
     }
 }

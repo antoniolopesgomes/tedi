@@ -13,3 +13,8 @@ export class ExpressUtils {
         });
     }
 }
+
+// TODO document this stuff!!!
+export function getClassName(target: any): string {
+    return target.name || target.constructor.name;
+}
