@@ -1,2 +1,2 @@
-export {BaseModule} from "./module";
+export {BaseModule} from "./_module";
 export {Module, ModuleDecoratorError} from "./module-decorator";

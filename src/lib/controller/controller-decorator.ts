@@ -1,10 +1,9 @@
 "use strict";
 import * as _ from "lodash";
-import * as ERRORS from "../constants/error-messages";
-import { ControllerMetadataManager } from "./controller-metadata";
-import { Dependency } from "../di";
+import { ControllerMetadata } from "./controller-metadata";
 import { TediError } from "../core";
 import { getClassName } from "../core/utils";
+import { Service } from "../service";
 import { HttpMethods, HTTP_METHODS_NAMES } from "../core/http";
 
 // CUSTOM ERRORS USED BY THIS MODULE
@@ -30,8 +29,8 @@ export interface BaseControllerDecorator extends HttpMethods<() => MethodDecorat
 function ControllerDecorator(): ClassDecorator {
     return function (target: Object) {
         try {
-            Dependency()(target);
-            ControllerMetadataManager.setControllerMetadata(target);
+            Service()(target);
+            ControllerMetadata.setMetadata(target);
         } catch (error) {
             throw new ControllerDecoratorError(target, "Failed to decorate controller", error);
         }
@@ -42,7 +41,7 @@ _.keys(HTTP_METHODS_NAMES).forEach(httpMethodName => {
     ControllerDecorator[httpMethodName] = function (): MethodDecorator {
         return function (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
             try {
-                ControllerMetadataManager.setActionMetadata(httpMethodName, propertyKey, target);
+                ControllerMetadata.setActionMetadata(httpMethodName, propertyKey, target);
             } catch (error) {
                 throw new ActionDecoratorError(target, httpMethodName, "Failed to decorate method", error);
             }

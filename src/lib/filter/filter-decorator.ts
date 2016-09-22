@@ -1,19 +1,20 @@
 "use strict";
-import {Dependency} from "../di";
-import * as METADATA_KEYS from "../constants/metadata-keys";
-import * as ERRORS from "../constants/error-messages";
 import {TediError} from "../core";
+import {getClassName} from "../core/utils";
+import {Service} from "../service";
+import {FilterMetadata} from "./filter-metadata";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
 export class FilterDecoratorError extends TediError {
-    constructor(filterName: string, msg: string, error?: any) {
-        super(`${filterName}": ${msg}`, error);
+    constructor(filter: any, msg: string, error?: any) {
+        super(`${getClassName(filter)}": ${msg}`, error);
     }
 }
 
 // FILTER DECORATOR
 
+// TODO maybe I can remove this?
 export interface BaseFilterDecorator {
     (): (target: any) => void;
 }
@@ -21,12 +22,14 @@ export interface BaseFilterDecorator {
 function FilterDecorator(): ClassDecorator {
     return function (target: Object) {
         try {
-            Dependency()(target);
-            Reflect.defineMetadata(METADATA_KEYS.FILTER, true, target);
+            Service()(target);
+            FilterMetadata.setMetadata(target);
         } catch (error) {
-            throw new FilterDecoratorError((<any> target).name, ERRORS.FILTER_ERROR_DECORATING, error);
+            throw new FilterDecoratorError(target, "Failed to decorate method", error);
         }
     };
 }
 
+/* tslint:disable */
 export const Filter = <BaseFilterDecorator> FilterDecorator;
+/* tslint:disable */

@@ -1,2 +1,2 @@
 export {Service, ServiceDecoratorError} from "./service-decorator";
-export {ServiceMetadata} from "./service-metadata";
+export {ServiceMetadata, ServiceMetadataDescriptor} from "./service-metadata";

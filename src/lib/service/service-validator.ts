@@ -1,21 +1,18 @@
 import {ServiceMetadata} from "./service-metadata";
 import {TediError} from "../core";
-import {BindingOptions, BindingContext} from "../di";
+import {getClassName} from "../core/utils";
 
 export class ServiceValidatorError extends TediError {
-    constructor(msg: string, error?: any) {
-        super(msg, error);
+    constructor(service: any, msg: string, error?: any) {
+        super(`${getClassName(service)}: ${msg}`, error);
     }
 }
 
 export class ServiceValidator {
-    public static isValid(target: Object, options: BindingOptions): boolean {
-        let targetIsClass = options.context !== BindingContext.VALUE;
-        return ServiceMetadata.isDecorated(targetIsClass ? target : target.constructor);
-    }
-    public static validate(target: Object, options: BindingOptions): void {
-        if (!ServiceValidator.isValid(target, options)) {
-            throw new ServiceValidatorError(`target "${(<any> target).constructor.name}" it"s not a valid Service`);
+    public static validate(service: Object): void {
+        // check if it was valid metadata
+        if (!ServiceMetadata.getMetadata(service)) {
+            throw new ServiceValidatorError(service, "must be decorated with @Service");
         }
     }
 }

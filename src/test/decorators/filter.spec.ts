@@ -1,20 +1,33 @@
-import {Filter} from "../../core";
-import {FilterMetadata} from "../../lib/filter";
+import { Filter } from "../../core";
+import { FilterMetadata, FilterMetadataDescriptor } from "../../lib/filter";
 
-describe("Filter decorator", () => {
+describe("Filter", () => {
 
-    describe("when we have a non decorated class", () => {
-        class AFilter { };
-        it("should not be decorated", () => {
-            expect(FilterMetadata.isDecorated(AFilter)).toBeFalsy();
+    describe("@Filter decorator:", () => {
+
+        describe("when we have a non decorated class", () => {
+            class AFilter { };
+            it("metadata should not exist", () => {
+                expect(FilterMetadata.getMetadata(AFilter)).toBeUndefined();
+            });
         });
-    });
 
-    describe("when we have a decorated class", () => {
-        @Filter() class AFilter { };
-        it("should be decorated", () => {
-            expect(FilterMetadata.isDecorated(AFilter)).toBeTruthy();
+        describe("when we have a decorated class", () => {
+            @Filter()
+            class AFilter { }
+            let filterMetadataDescriptor: FilterMetadataDescriptor;
+
+            beforeEach(() => {
+                filterMetadataDescriptor = FilterMetadata.getMetadata(AFilter);
+            });
+            it("metadata should exist", () => {
+                expect(filterMetadataDescriptor).toEqual(<FilterMetadataDescriptor>{
+                    service: {
+                        className: "AFilter",
+                    },
+                });
+            });
         });
-    });
 
+    });
 });

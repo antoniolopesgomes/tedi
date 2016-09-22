@@ -3,7 +3,7 @@ import {RouteAction, RouteActions, RouteActionsBuilder} from "./core";
 import {BaseModule} from "../module";
 import {Service} from "../service";
 import {HTTP_METHODS_NAMES} from "../core/http";
-import {ControllerMetadataManager} from "../controller";
+import {ControllerMetadata} from "../controller";
 
 const JSON_HTTP_METHOD_KEYS = HTTP_METHODS_NAMES;
 const JSON_CONTROLLER_KEY = "$controller";
@@ -56,7 +56,7 @@ export class BaseRouteActionsBuilder implements RouteActionsBuilder {
         }
 
         let controller = module.getDependency(controllerToken);
-        let actionMetadata = ControllerMetadataManager.getActionMetadata(httpMethodName, controller);
+        let actionMetadata = ControllerMetadata.getActionMetadata(httpMethodName, controller);
 
         if (!actionMetadata) {
             return undefined;

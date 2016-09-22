@@ -1,19 +1,20 @@
 "use strict";
-import {Dependency} from "../di";
-import * as METADATA_KEYS from "../constants/metadata-keys";
-import * as ERRORS from "../constants/error-messages";
 import {TediError} from "../core";
+import {getClassName} from "../core/utils";
+import {Service} from "../service";
+import {ErrorHandlerMetadata} from "./error-handler-metadata";
 
 // CUSTOM ERRORS USED BY THIS MODULE
 
 export class ErrorHandlerDecoratorError extends TediError {
-    constructor(errorHandlerName: string, msg: string, error?: any) {
-        super(`${errorHandlerName}": ${msg}`, error);
+    constructor(errorHandler: any, msg: string, error?: any) {
+        super(`${getClassName(errorHandler)}": ${msg}`, error);
     }
 }
 
 // ERROR HANDLER DECORATOR
 
+// TODO maybe I can remove this?
 export interface BaseErrorHandlerDecorator {
     (): (target: any) => void;
 }
@@ -21,12 +22,14 @@ export interface BaseErrorHandlerDecorator {
 function ErrorHandlerDecorator(): ClassDecorator {
     return function (target: Object) {
         try {
-            Dependency()(target);
-            Reflect.defineMetadata(METADATA_KEYS.ERROR_HANDLER, true, target);
+            Service()(target);
+            ErrorHandlerMetadata.setMetadata(target);
         } catch (error) {
-            throw new ErrorHandlerDecoratorError((<any> target).name, ERRORS.ERROR_HANDLER_ERROR_DECORATING, error);
+            throw new ErrorHandlerDecoratorError(target, "Failed to decorate method", error);
         }
     };
 }
 
+/* tslint:disable */
 export const ErrorHandler = <BaseErrorHandlerDecorator> ErrorHandlerDecorator;
+/* tslint:enable */
