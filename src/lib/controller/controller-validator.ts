@@ -1,9 +1,10 @@
 import {ControllerMetadataManager} from "./controller-metadata";
 import {TediError} from "../core";
+import {getClassName} from "../core/utils";
 
 export class ControllerValidatorError extends TediError {
     constructor(controller: any, msg: string, error?: any) {
-        super(`${(<any> controller).constructor.name}: ${msg}`, error);
+        super(`${getClassName(controller)}: ${msg}`, error);
     }
 }
 
