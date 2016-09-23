@@ -22,7 +22,7 @@ export class ErrorHandlerValidator {
             throw new ErrorHandlerValidatorError(errorHandler, "must implement 'BaseErrorHandler'");
         }
         // check if it was valid metadata
-        if (!ErrorHandlerMetadata.getMetadata(errorHandler)) {
+        if (!ErrorHandlerMetadata.getMetadata((<Object> errorHandler).constructor)) {
             throw new ErrorHandlerValidatorError(errorHandler, "must be decorated with @ErrorHandler");
         }
     }

@@ -22,7 +22,7 @@ export class FilterValidator {
             throw new FilterValidatorError(filter, "must implement 'BaseFilter'");
         }
         // check if it was valid metadata
-        if (!FilterMetadata.getMetadata(filter)) {
+        if (!FilterMetadata.getMetadata((<Object> filter).constructor)) {
             throw new FilterValidatorError(filter, "must be decorated with @Filter");
         }
     }
