@@ -1,6 +1,6 @@
-import { Route, RouteActions, RouteFilter, RouteErrorHandler } from "./core";
+import { Route, RouteActions, RouteFilter, RouteErrorHandler } from "../core";
 
-export class BaseRoute implements Route {
+export class TediRoute implements Route {
     public path: string;
     public filters: RouteFilter[];
     public errorHandlers: RouteErrorHandler[];

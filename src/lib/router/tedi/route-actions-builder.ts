@@ -1,16 +1,16 @@
 import * as _ from "lodash";
-import {RouteAction, RouteActions, RouteActionsBuilder} from "./core";
-import {BaseModule} from "../module";
-import {Service} from "../service";
-import {HTTP_METHODS_NAMES} from "../core/http";
-import {ControllerMetadata} from "../controller";
+import {RouteAction, RouteActions, RouteActionsBuilder} from "../core";
+import {BaseModule} from "../../module";
+import {Service} from "../../service";
+import {HTTP_METHODS_NAMES} from "../../core/http";
+import {ControllerUtils} from "../../controller";
 
 const JSON_HTTP_METHOD_KEYS = HTTP_METHODS_NAMES;
 const JSON_CONTROLLER_KEY = "$controller";
 
 // TODO test this stuff
 @Service()
-export class BaseRouteActionsBuilder implements RouteActionsBuilder {
+export class TediRouteActionsBuilder implements RouteActionsBuilder {
 
     public build(jsonRoute: any, module: BaseModule): RouteActions {
         let routeActions = <RouteActions> {};
@@ -39,6 +39,8 @@ export class BaseRouteActionsBuilder implements RouteActionsBuilder {
         let methodName = routeAction[1];
         let controller: any = module.getDependency(controllerToken);
 
+        // TODO validate Controller!!!
+
         if (!_.isFunction(controller[methodName])) {
             throw new Error(`parseRouteAction: invalid controller[${controllerToken}] method[${methodName}]`);
         }
@@ -56,7 +58,7 @@ export class BaseRouteActionsBuilder implements RouteActionsBuilder {
         }
 
         let controller = module.getDependency(controllerToken);
-        let actionMetadata = ControllerMetadata.getActionMetadata(httpMethodName, controller);
+        let actionMetadata = ControllerUtils.getActionMetadata(httpMethodName, controller);
 
         if (!actionMetadata) {
             return undefined;

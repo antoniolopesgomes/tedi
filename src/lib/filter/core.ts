@@ -1,5 +1,6 @@
 import * as express from "express";
-import {TediError} from "../core";
+import { TediError } from "../core";
+import { getClassName } from "../core/utils";
 
 export interface BaseFilter<T> {
     apply(req: express.Request, res: express.Response): any;
@@ -7,7 +8,7 @@ export interface BaseFilter<T> {
 }
 
 export class FilterError extends TediError {
-    constructor(name: string, err: any) {
-        super(`${name}`, err);
+    constructor(target: Object, msg: string, error?: any) {
+        super(`${getClassName(target)}": ${msg}`, error);
     }
 }

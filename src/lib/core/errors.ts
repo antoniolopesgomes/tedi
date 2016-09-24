@@ -1,6 +1,7 @@
 import {Constructor} from "./interfaces";
-
+/* tslint:disable */
 export const NestedError: Constructor<Object> = require("nested-error-stacks");
+/* tslint:enable */
 
 export class TediError extends NestedError {
 

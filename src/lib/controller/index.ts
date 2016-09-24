@@ -1,4 +1,3 @@
-export {ActionError} from "./core";
-export {Controller, ControllerDecoratorError, ActionDecoratorError} from "./controller-decorator";
-export {ControllerMetadata, ActionMetadataDescriptor, ControllerMetadataDescriptor} from "./controller-metadata";
-export {ControllerValidator} from "./controller-validator";
+export * from "./core";
+export * from "./decorator";
+export * from "./action-decorator";

@@ -6,7 +6,7 @@ import {Service} from "../../service";
 import {dependency} from "../../di";
 import {Config} from "../../config";
 import {Promise} from "../../core";
-import {BaseRouter, BaseRouteActionsBuilder} from "../../router";
+import {TediRouter, TediRouteActionsBuilder} from "../../router";
 import {ExpressAppBuilder} from "./express-app-builder";
 
 @Service()
@@ -25,8 +25,8 @@ export class ExpressServer extends BaseModule {
             .dependencies(
                 dependency("Server", { value: this }),
                 dependency("ExpressAppBuilder", { class: ExpressAppBuilder }),
-                dependency("Router", { class: BaseRouter }),
-                dependency("RouteActionsBuilder", { class: BaseRouteActionsBuilder }),
+                dependency("Router", { class: TediRouter }),
+                dependency("RouteActionsBuilder", { class: TediRouteActionsBuilder }),
                 dependency("Logger", { class: WinstonLoggerFactory() }),
                 dependency("Config", { value: { port: 8080 } })
             );

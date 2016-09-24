@@ -1,1 +1,1 @@
-export {BaseRoute, BaseRouter, RouteErrorHandler} from "./lib/router";
+export {TediRoute, TediRouter, RouteErrorHandler} from "./lib/router";

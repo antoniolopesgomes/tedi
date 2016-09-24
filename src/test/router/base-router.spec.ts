@@ -1,17 +1,13 @@
-import {BaseRoute, Route, RouteError, BaseRouter, BaseRouteActionsBuilder} from "../../lib/router";
+import { TediRoute, Route, RouteError, TediRouter, TediRouteActionsBuilder } from "../../lib/router";
+import { BaseFilter, Filter, FilterError } from "../../lib/filter";
+import { BaseErrorHandler, ErrorHandler, ErrorHandlerError } from "../../lib/error-handler";
+import { Controller } from "../../lib/controller";
+import { Service } from "../../lib/service";
 import {
-    Controller,
     Module,
     BaseModule,
-    BaseFilter,
-    Filter,
-    Service,
-    ErrorHandler,
-    BaseErrorHandler,
     dependency,
 } from "../../core";
-import {ErrorHandlerValidatorError} from "../../lib/error-handler";
-import {FilterValidatorError} from "../../lib/filter";
 
 describe("BaseRouter", () => {
 
@@ -40,7 +36,7 @@ describe("BaseRouter", () => {
     }
 
     let simpleModule: BaseModule;
-    let baseRouteActionsBuilder = new BaseRouteActionsBuilder();
+    let baseRouteActionsBuilder = new TediRouteActionsBuilder();
 
     beforeEach(() => {
         simpleModule = new SimpleModule();
@@ -48,7 +44,7 @@ describe("BaseRouter", () => {
 
     describe("when we have valid routes", () => {
         let route: Route;
-        let router: BaseRouter;
+        let router: TediRouter;
         beforeEach(() => {
             // configure module
             simpleModule.dependencies(
@@ -68,7 +64,7 @@ describe("BaseRouter", () => {
                     "/two": {},
                 },
             };
-            router = new BaseRouter(null, baseRouteActionsBuilder);
+            router = new TediRouter(null, baseRouteActionsBuilder);
             // build route
             route = router.getRootRoute(jsonRoutes, simpleModule);
         });
@@ -109,7 +105,7 @@ describe("BaseRouter", () => {
                 expect(childRoute.path).toEqual("/one");
             });
             it("should be a BaseRoute", () => {
-                expect(childRoute).toEqual(jasmine.any(BaseRoute));
+                expect(childRoute).toEqual(jasmine.any(TediRoute));
             });
             it("should have get action defined", () => {
                 expect(childRoute.actions.get.controller).toEqual(jasmine.any(DummyController));
@@ -143,7 +139,7 @@ describe("BaseRouter", () => {
                 childRoute = route.children[0].children[0];
             });
             it("should be defined", () => {
-                expect(childRoute).toEqual(jasmine.any(BaseRoute));
+                expect(childRoute).toEqual(jasmine.any(TediRoute));
             });
             it("should have the right path", () => {
                 expect(childRoute.path).toEqual("/one/two");
@@ -153,7 +149,7 @@ describe("BaseRouter", () => {
 
     describe("with invalid filters", () => {
         let jsonRouter: any;
-        let router: BaseRouter;
+        let router: TediRouter;
         beforeEach(() => {
             // define router
             jsonRouter = {
@@ -161,7 +157,7 @@ describe("BaseRouter", () => {
                     "$filters": ["InvalidFilter"],
                 },
             };
-            router = new BaseRouter(null, baseRouteActionsBuilder);
+            router = new TediRouter(null, baseRouteActionsBuilder);
         });
 
         describe("when filter does not implement BaseFilter", () => {
@@ -175,7 +171,7 @@ describe("BaseRouter", () => {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
                     expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(FilterValidatorError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(FilterError));
                     done();
                 }
             });
@@ -197,7 +193,7 @@ describe("BaseRouter", () => {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
                     expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(FilterValidatorError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(FilterError));
                     done();
                 }
             });
@@ -206,7 +202,7 @@ describe("BaseRouter", () => {
 
     describe("with invalid errorHandlers", () => {
         let jsonRouter: any;
-        let router: BaseRouter;
+        let router: TediRouter;
 
         beforeEach(() => {
             jsonRouter = {
@@ -214,7 +210,7 @@ describe("BaseRouter", () => {
                     "$errorHandlers": ["InvalidErrorHandler"],
                 },
             };
-            router = new BaseRouter(null, baseRouteActionsBuilder);
+            router = new TediRouter(null, baseRouteActionsBuilder);
         });
 
         describe("when error handler doest not implement BaseErrorHandler interface", () => {
@@ -232,7 +228,7 @@ describe("BaseRouter", () => {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
                     expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerValidatorError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerError));
                     done();
                 }
             });
@@ -253,7 +249,7 @@ describe("BaseRouter", () => {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
                     expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerValidatorError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerError));
                     done();
                 }
             });

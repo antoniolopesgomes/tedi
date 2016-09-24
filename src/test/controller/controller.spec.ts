@@ -1,11 +1,11 @@
 import * as _ from "lodash";
-import { Controller } from "../../core";
 import { HTTP_METHODS_NAMES } from "../../http";
 import {
-    ActionDecoratorError,
+    Controller,
+    ControllerUtils,
     ControllerMetadata,
-    ControllerMetadataDescriptor,
-    ActionMetadataDescriptor,
+    ActionMetadata,
+    ActionDecoratorError,
 } from "../../lib/controller";
 
 describe("Controller", () => {
@@ -15,23 +15,22 @@ describe("Controller", () => {
         describe("when we have a non decorated class", () => {
             class AController { };
             it("metadata should not exist", () => {
-                expect(ControllerMetadata.getMetadata(AController)).toBeUndefined();
+                expect(ControllerUtils.getMetadata(AController)).toBeUndefined();
             });
         });
 
         describe("when we have a decorated class, without action decorators,", () => {
             @Controller()
             class AController { }
-            let ctrlMetadata: ControllerMetadataDescriptor;
+            let ctrlMetadata: ControllerMetadata;
             beforeEach(() => {
-                ctrlMetadata = ControllerMetadata.getMetadata(AController);
+                ctrlMetadata = ControllerUtils.getMetadata(AController);
             });
             it("metadata should exist", () => {
                 expect(ctrlMetadata).toBeDefined();
-                expect(ctrlMetadata.service).toBeDefined();
             });
             it("metadata should have the right class name", () => {
-                expect(ctrlMetadata.service.className).toEqual("AController");
+                expect(ctrlMetadata.className).toEqual("AController");
             });
         });
 
@@ -52,8 +51,8 @@ describe("Controller", () => {
                 controller = new AController();
             });
             describe(`${httpMethodName} metadata,`, () => {
-                let actionMetadata: ActionMetadataDescriptor;
-                beforeEach(() => actionMetadata = ControllerMetadata.getActionMetadata(httpMethodName, controller));
+                let actionMetadata: ActionMetadata;
+                beforeEach(() => actionMetadata = ControllerUtils.getActionMetadata(httpMethodName, controller));
                 it("should exist", () => expect(actionMetadata).toBeDefined());
                 it(`should have the '${httpMethodName}' method name`, () => expect(actionMetadata.methodName).toEqual("aMethod"));
                 it(`'${httpMethodName}' method name should be right`, () => expect(controller[actionMetadata.methodName]()).toEqual(httpMethodName.toUpperCase()));
@@ -81,7 +80,7 @@ describe("Controller", () => {
                 expect(error).toEqual(jasmine.any(ActionDecoratorError))
             });
             it("error should have the right message", () => {
-                expect(error.message).toEqual("AController#get: Failed to decorate method");
+                expect(error.message).toEqual("AController: duplicate decoration found for @get");
             });
         });
 

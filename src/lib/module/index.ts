@@ -1,2 +1,3 @@
-export {BaseModule} from "./_module";
-export {Module, ModuleDecoratorError} from "./module-decorator";
+export * from "./base-module";
+export * from "./decorator";
+export * from "./helper";
