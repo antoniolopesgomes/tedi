@@ -1,4 +1,4 @@
-import {DIModuleError} from "./errors";
+import {DIModuleError} from "./shared";
 import {Constructor} from "../interfaces";
 import {DependencyInfo} from "./dependency";
 import * as inversify from "inversify";

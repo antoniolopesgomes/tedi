@@ -1,5 +1,5 @@
 import { isFunction } from "lodash";
-import { BaseFilter, FilterError } from "./errors";
+import { BaseFilter, FilterError } from "./shared";
 
 const METADATA_KEY = "tedi:filter";
 

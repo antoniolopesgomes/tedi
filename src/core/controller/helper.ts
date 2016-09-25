@@ -1,4 +1,4 @@
-import { ControllerError } from "./errors";
+import { ControllerError } from "./shared";
 
 const METADATA_KEY = "tedi:controller";
 

@@ -1,4 +1,4 @@
-import { ServiceError } from "./errors";
+import { ServiceError } from "./shared";
 
 const METADATA_KEY = "tedi:service";
 

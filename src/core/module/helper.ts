@@ -1,5 +1,5 @@
 import { BaseModule } from "./base-module";
-import { ModuleError } from "./errors";
+import { ModuleError } from "./shared";
 import { getClassName } from "../utils";
 
 const METADATA_KEY = "tedi:module";

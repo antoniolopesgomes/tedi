@@ -1,5 +1,5 @@
 import { isFunction } from "lodash";
-import { BaseErrorHandler, ErrorHandlerError } from "./errors";
+import { BaseErrorHandler, ErrorHandlerError } from "./shared";
 
 const METADATA_KEY = "tedi:errorHandler";
 
