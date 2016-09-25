@@ -1,5 +1,7 @@
 
-import {ExpressServer} from "../../server";
+import * as express from "express";
+import * as request from "supertest-as-promised";
+import {ExpressServer} from "../../express";
 import {
     BaseFilter,
     BaseModule,
@@ -7,10 +9,8 @@ import {
     Filter,
     Module,
     dependency,
+    Logger,
 } from "../../core";
-import {Logger} from "../../logger";
-import * as express from "express";
-import * as request from "supertest-as-promised";
 
 describe("Modules", () => {
 

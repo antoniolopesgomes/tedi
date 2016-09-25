@@ -1,13 +1,18 @@
-import { Filter, FilterMetadata, FilterUtils } from "../../lib/filter";
+import { Filter, FilterMetadata, FilterHelper } from "../../core";
 
 describe("Filter", () => {
 
     describe("@Filter decorator:", () => {
 
+        let filterHelper: FilterHelper;
+        beforeEach(() => {
+            filterHelper = new FilterHelper();
+        });
+
         describe("when we have a non decorated class", () => {
             class AFilter { };
             it("metadata should not exist", () => {
-                expect(FilterUtils.getMetadata(AFilter)).toBeUndefined();
+                expect(filterHelper.getMetadata(AFilter)).toBeUndefined();
             });
         });
 
@@ -17,7 +22,7 @@ describe("Filter", () => {
             let filterMetadataDescriptor: FilterMetadata;
 
             beforeEach(() => {
-                filterMetadataDescriptor = FilterUtils.getMetadata(AFilter);
+                filterMetadataDescriptor = filterHelper.getMetadata(AFilter);
             });
             it("metadata should exist", () => {
                 expect(filterMetadataDescriptor).toEqual(<FilterMetadata> {

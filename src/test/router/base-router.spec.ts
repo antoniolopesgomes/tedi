@@ -1,13 +1,13 @@
-import { TediRoute, Route, RouteError, TediRouter, TediRouteActionsBuilder } from "../../lib/router";
-import { BaseFilter, Filter, FilterError } from "../../lib/filter";
-import { BaseErrorHandler, ErrorHandler, ErrorHandlerError } from "../../lib/error-handler";
-import { Controller } from "../../lib/controller";
-import { Service } from "../../lib/service";
 import {
-    Module,
-    BaseModule,
+    Route, RouteError,
+    BaseFilter, Filter, FilterError,
+    BaseErrorHandler, ErrorHandler, ErrorHandlerError,
+    Controller,
+    Service,
+    Module, BaseModule,
     dependency,
 } from "../../core";
+import { TediRoute, TediRouter, TediRouteActionsBuilder } from "../../router";
 
 describe("BaseRouter", () => {
 

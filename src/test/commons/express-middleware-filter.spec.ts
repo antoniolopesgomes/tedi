@@ -1,9 +1,9 @@
-import * as bodyParser from "body-parser";
-import {ExpressServer} from "../../server";
-import {dependency, BaseFilter, Controller} from "../../core";
-import {ExpressMiddlewareFilter} from "../../commons";
 import * as request from "supertest-as-promised";
 import * as express from "express";
+
+import * as bodyParser from "body-parser";
+import { ExpressServer, ExpressMiddlewareFilter } from "../../express";
+import { dependency, BaseFilter, Controller } from "../../core";
 
 describe("ExpressMiddlewareFilter", () => {
 
@@ -26,8 +26,8 @@ describe("ExpressMiddlewareFilter", () => {
                 },
             })
             .dependencies(
-                DummyController,
-                dependency("jsonBodyParser", { value: new ExpressMiddlewareFilter(jsonBodyParser)})
+            DummyController,
+            dependency("jsonBodyParser", { value: new ExpressMiddlewareFilter(jsonBodyParser) })
             );
     });
 

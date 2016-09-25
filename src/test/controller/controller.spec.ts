@@ -1,21 +1,23 @@
 import * as _ from "lodash";
-import { HTTP_METHODS_NAMES } from "../../http";
 import {
     Controller,
-    ControllerUtils,
+    ControllerHelper,
     ControllerMetadata,
     ActionMetadata,
     ActionDecoratorError,
-} from "../../lib/controller";
+    HTTP_METHODS_NAMES,
+} from "../../core";
 
 describe("Controller", () => {
+
+    let controllerHelper = new ControllerHelper();
 
     describe("@Controller() decorator:", () => {
 
         describe("when we have a non decorated class", () => {
             class AController { };
             it("metadata should not exist", () => {
-                expect(ControllerUtils.getMetadata(AController)).toBeUndefined();
+                expect(controllerHelper.getMetadata(AController)).toBeUndefined();
             });
         });
 
@@ -24,7 +26,7 @@ describe("Controller", () => {
             class AController { }
             let ctrlMetadata: ControllerMetadata;
             beforeEach(() => {
-                ctrlMetadata = ControllerUtils.getMetadata(AController);
+                ctrlMetadata = controllerHelper.getMetadata(AController);
             });
             it("metadata should exist", () => {
                 expect(ctrlMetadata).toBeDefined();
@@ -52,7 +54,7 @@ describe("Controller", () => {
             });
             describe(`${httpMethodName} metadata,`, () => {
                 let actionMetadata: ActionMetadata;
-                beforeEach(() => actionMetadata = ControllerUtils.getActionMetadata(httpMethodName, controller));
+                beforeEach(() => actionMetadata = controllerHelper.getActionMetadata(httpMethodName, controller));
                 it("should exist", () => expect(actionMetadata).toBeDefined());
                 it(`should have the '${httpMethodName}' method name`, () => expect(actionMetadata.methodName).toEqual("aMethod"));
                 it(`'${httpMethodName}' method name should be right`, () => expect(controller[actionMetadata.methodName]()).toEqual(httpMethodName.toUpperCase()));
@@ -77,7 +79,7 @@ describe("Controller", () => {
                 }
             });
             it("should throw an error", () => {
-                expect(error).toEqual(jasmine.any(ActionDecoratorError))
+                expect(error).toEqual(jasmine.any(ActionDecoratorError));
             });
             it("error should have the right message", () => {
                 expect(error.message).toEqual("AController: duplicate decoration found for @get");

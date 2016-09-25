@@ -1,23 +1,28 @@
-import { ErrorHandler, ErrorHandlerMetadata, ErrorHandlerUtils } from "../../lib/error-handler";
+import { ErrorHandler, ErrorHandlerMetadata, ErrorHandlerHelper } from "../../core";
 
 describe("ErrorHandler", () => {
 
     describe("@Filter decorator", () => {
 
+        let errorHandlerHelper: ErrorHandlerHelper;
+        beforeEach(() => {
+            errorHandlerHelper = new ErrorHandlerHelper();
+        });
+
         describe("when we have a non decorated class", () => {
             class AnErrorHandler { };
             it("metadata should not exist", () => {
-                expect(ErrorHandlerUtils.getMetadata(AnErrorHandler)).toBeUndefined();
+                expect(errorHandlerHelper.getMetadata(AnErrorHandler)).toBeUndefined();
             });
         });
 
         describe("when we have a decorated class", () => {
             @ErrorHandler()
-            class AnErrorHandler { };
+            class AnErrorHandler { }
             let errorHandlerMetadataDescriptor: ErrorHandlerMetadata;
 
             beforeEach(() => {
-                errorHandlerMetadataDescriptor = ErrorHandlerUtils.getMetadata(AnErrorHandler);
+                errorHandlerMetadataDescriptor = errorHandlerHelper.getMetadata(AnErrorHandler);
             });
             it("metadata should exist", () => {
                 expect(errorHandlerMetadataDescriptor).toEqual(<ErrorHandlerMetadata> {

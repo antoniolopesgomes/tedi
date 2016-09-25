@@ -1,7 +1,5 @@
-
-import {Controller, inject, BaseModule} from "../../core";
-import {ExpressServer} from "../../server";
-import {Logger} from "../../logger";
+import {Controller, inject, BaseModule, Logger} from "../../core";
+import {ExpressServer} from "../../express";
 
 describe("inject decorator", () => {
 
