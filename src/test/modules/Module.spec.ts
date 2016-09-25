@@ -5,9 +5,7 @@ import {ExpressServer} from "../../express";
 import {
     BaseFilter,
     BaseModule,
-    Controller,
-    Filter,
-    Module,
+    tedi,
     dependency,
     Logger,
 } from "../../core";
@@ -16,20 +14,20 @@ describe("Modules", () => {
 
     let server: ExpressServer;
 
-    @Controller()
+    @tedi.controller()
     class AuthController {
         get(req, res): void {
             res.status(200).end();
         };
     }
 
-    @Filter()
+    @tedi.filter()
     class CustomFilter2 implements BaseFilter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
 
-    @Module()
+    @tedi.module()
     class AuthModule extends BaseModule {
         init(): void {
             this
@@ -97,7 +95,7 @@ describe("Modules", () => {
             });
 
             describe("and override an internal component", () => {
-                @Controller()
+                @tedi.controller()
                 class CustomAuthController {
                     get(req, res): void {
                         res.status(200).end();

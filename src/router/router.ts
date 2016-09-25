@@ -2,9 +2,9 @@ import * as _ from "lodash";
 
 import * as RouterCore from "../core/router";
 import {
+    tedi,
     FilterHelper, BaseFilter,
     BaseErrorHandler, ErrorHandlerHelper,
-    Service,
     Logger,
     BaseModule, ModuleHelper,
     inject,
@@ -19,7 +19,7 @@ const MODULE_HELPER = new ModuleHelper();
 const FILTER_HELPER = new FilterHelper();
 const ERROR_HANDLER_HELPER = new ErrorHandlerHelper();
 
-@Service()
+@tedi.service()
 export class TediRouter implements RouterCore.Router {
 
     constructor(

@@ -2,17 +2,17 @@ import * as _ from "lodash";
 import * as express from "express";
 
 import {
+    tedi,
     Router, Route, RouteAction, RouteFilter, RouteErrorHandler,
     inject,
     Logger,
     BaseModule,
     FilterError,
-    Service,
     ActionError,
     HTTP_METHODS_NAMES,
 } from "../core";
 
-@Service()
+@tedi.service()
 export class ExpressAppBuilder {
 
     constructor(

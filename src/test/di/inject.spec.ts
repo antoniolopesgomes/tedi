@@ -1,16 +1,16 @@
-import {Controller, inject, BaseModule, Logger} from "../../core";
+import {tedi, inject, BaseModule, Logger} from "../../core";
 import {ExpressServer} from "../../express";
 
 describe("inject decorator", () => {
 
     const WARN_MSG = "This is a warning message";
 
-    @Controller()
+    @tedi.controller()
     class DummyController {
         constructor(
             @inject("Logger") private _logger: Logger
         ) { }
-        @Controller.get()
+        @tedi.controller.get()
         get(): void {
             this._logger.warn(WARN_MSG);
         }

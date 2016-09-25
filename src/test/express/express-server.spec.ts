@@ -2,13 +2,12 @@
 import * as request from "supertest-as-promised";
 import * as express from "express";
 import {
+    tedi,
     dependency,
-    Filter, BaseFilter,
+    BaseFilter,
     FilterError,
     BaseErrorHandler,
     ActionError,
-    Controller,
-    ErrorHandler,
     Logger, LoggerLevels,
 } from "../../core";
 import {ExpressServer} from "../../express";
@@ -17,7 +16,7 @@ describe("ExpressServer", () => {
 
     let server: ExpressServer;
 
-    @Controller()
+    @tedi.controller()
     class AuthController {
         login(req, res: express.Response) {
             res.send(req.$thisFilter);
@@ -30,26 +29,26 @@ describe("ExpressServer", () => {
         }
     }
 
-    @Filter()
+    @tedi.filter()
     class CustomFilter implements BaseFilter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
 
-    @ErrorHandler()
+    @tedi.errorHandler()
     class CustomErrorHandler implements BaseErrorHandler {
         catch(err: any) {
             throw err;
         }
     }
 
-    @Controller()
+    @tedi.controller()
     class ControllerClass {
-        @Controller.get()
+        @tedi.controller.get()
         read(req: express.Request, res: express.Response): void {
             res.status(200).end();
         }
-        @Controller.post()
+        @tedi.controller.post()
         write(req: express.Request, res: express.Response): void {
             res.status(200).end();
         }

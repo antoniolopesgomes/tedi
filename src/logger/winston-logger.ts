@@ -1,5 +1,5 @@
 import * as winston from "winston";
-import {Logger, LoggerLevels, Service} from "../core";
+import {Logger, LoggerLevels, tedi} from "../core";
 
 export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args) => Logger {
 
@@ -9,7 +9,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
         ],
     };
 
-    @Service()
+    @tedi.service()
     class WinstonLogger implements Logger {
 
         private _logger: winston.LoggerInstance;

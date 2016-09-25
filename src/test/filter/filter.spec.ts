@@ -1,8 +1,8 @@
-import { Filter, FilterMetadata, FilterHelper } from "../../core";
+import { tedi, FilterMetadata, FilterHelper } from "../../core";
 
 describe("Filter", () => {
 
-    describe("@Filter decorator:", () => {
+    describe("Filter decorator:", () => {
 
         let filterHelper: FilterHelper;
         beforeEach(() => {
@@ -17,7 +17,7 @@ describe("Filter", () => {
         });
 
         describe("when we have a decorated class", () => {
-            @Filter()
+            @tedi.filter()
             class AFilter { }
             let filterMetadataDescriptor: FilterMetadata;
 

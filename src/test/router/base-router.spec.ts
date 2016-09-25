@@ -1,17 +1,16 @@
 import {
+    tedi,
     Route, RouteError,
-    BaseFilter, Filter, FilterError,
-    BaseErrorHandler, ErrorHandler, ErrorHandlerError,
-    Controller,
-    Service,
-    Module, BaseModule,
+    BaseFilter, FilterError,
+    BaseErrorHandler, ErrorHandlerError,
+    BaseModule,
     dependency,
 } from "../../core";
 import { TediRoute, TediRouter, TediRouteActionsBuilder } from "../../router";
 
 describe("BaseRouter", () => {
 
-    @Controller()
+    @tedi.controller()
     class DummyController {
         get(): void { return; }
         post(): void { return; }
@@ -19,18 +18,18 @@ describe("BaseRouter", () => {
         delete(): void { return; }
     }
 
-    @Module()
+    @tedi.module()
     class SimpleModule extends BaseModule {
         init(): void { return; }
     }
 
-    @Filter()
+    @tedi.filter()
     class SimpleFilter implements BaseFilter<any> {
         apply(): void { return; }
         getDataFromRequest(): any { return; }
     }
 
-    @ErrorHandler()
+    @tedi.errorHandler()
     class SimpleErrorHandler implements BaseErrorHandler {
         catch(): void { return; }
     }
@@ -161,7 +160,7 @@ describe("BaseRouter", () => {
         });
 
         describe("when filter does not implement BaseFilter", () => {
-            @Filter()
+            @tedi.filter()
             class InvalidFilter { }
             beforeEach(() => {
                 simpleModule.dependencies(dependency("InvalidFilter", { class: InvalidFilter }));
@@ -178,7 +177,7 @@ describe("BaseRouter", () => {
         });
 
         describe("when filter is wrongly decorated", () => {
-            @Service()
+            @tedi.service()
             class NotDecoratedFilter implements BaseFilter<any> {
                 apply(): any { return; }
                 getDataFromRequest(): any { return; }
@@ -214,7 +213,7 @@ describe("BaseRouter", () => {
         });
 
         describe("when error handler doest not implement BaseErrorHandler interface", () => {
-            @ErrorHandler()
+            @tedi.errorHandler()
             class InvalidErrorHandler { }
 
             beforeEach(() => {
@@ -235,7 +234,7 @@ describe("BaseRouter", () => {
         });
 
         describe("when errorHandler is wrongly decorated", () => {
-            @Service()
+            @tedi.service()
             class NotDecoratedErrorHandler {
                 catch(): void { return; }
             }

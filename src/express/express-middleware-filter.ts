@@ -1,9 +1,9 @@
 import * as express from "express";
 import * as Promise from "bluebird";
 
-import {BaseFilter, Filter} from "../core/filter";
+import {BaseFilter, tedi} from "../core";
 
-@Filter()
+@tedi.filter()
 export class ExpressMiddlewareFilter implements BaseFilter<any> {
 
     constructor(

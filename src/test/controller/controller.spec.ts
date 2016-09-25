@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import {
-    Controller,
+    tedi,
     ControllerHelper,
     ControllerMetadata,
     ActionMetadata,
@@ -12,7 +12,7 @@ describe("Controller", () => {
 
     let controllerHelper = new ControllerHelper();
 
-    describe("@Controller() decorator:", () => {
+    describe("Controller decorator:", () => {
 
         describe("when we have a non decorated class", () => {
             class AController { };
@@ -22,7 +22,7 @@ describe("Controller", () => {
         });
 
         describe("when we have a decorated class, without action decorators,", () => {
-            @Controller()
+            @tedi.controller()
             class AController { }
             let ctrlMetadata: ControllerMetadata;
             beforeEach(() => {
@@ -42,7 +42,7 @@ describe("Controller", () => {
     _.keys(HTTP_METHODS_NAMES).forEach(httpMethodName => {
         describe(`when we have an @Controller.${httpMethodName} decorator`, () => {
             class AController {
-                @(Controller[httpMethodName])()
+                @(tedi.controller[httpMethodName])()
                 aMethod(): string {
                     return httpMethodName.toUpperCase();
                 }
@@ -68,10 +68,10 @@ describe("Controller", () => {
             beforeEach(() => {
                 try {
                     class AController {
-                        @Controller.get()
+                        @tedi.controller.get()
                         read(): void { return; }
 
-                        @Controller.get()
+                        @tedi.controller.get()
                         anotherRead(): void { return; }
                     }
                 } catch (err) {

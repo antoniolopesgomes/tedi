@@ -1,4 +1,4 @@
-import {BaseModule, Service} from "../../core";
+import {BaseModule, tedi} from "../../core";
 
 describe("Module bindings", () => {
 
@@ -12,7 +12,7 @@ describe("Module bindings", () => {
             module = new SimpleModule();
         });
         describe("and we register a dependency", () => {
-            @Service()
+            @tedi.service()
             class SimpleService { }
             let service: any;
             beforeEach(() => {

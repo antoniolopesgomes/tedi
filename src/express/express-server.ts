@@ -2,9 +2,9 @@ import * as express from "express";
 import * as http from "http";
 
 import {
+    tedi,
     Logger,
     BaseModule,
-    Service,
     dependency,
     Config,
     Promise,
@@ -14,7 +14,7 @@ import { WinstonLoggerFactory } from "../logger/winston-logger";
 import { TediRouter, TediRouteActionsBuilder } from "../router";
 import { ExpressAppBuilder } from "./express-app-builder";
 
-@Service()
+@tedi.service()
 export class ExpressServer extends BaseModule {
 
     private _server: http.Server;

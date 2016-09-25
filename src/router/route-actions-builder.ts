@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 
 import {
+    tedi,
     RouteAction, RouteActions, RouteActionsBuilder,
     BaseModule,
-    Service,
     HTTP_METHODS_NAMES,
     ControllerHelper,
 } from "../core";
@@ -13,7 +13,7 @@ const JSON_CONTROLLER_KEY = "$controller";
 const CONTROL_HELPER = new ControllerHelper();
 
 // TODO test this stuff
-@Service()
+@tedi.service()
 export class TediRouteActionsBuilder implements RouteActionsBuilder {
 
     public build(jsonRoute: any, module: BaseModule): RouteActions {

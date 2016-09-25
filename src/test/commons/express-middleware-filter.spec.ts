@@ -3,7 +3,7 @@ import * as express from "express";
 
 import * as bodyParser from "body-parser";
 import { ExpressServer, ExpressMiddlewareFilter } from "../../express";
-import { dependency, BaseFilter, Controller } from "../../core";
+import { dependency, BaseFilter, tedi } from "../../core";
 
 describe("ExpressMiddlewareFilter", () => {
 
@@ -11,7 +11,7 @@ describe("ExpressMiddlewareFilter", () => {
     let server: ExpressServer;
     let payloadString = "this is a dummy payload";
 
-    @Controller()
+    @tedi.controller()
     class DummyController {
         post(): void { return; }
     }

@@ -1,8 +1,8 @@
-import { ErrorHandler, ErrorHandlerMetadata, ErrorHandlerHelper } from "../../core";
+import { tedi, ErrorHandlerMetadata, ErrorHandlerHelper } from "../../core";
 
 describe("ErrorHandler", () => {
 
-    describe("@Filter decorator", () => {
+    describe("Filter decorator", () => {
 
         let errorHandlerHelper: ErrorHandlerHelper;
         beforeEach(() => {
@@ -17,7 +17,7 @@ describe("ErrorHandler", () => {
         });
 
         describe("when we have a decorated class", () => {
-            @ErrorHandler()
+            @tedi.errorHandler()
             class AnErrorHandler { }
             let errorHandlerMetadataDescriptor: ErrorHandlerMetadata;
 

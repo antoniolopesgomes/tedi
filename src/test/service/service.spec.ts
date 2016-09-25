@@ -1,8 +1,8 @@
-import { Service, ServiceMetadata, ServiceHelper } from "../../core";
+import { tedi, ServiceMetadata, ServiceHelper } from "../../core";
 
 describe("Service", () => {
 
-    describe("@Service decorator:", () => {
+    describe("Service decorator:", () => {
 
         let serviceHelper: ServiceHelper;
         beforeEach(() => {
@@ -17,7 +17,7 @@ describe("Service", () => {
         });
 
         describe("when we have a decorated class", () => {
-            @Service()
+            @tedi.service()
             class AService { }
             let filterMetadataDescriptor: ServiceMetadata;
 

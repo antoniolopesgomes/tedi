@@ -1,6 +1,6 @@
 import * as request from "supertest-as-promised";
 import * as express from "express";
-import {Controller, dependency} from "../../core";
+import {tedi, dependency} from "../../core";
 import {ExpressServer} from "../../express";
 
 describe("ExpressServer params", () => {
@@ -12,7 +12,7 @@ describe("ExpressServer params", () => {
     });
 
     describe("given a route tree with parameters", () => {
-        @Controller()
+        @tedi.controller()
         class TestController {
             get(): void { return; }
         }
