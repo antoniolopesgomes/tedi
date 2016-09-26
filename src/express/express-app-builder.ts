@@ -5,7 +5,7 @@ import {
     tedi,
     Router, Route, RouteAction, RouteFilter, RouteErrorHandler,
     Logger,
-    BaseModule,
+    Module,
     FilterError,
     ActionError,
     HTTP_METHODS_NAMES,
@@ -20,7 +20,7 @@ export class ExpressAppBuilder {
     ) {
     }
 
-    public buildApp(jsonRoutes: any, module: BaseModule): express.Application {
+    public buildApp(jsonRoutes: any, module: Module): express.Application {
         let rootRoute = this._router.getRootRoute(jsonRoutes, module);
         let app = express();
         this._buildRouting(app, rootRoute);

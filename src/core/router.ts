@@ -1,7 +1,7 @@
 "use strict";
 import { Filter } from "./filter";
 import { ErrorHandler } from "./error-handler";
-import { BaseModule } from "./module";
+import { Module } from "./module";
 import { TediError } from "../core";
 import { HttpMethods } from "../core/http";
 
@@ -13,7 +13,7 @@ export interface RouteAction {
 export interface RouteActions extends HttpMethods<RouteAction> { }
 
 export interface RouteActionsBuilder {
-    build(jsonRoute: any, module: BaseModule): RouteActions;
+    build(jsonRoute: any, module: Module): RouteActions;
 }
 
 export interface RouteFilter {
@@ -41,7 +41,7 @@ export class RouteError extends TediError {
 }
 
 export interface Router {
-    getRootRoute(jsonRoutes: any, module: BaseModule): Route;
+    getRootRoute(jsonRoutes: any, module: Module): Route;
 }
 
 export class RouterError extends TediError {

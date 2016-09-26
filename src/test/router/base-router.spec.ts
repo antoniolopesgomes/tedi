@@ -3,7 +3,7 @@ import {
     Route, RouteError,
     Filter, FilterError,
     ErrorHandler, ErrorHandlerError,
-    BaseModule,
+    Module,
     dependency,
 } from "../../core";
 import { TediRoute, TediRouter, TediRouteActionsBuilder } from "../../router";
@@ -19,7 +19,7 @@ describe("BaseRouter", () => {
     }
 
     @tedi.module()
-    class SimpleModule extends BaseModule {
+    class SimpleModule extends Module {
         init(): void { return; }
     }
 
@@ -34,7 +34,7 @@ describe("BaseRouter", () => {
         catch(): void { return; }
     }
 
-    let simpleModule: BaseModule;
+    let simpleModule: Module;
     let baseRouteActionsBuilder = new TediRouteActionsBuilder();
 
     beforeEach(() => {

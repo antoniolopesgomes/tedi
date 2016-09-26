@@ -4,7 +4,7 @@ import * as request from "supertest-as-promised";
 import {ExpressServer} from "../../express";
 import {
     Filter,
-    BaseModule,
+    Module,
     tedi,
     dependency,
     Logger,
@@ -28,7 +28,7 @@ describe("Modules", () => {
     }
 
     @tedi.module()
-    class AuthModule extends BaseModule {
+    class AuthModule extends Module {
         init(): void {
             this
                 .setJsonRoutes({
@@ -51,7 +51,7 @@ describe("Modules", () => {
     describe("When we got an app with a child module", () => {
         let results: any[] = [];
         let app: express.Application;
-        let authModule: BaseModule;
+        let authModule: Module;
 
         beforeEach(() => {
             results.push("_here");
@@ -62,7 +62,7 @@ describe("Modules", () => {
                 .setModule("AuthModule", AuthModule);
             // server.component<Logger>("Logger").setLevel(LoggerLevels.DEBUG);
             app = server.getApp();
-            authModule = server.getDependency<BaseModule>("AuthModule");
+            authModule = server.getDependency<Module>("AuthModule");
         });
 
         describe("/auth/login", () => {

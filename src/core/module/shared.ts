@@ -11,15 +11,15 @@ export class ModuleError extends TediError {
     }
 }
 
-export abstract class BaseModule {
+export abstract class Module {
 
-    private _parentModule: BaseModule;
+    private _parentModule: Module;
     private _di: DIModule;
 
-    constructor(parentModule?: BaseModule) {
+    constructor(parentModule?: Module) {
         this._parentModule = parentModule;
-        if (parentModule instanceof BaseModule) {
-            this._di = new DIModule((parentModule instanceof BaseModule) ? parentModule._di : null);
+        if (parentModule instanceof Module) {
+            this._di = new DIModule((parentModule instanceof Module) ? parentModule._di : null);
         } else {
             this._di = new DIModule(null);
         }
@@ -27,11 +27,11 @@ export abstract class BaseModule {
         this.init();
     }
 
-    public getParentModule(): BaseModule {
+    public getParentModule(): Module {
         return this._parentModule;
     }
 
-    public dependencies(...args: any[]): BaseModule {
+    public dependencies(...args: any[]): Module {
         let deps = _.isArray(args) ? args : [];
 
         deps.forEach((dep: any) => {
@@ -41,7 +41,7 @@ export abstract class BaseModule {
         return this;
     }
 
-    public setDependency(dep: any): BaseModule {
+    public setDependency(dep: any): Module {
         if (_.isUndefined(dep) || _.isNull(dep)) {
             return this;
         }
@@ -52,7 +52,7 @@ export abstract class BaseModule {
         return this;
     }
 
-    public setModule(token: any, moduleClass: Constructor<BaseModule>): BaseModule {
+    public setModule(token: any, moduleClass: Constructor<Module>): Module {
         this.setDependency(dependency(token, { value: new moduleClass(this) }));
         return this;
     }
@@ -66,17 +66,17 @@ export abstract class BaseModule {
         return depInstance;
     }
 
-    public snapshot(): BaseModule {
+    public snapshot(): Module {
         this._di.snapshot();
         return this;
     }
 
-    public restore(): BaseModule {
+    public restore(): Module {
         this._di.restore();
         return this;
     }
 
-    public setJsonRoutes(value: any): BaseModule {
+    public setJsonRoutes(value: any): Module {
         this._di.setDependency(dependency("RoutesDefinition", { value: value }));
         return this;
     }

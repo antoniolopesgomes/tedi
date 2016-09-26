@@ -6,7 +6,7 @@ import {
     FilterHelper, Filter,
     ErrorHandler, ErrorHandlerHelper,
     Logger,
-    BaseModule, ModuleHelper,
+    Module, ModuleHelper,
 } from "../core";
 import {TediRoute} from "../router";
 
@@ -26,11 +26,11 @@ export class TediRouter implements RouterCore.Router {
         @tedi.inject("RouteActionsBuilder") private _routeActionsBuilder: RouterCore.RouteActionsBuilder
     ) { }
 
-    public getRootRoute(jsonRoutes: any, module: BaseModule): RouterCore.Route {
+    public getRootRoute(jsonRoutes: any, module: Module): RouterCore.Route {
         return this._parseJsonRoute("/", jsonRoutes, module);
     }
 
-    private _parseJsonRoute(path: string, jsonRoute: any, module: BaseModule): RouterCore.Route {
+    private _parseJsonRoute(path: string, jsonRoute: any, module: Module): RouterCore.Route {
         let route: RouterCore.Route = new TediRoute(path);
 
         route.filters = this._parseRouteFilters(route, jsonRoute[ROUTER_WORDS.FILTERS], module);
@@ -41,7 +41,7 @@ export class TediRouter implements RouterCore.Router {
         return route;
     }
 
-    private _parseRouteFilters(route: RouterCore.Route, filterNames: string[], module: BaseModule): RouterCore.RouteFilter[] {
+    private _parseRouteFilters(route: RouterCore.Route, filterNames: string[], module: Module): RouterCore.RouteFilter[] {
 
         if (!_.isArray(filterNames)) {
             return [];
@@ -61,7 +61,7 @@ export class TediRouter implements RouterCore.Router {
         });
     }
 
-    private _parseRouteErrorHandlers(route: RouterCore.Route, errorHandlersNames: string[], module: BaseModule): RouterCore.RouteErrorHandler[] {
+    private _parseRouteErrorHandlers(route: RouterCore.Route, errorHandlersNames: string[], module: Module): RouterCore.RouteErrorHandler[] {
 
         if (!_.isArray(errorHandlersNames)) {
             return [];
@@ -81,7 +81,7 @@ export class TediRouter implements RouterCore.Router {
         });
     }
 
-    private _parseModuleRoute(route: RouterCore.Route, path: string, module: BaseModule): RouterCore.Route {
+    private _parseModuleRoute(route: RouterCore.Route, path: string, module: Module): RouterCore.Route {
 
         try {
             MODULE_HELPER.validateInstance(module);
@@ -96,7 +96,7 @@ export class TediRouter implements RouterCore.Router {
         return _.isString(jsonRouteValue);
     }
 
-    private _parseChildrenRoutes(jsonRoute: any, route: RouterCore.Route, module: BaseModule): RouterCore.Route[] {
+    private _parseChildrenRoutes(jsonRoute: any, route: RouterCore.Route, module: Module): RouterCore.Route[] {
         let childrenRoutes: RouterCore.Route[] = [];
         Object.keys(jsonRoute).forEach((key: string) => {
             // all endpoints definitions begin with a slash
@@ -106,7 +106,7 @@ export class TediRouter implements RouterCore.Router {
                 let childRoute: RouterCore.Route;
                 // if we"re deling with a module (string value)
                 if (this._isModule(childJsonRouteValue)) {
-                    childRoute = this._parseModuleRoute(route, childRoutePath, module.getDependency<BaseModule>(childJsonRouteValue));
+                    childRoute = this._parseModuleRoute(route, childRoutePath, module.getDependency<Module>(childJsonRouteValue));
                 } else {
                     childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
                 }

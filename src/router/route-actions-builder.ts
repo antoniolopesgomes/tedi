@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import {
     tedi,
     RouteAction, RouteActions, RouteActionsBuilder,
-    BaseModule,
+    Module,
     HTTP_METHODS_NAMES,
     ControllerHelper,
 } from "../core";
@@ -16,7 +16,7 @@ const CONTROL_HELPER = new ControllerHelper();
 @tedi.service()
 export class TediRouteActionsBuilder implements RouteActionsBuilder {
 
-    public build(jsonRoute: any, module: BaseModule): RouteActions {
+    public build(jsonRoute: any, module: Module): RouteActions {
         let routeActions = <RouteActions>{};
         Object.keys(JSON_HTTP_METHOD_KEYS).forEach(httpMethodName => {
             routeActions[httpMethodName] = this._parseRouteAction(httpMethodName, jsonRoute, module);
@@ -24,12 +24,12 @@ export class TediRouteActionsBuilder implements RouteActionsBuilder {
         return routeActions;
     }
 
-    private _parseRouteAction(method: string, jsonRoute: any, module: BaseModule): RouteAction {
+    private _parseRouteAction(method: string, jsonRoute: any, module: Module): RouteAction {
         return this._parseRouteActionFromArray(method, jsonRoute, module) ||
             this._parseRouteActionFromController(method, jsonRoute, module);
     }
 
-    private _parseRouteActionFromArray(httpMethodName: string, jsonRoute: any, module: BaseModule): RouteAction {
+    private _parseRouteActionFromArray(httpMethodName: string, jsonRoute: any, module: Module): RouteAction {
         let routeAction = <string[]>jsonRoute[httpMethodName];
 
         if (!routeAction) {
@@ -55,7 +55,7 @@ export class TediRouteActionsBuilder implements RouteActionsBuilder {
         };
     }
 
-    private _parseRouteActionFromController(httpMethodName: string, jsonRoute: any, module: BaseModule): RouteAction {
+    private _parseRouteActionFromController(httpMethodName: string, jsonRoute: any, module: Module): RouteAction {
         let controllerToken: any = jsonRoute[JSON_CONTROLLER_KEY];
         if (!controllerToken) {
             return undefined;

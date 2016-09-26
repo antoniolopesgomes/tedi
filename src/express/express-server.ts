@@ -4,7 +4,7 @@ import * as http from "http";
 import {
     tedi,
     Logger,
-    BaseModule,
+    Module,
     dependency,
     Config,
     Promise,
@@ -15,7 +15,7 @@ import { TediRouter, TediRouteActionsBuilder } from "../router";
 import { ExpressAppBuilder } from "./express-app-builder";
 
 @tedi.service()
-export class ExpressServer extends BaseModule {
+export class ExpressServer extends Module {
 
     private _server: http.Server;
     private _app: express.Application;

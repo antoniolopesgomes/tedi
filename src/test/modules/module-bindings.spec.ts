@@ -1,13 +1,13 @@
-import {BaseModule, tedi} from "../../core";
+import {Module, tedi} from "../../core";
 
 describe("Module bindings", () => {
 
-    class SimpleModule extends BaseModule {
+    class SimpleModule extends Module {
         init() { return; }
     }
 
     describe("when we have a module", () => {
-        let module: BaseModule;
+        let module: Module;
         beforeEach(() => {
             module = new SimpleModule();
         });

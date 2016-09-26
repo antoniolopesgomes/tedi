@@ -1,4 +1,4 @@
-import { BaseModule } from "./shared";
+import { Module } from "./shared";
 import { ModuleError } from "./shared";
 import { getClassName } from "../utils";
 
@@ -18,10 +18,10 @@ export class ModuleHelper {
         return Reflect.getMetadata(METADATA_KEY, target);
     }
 
-    validateInstance(instance: BaseModule): void {
+    validateInstance(instance: Module): void {
         // check if it was valid metadata
-        if (!(instance instanceof BaseModule)) {
-            throw new ModuleError(instance, `must be an instance of ${getClassName(BaseModule)}`);
+        if (!(instance instanceof Module)) {
+            throw new ModuleError(instance, `must be an instance of ${getClassName(Module)}`);
         }
         if (!this.getMetadata((<Object>instance).constructor)) {
             throw new ModuleError(instance, "must be decorated with @Module");

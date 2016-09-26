@@ -1,4 +1,4 @@
-import {tedi, BaseModule, Logger} from "../../core";
+import {tedi, Module, Logger} from "../../core";
 import {ExpressServer} from "../../express";
 
 describe("inject decorator", () => {
@@ -16,7 +16,7 @@ describe("inject decorator", () => {
         }
     }
 
-    class DummyModule extends BaseModule {
+    class DummyModule extends Module {
         init() {
             this
                 .setJsonRoutes({
@@ -43,10 +43,10 @@ describe("inject decorator", () => {
 
     describe("when we request the DummyController dependency", () => {
         let dummyController: DummyController;
-        let dummyModule: BaseModule;
+        let dummyModule: Module;
         beforeEach(() => {
             spyOn(server.getDependency<Logger>("Logger"), "warn");
-            dummyModule = server.getDependency<BaseModule>("DummyModule");
+            dummyModule = server.getDependency<Module>("DummyModule");
             dummyController = dummyModule.getDependency(DummyController);
             dummyController.get();
         });
