@@ -1,6 +1,6 @@
 "use strict";
 import { keys } from "lodash";
-import { injectable } from "../di";
+import { InjectableDecorator } from "../di/decorators";
 import { TediError } from "../errors";
 import { HttpMethods, HTTP_METHODS_NAMES } from "../http";
 import { getClassName } from "../utils";
@@ -26,7 +26,7 @@ let controllerDecorator = <ControllerDecorator> function () {
         if (controllerHelper.getMetadata(target)) {
             throw new ControllerDecoratorError(target, "Class was alredy decorated");
         }
-        injectable()(<any> target);
+        InjectableDecorator()(<any> target);
         controllerHelper.setMetadata(target, <ControllerMetadata>{
             className: getClassName(target),
         });
@@ -38,5 +38,5 @@ keys(HTTP_METHODS_NAMES).forEach(httpMethodName => {
 });
 
 /* tslint:disable */
-export const Controller = controllerDecorator;
+export const ControllerDecorator = controllerDecorator;
 /* tslint:enable */

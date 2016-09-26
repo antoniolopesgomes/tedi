@@ -3,7 +3,7 @@ import * as express from "express";
 
 import * as bodyParser from "body-parser";
 import { ExpressServer, ExpressMiddlewareFilter } from "../../express";
-import { dependency, BaseFilter, tedi } from "../../core";
+import { dependency, Filter, tedi } from "../../core";
 
 describe("ExpressMiddlewareFilter", () => {
 
@@ -49,7 +49,7 @@ describe("ExpressMiddlewareFilter", () => {
                 .catch((error: any) => done.fail(error));
         });
         it("should have called filter#apply", () => {
-            expect(server.getDependency<BaseFilter<any>>("jsonBodyParser").apply).toHaveBeenCalled();
+            expect(server.getDependency<Filter<any>>("jsonBodyParser").apply).toHaveBeenCalled();
         });
         it("should have called controller", () => {
             expect(server.getDependency(DummyController).post).toHaveBeenCalled();

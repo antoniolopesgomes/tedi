@@ -1,5 +1,5 @@
 "use strict";
-import { injectable } from "../di";
+import { InjectableDecorator } from "../di/decorators";
 import { TediError } from "../errors";
 import { getClassName } from "../utils";
 import { ServiceHelper, ServiceMetadata } from "./helper";
@@ -16,18 +16,14 @@ export class ServiceDecoratorError extends TediError {
 
 let serviceHelper = new ServiceHelper();
 
-function ServiceDecorator(): ClassDecorator {
+export function ServiceDecorator(): ClassDecorator {
     return function (target: Object) {
         if (serviceHelper.getMetadata(target)) {
             throw new ServiceDecoratorError(target, "Failed to decorate class");
         }
-        injectable()(<any> target);
+        InjectableDecorator()(<any> target);
         serviceHelper.setMetadata(target, <ServiceMetadata> {
             className: getClassName(target),
         });
     };
 }
-
-/* tslint:disable */
-export const Service = <() => ClassDecorator> ServiceDecorator;
-/* tslint:enable */

@@ -1,6 +1,6 @@
 "use strict";
-import { BaseFilter } from "./filter";
-import { BaseErrorHandler } from "./error-handler";
+import { Filter } from "./filter";
+import { ErrorHandler } from "./error-handler";
 import { BaseModule } from "./module";
 import { TediError } from "../core";
 import { HttpMethods } from "../core/http";
@@ -18,12 +18,12 @@ export interface RouteActionsBuilder {
 
 export interface RouteFilter {
     name: string;
-    filter: BaseFilter<any>;
+    filter: Filter<any>;
 }
 
 export interface RouteErrorHandler {
     name: string;
-    errorHandler: BaseErrorHandler;
+    errorHandler: ErrorHandler;
 }
 
 export interface Route {

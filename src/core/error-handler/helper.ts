@@ -1,5 +1,5 @@
 import { isFunction } from "lodash";
-import { BaseErrorHandler, ErrorHandlerError } from "./shared";
+import { ErrorHandler, ErrorHandlerError } from "./shared";
 
 const METADATA_KEY = "tedi:errorHandler";
 
@@ -17,7 +17,7 @@ export class ErrorHandlerHelper {
         return Reflect.getMetadata(METADATA_KEY, target);
     }
 
-    validateInstance(instance: BaseErrorHandler): void {
+    validateInstance(instance: ErrorHandler): void {
         // check if it was valid metadata
         if (!this.getMetadata((<Object>instance).constructor)) {
             throw new ErrorHandlerError(instance, "invalid: must be decorated with @ErrorHandler");

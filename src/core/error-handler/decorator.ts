@@ -1,5 +1,5 @@
 "use strict";
-import { injectable } from "../di";
+import { InjectableDecorator } from "../di/decorators";
 import { TediError } from "../errors";
 import { getClassName } from "../utils";
 import { ErrorHandlerHelper, ErrorHandlerMetadata } from "./helper";
@@ -16,18 +16,14 @@ export class ErrorHandlerDecoratorError extends TediError {
 
 let errorHandlerHelper = new ErrorHandlerHelper();
 
-function ErrorHandlerDecorator(): ClassDecorator {
+export function ErrorHandlerDecorator(): ClassDecorator {
     return function (target: Object) {
         if (errorHandlerHelper.getMetadata(target)) {
             throw new ErrorHandlerDecoratorError(target, "Failed to decorate class");
         }
-        injectable()(<any> target);
+        InjectableDecorator()(<any> target);
         errorHandlerHelper.setMetadata(target, <ErrorHandlerMetadata> {
             className: getClassName(target),
         });
     };
 }
-
-/* tslint:disable */
-export const ErrorHandler = <() => ClassDecorator> ErrorHandlerDecorator;
-/* tslint:enable */

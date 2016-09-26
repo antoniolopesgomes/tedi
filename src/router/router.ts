@@ -3,11 +3,10 @@ import * as _ from "lodash";
 import * as RouterCore from "../core/router";
 import {
     tedi,
-    FilterHelper, BaseFilter,
-    BaseErrorHandler, ErrorHandlerHelper,
+    FilterHelper, Filter,
+    ErrorHandler, ErrorHandlerHelper,
     Logger,
     BaseModule, ModuleHelper,
-    inject,
 } from "../core";
 import {TediRoute} from "../router";
 
@@ -23,8 +22,8 @@ const ERROR_HANDLER_HELPER = new ErrorHandlerHelper();
 export class TediRouter implements RouterCore.Router {
 
     constructor(
-        @inject("Logger") private logger: Logger,
-        @inject("RouteActionsBuilder") private _routeActionsBuilder: RouterCore.RouteActionsBuilder
+        @tedi.inject("Logger") private logger: Logger,
+        @tedi.inject("RouteActionsBuilder") private _routeActionsBuilder: RouterCore.RouteActionsBuilder
     ) { }
 
     public getRootRoute(jsonRoutes: any, module: BaseModule): RouterCore.Route {
@@ -49,7 +48,7 @@ export class TediRouter implements RouterCore.Router {
         }
 
         return filterNames.map<RouterCore.RouteFilter>((name: string) => {
-            let filter = module.getDependency<BaseFilter<any>>(name);
+            let filter = module.getDependency<Filter<any>>(name);
             try {
                 FILTER_HELPER.validateInstance(filter);
             } catch (error) {
@@ -69,7 +68,7 @@ export class TediRouter implements RouterCore.Router {
         }
 
         return errorHandlersNames.map<RouterCore.RouteErrorHandler>((name: string) => {
-            let errorHandler = module.getDependency<BaseErrorHandler>(name);
+            let errorHandler = module.getDependency<ErrorHandler>(name);
             try {
                 ERROR_HANDLER_HELPER.validateInstance(errorHandler);
             } catch (error) {

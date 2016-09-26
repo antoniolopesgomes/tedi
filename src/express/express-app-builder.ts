@@ -4,7 +4,6 @@ import * as express from "express";
 import {
     tedi,
     Router, Route, RouteAction, RouteFilter, RouteErrorHandler,
-    inject,
     Logger,
     BaseModule,
     FilterError,
@@ -16,8 +15,8 @@ import {
 export class ExpressAppBuilder {
 
     constructor(
-        @inject("Logger") private _logger: Logger,
-        @inject("Router") private _router: Router
+        @tedi.inject("Logger") private _logger: Logger,
+        @tedi.inject("Router") private _router: Router
     ) {
     }
 

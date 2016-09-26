@@ -1,4 +1,4 @@
-import { BaseModule } from "./base-module";
+import { BaseModule } from "./shared";
 import { ModuleError } from "./shared";
 import { getClassName } from "../utils";
 

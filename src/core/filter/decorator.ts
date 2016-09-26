@@ -1,5 +1,5 @@
 "use strict";
-import { injectable } from "../di";
+import { InjectableDecorator } from "../di/decorators";
 import { getClassName } from "../utils";
 import { TediError } from "../errors";
 import { FilterHelper, FilterMetadata } from "./helper";
@@ -16,18 +16,14 @@ export class FilterDecoratorError extends TediError {
 
 let filterHelper = new FilterHelper();
 
-function FilterDecorator(): ClassDecorator {
+export function FilterDecorator(): ClassDecorator {
     return function (target: Object) {
         if (filterHelper.getMetadata(target)) {
             throw new FilterDecoratorError(target, "Failed to decorate class");
         }
-        injectable()(<any> target);
+        InjectableDecorator()(<any> target);
         filterHelper.setMetadata(target, <FilterMetadata> {
             className: getClassName(target),
         });
     };
 }
-
-/* tslint:disable */
-export const Filter = <() => ClassDecorator> FilterDecorator;
-/* tslint:enable */

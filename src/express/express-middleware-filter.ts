@@ -1,10 +1,10 @@
 import * as express from "express";
 import * as Promise from "bluebird";
 
-import {BaseFilter, tedi} from "../core";
+import {Filter, tedi} from "../core";
 
 @tedi.filter()
-export class ExpressMiddlewareFilter implements BaseFilter<any> {
+export class ExpressMiddlewareFilter implements Filter<any> {
 
     constructor(
         private _requestHandler: express.RequestHandler

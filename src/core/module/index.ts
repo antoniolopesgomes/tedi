@@ -1,2 +1,2 @@
-export * from "./base-module";
+export * from "./shared";
 export * from "./helper";

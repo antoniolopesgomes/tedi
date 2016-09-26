@@ -1,6 +1,5 @@
 export * from "./service";
 export * from "./controller";
-export * from "./di";
 export * from "./error-handler";
 export * from "./filter";
 export * from "./module";
@@ -13,19 +12,23 @@ export * from "./promises";
 export * from "./errors";
 export * from "./interfaces";
 export * from "./utils";
+export * from "./di";
 
 // DECORATORS
 
-import {Controller, ControllerDecorator} from "./controller/decorator";
-import {Filter} from "./filter/decorator";
-import {ErrorHandler} from "./error-handler/decorator";
-import {Service} from "./service/decorator";
-import {Module} from "./module/decorator";
+import { ControllerDecorator } from "./controller/decorator";
+import { FilterDecorator } from "./filter/decorator";
+import { ErrorHandlerDecorator } from "./error-handler/decorator";
+import { ServiceDecorator } from "./service/decorator";
+import { ModuleDecorator } from "./module/decorator";
+import { InjectDecorator } from "./di/decorators";
+import { DIToken } from "./di/shared";
 
 export const tedi = {
-    controller: Controller,
-    filter: Filter,
-    errorHandler: ErrorHandler,
-    service: Service,
-    module: Module,
+    controller: ControllerDecorator,
+    filter: FilterDecorator,
+    errorHandler: ErrorHandlerDecorator,
+    service: ServiceDecorator,
+    module: ModuleDecorator,
+    inject: InjectDecorator,
 };

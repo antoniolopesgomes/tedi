@@ -1,5 +1,5 @@
 import { isFunction } from "lodash";
-import { BaseFilter, FilterError } from "./shared";
+import { Filter, FilterError } from "./shared";
 
 const METADATA_KEY = "tedi:filter";
 
@@ -17,7 +17,7 @@ export class FilterHelper {
         return Reflect.getMetadata(METADATA_KEY, target);
     }
 
-    validateInstance(instance: BaseFilter<any>): void {
+    validateInstance(instance: Filter<any>): void {
         // check if instance class has valid metadata
         if (!this.getMetadata((<Object> instance).constructor)) {
             throw new FilterError(instance, "must be decorated with @Filter");

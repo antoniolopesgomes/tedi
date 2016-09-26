@@ -4,9 +4,9 @@ import * as express from "express";
 import {
     tedi,
     dependency,
-    BaseFilter,
+    Filter,
     FilterError,
-    BaseErrorHandler,
+    ErrorHandler,
     ActionError,
     Logger, LoggerLevels,
 } from "../../core";
@@ -30,13 +30,13 @@ describe("ExpressServer", () => {
     }
 
     @tedi.filter()
-    class CustomFilter implements BaseFilter<any> {
+    class CustomFilter implements Filter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
 
     @tedi.errorHandler()
-    class CustomErrorHandler implements BaseErrorHandler {
+    class CustomErrorHandler implements ErrorHandler {
         catch(err: any) {
             throw err;
         }
@@ -131,11 +131,11 @@ describe("ExpressServer", () => {
             });
 
             it("should have called the right filters", () => {
-                expect(server.getDependency<BaseFilter<any>>("RootFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("LoginFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("AfterLoginFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("UserFilter").apply).not.toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("AfterLoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("UserFilter").apply).not.toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
             });
 
         });
@@ -162,10 +162,10 @@ describe("ExpressServer", () => {
             });
 
             it("should have called the right filters", () => {
-                expect(server.getDependency<BaseFilter<any>>("RootFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("LoginFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("UserFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<BaseFilter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("UserFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
             });
 
         });
@@ -245,13 +245,13 @@ describe("ExpressServer", () => {
                         .catch((error) => done.fail(error));
                 });
                 it("loginErrorHandler #catch should have been called", () => {
-                    expect(server.getDependency<BaseErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<ErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
                 });
                 it("catchedError should be an ActionError", () => {
                     expect(catchedError).toEqual(jasmine.any(ActionError));
                 });
                 it("authErrorHandler #catch should not have been called", () => {
-                    expect(server.getDependency<BaseErrorHandler>("AuthErrorHandler").catch).not.toHaveBeenCalled();
+                    expect(server.getDependency<ErrorHandler>("AuthErrorHandler").catch).not.toHaveBeenCalled();
                 });
             });
             describe("and only RootErrorHandler handles it", () => {
@@ -281,10 +281,10 @@ describe("ExpressServer", () => {
                         .catch((error) => done.fail(error));
                 });
                 it("all error handlers should be called", () => {
-                    expect(server.getDependency<BaseErrorHandler>("AfterLoginErrorHandler").catch).toHaveBeenCalled();
-                    expect(server.getDependency<BaseErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
-                    expect(server.getDependency<BaseErrorHandler>("AuthErrorHandler").catch).toHaveBeenCalled();
-                    expect(server.getDependency<BaseErrorHandler>("RootErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<ErrorHandler>("AfterLoginErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<ErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<ErrorHandler>("AuthErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<ErrorHandler>("RootErrorHandler").catch).toHaveBeenCalled();
                 });
                 it("error handlers should have been called in the right order", () => {
                     expect(errorHandlers).toEqual([
@@ -336,7 +336,7 @@ describe("ExpressServer", () => {
 
             });
             it("filter should have responded", () => {
-                expect(server.getDependency<BaseFilter<any>>("LoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
                 expect(response.text).toEqual("HIJACKED");
             });
             it("server logger should warn about it", () => {

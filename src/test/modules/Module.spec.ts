@@ -3,7 +3,7 @@ import * as express from "express";
 import * as request from "supertest-as-promised";
 import {ExpressServer} from "../../express";
 import {
-    BaseFilter,
+    Filter,
     BaseModule,
     tedi,
     dependency,
@@ -22,7 +22,7 @@ describe("Modules", () => {
     }
 
     @tedi.filter()
-    class CustomFilter2 implements BaseFilter<any> {
+    class CustomFilter2 implements Filter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
@@ -82,7 +82,7 @@ describe("Modules", () => {
             });
 
             it("should have called the module auth.RootFilter", () => {
-                expect(authModule.getDependency<BaseFilter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(authModule.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
             });
         });
 

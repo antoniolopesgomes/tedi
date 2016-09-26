@@ -1,8 +1,8 @@
 import {
     tedi,
     Route, RouteError,
-    BaseFilter, FilterError,
-    BaseErrorHandler, ErrorHandlerError,
+    Filter, FilterError,
+    ErrorHandler, ErrorHandlerError,
     BaseModule,
     dependency,
 } from "../../core";
@@ -24,13 +24,13 @@ describe("BaseRouter", () => {
     }
 
     @tedi.filter()
-    class SimpleFilter implements BaseFilter<any> {
+    class SimpleFilter implements Filter<any> {
         apply(): void { return; }
         getDataFromRequest(): any { return; }
     }
 
     @tedi.errorHandler()
-    class SimpleErrorHandler implements BaseErrorHandler {
+    class SimpleErrorHandler implements ErrorHandler {
         catch(): void { return; }
     }
 
@@ -178,7 +178,7 @@ describe("BaseRouter", () => {
 
         describe("when filter is wrongly decorated", () => {
             @tedi.service()
-            class NotDecoratedFilter implements BaseFilter<any> {
+            class NotDecoratedFilter implements Filter<any> {
                 apply(): any { return; }
                 getDataFromRequest(): any { return; }
             }

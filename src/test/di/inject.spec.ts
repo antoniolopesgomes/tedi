@@ -1,4 +1,4 @@
-import {tedi, inject, BaseModule, Logger} from "../../core";
+import {tedi, BaseModule, Logger} from "../../core";
 import {ExpressServer} from "../../express";
 
 describe("inject decorator", () => {
@@ -8,7 +8,7 @@ describe("inject decorator", () => {
     @tedi.controller()
     class DummyController {
         constructor(
-            @inject("Logger") private _logger: Logger
+            @tedi.inject("Logger") private _logger: Logger
         ) { }
         @tedi.controller.get()
         get(): void {

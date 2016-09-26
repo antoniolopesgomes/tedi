@@ -2,7 +2,7 @@ import * as express from "express";
 import { TediError } from "../errors";
 import { getClassName } from "../utils";
 
-export interface BaseErrorHandler {
+export interface ErrorHandler {
     catch(error: any, req: express.Request, res: express.Response): void;
 }
 
