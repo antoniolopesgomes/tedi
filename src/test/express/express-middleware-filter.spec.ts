@@ -3,7 +3,8 @@ import * as express from "express";
 
 import * as bodyParser from "body-parser";
 import { ExpressServer, ExpressMiddlewareFilter } from "../../express";
-import { dependency, Filter, tedi } from "../../core";
+import * as core from "../../core";
+import { Injectable } from "../../decorators";
 
 describe("ExpressMiddlewareFilter", () => {
 
@@ -11,7 +12,7 @@ describe("ExpressMiddlewareFilter", () => {
     let server: ExpressServer;
     let payloadString = "this is a dummy payload";
 
-    @tedi.controller()
+    @Injectable()
     class DummyController {
         post(): void { return; }
     }
@@ -26,8 +27,8 @@ describe("ExpressMiddlewareFilter", () => {
                 },
             })
             .dependencies(
-            DummyController,
-            dependency("jsonBodyParser", { value: new ExpressMiddlewareFilter(jsonBodyParser) })
+                DummyController,
+                core.dependency("jsonBodyParser", { value: new ExpressMiddlewareFilter(jsonBodyParser) })
             );
     });
 
@@ -49,7 +50,7 @@ describe("ExpressMiddlewareFilter", () => {
                 .catch((error: any) => done.fail(error));
         });
         it("should have called filter#apply", () => {
-            expect(server.getDependency<Filter<any>>("jsonBodyParser").apply).toHaveBeenCalled();
+            expect(server.getDependency<core.Filter<any>>("jsonBodyParser").apply).toHaveBeenCalled();
         });
         it("should have called controller", () => {
             expect(server.getDependency(DummyController).post).toHaveBeenCalled();

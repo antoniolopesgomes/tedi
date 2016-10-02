@@ -1,5 +1,6 @@
 import * as winston from "winston";
-import {Logger, LoggerLevels, tedi} from "../core";
+import { Logger, LoggerLevels } from "../core";
+import { Injectable } from "../decorators";
 
 export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args) => Logger {
 
@@ -9,7 +10,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
         ],
     };
 
-    @tedi.service()
+    @Injectable()
     class WinstonLogger implements Logger {
 
         private _logger: winston.LoggerInstance;
@@ -17,7 +18,7 @@ export function WinstonLoggerFactory(cfg?: winston.LoggerOptions): new (...args)
         constructor() {
             this._logger = new winston.Logger(cfg);
             // set syslog levels
-            this._logger.setLevels((<any> winston).config.syslog.levels);
+            this._logger.setLevels((<any>winston).config.syslog.levels);
             this.setLevel(LoggerLevels.INFO);
         }
 

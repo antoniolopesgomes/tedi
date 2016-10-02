@@ -1,37 +1,42 @@
 import * as _ from "lodash";
 
-import * as RouterCore from "../core/router";
 import {
-    tedi,
-    FilterHelper, Filter,
-    ErrorHandler, ErrorHandlerHelper,
     Logger,
-    Module, ModuleHelper,
+    Router,
+    RouteActionsBuilder,
+    Module,
+    Route,
+    RouteFilter,
+    RouteError,
+    RouteErrorHandler,
+    ErrorHandler,
+    Filter,
+    validateFilter, validateErrorHandler, validateModule,
 } from "../core";
-import {TediRoute} from "../router";
+
+import { getClassName } from "../core/utils";
+import { Injectable, Inject } from "../decorators";
+import { TediRoute } from "./route";
 
 const ROUTER_WORDS: any = {
     "FILTERS": "$filters",
     "ERROR_HANDLERS": "$errorHandlers",
 };
-const MODULE_HELPER = new ModuleHelper();
-const FILTER_HELPER = new FilterHelper();
-const ERROR_HANDLER_HELPER = new ErrorHandlerHelper();
 
-@tedi.service()
-export class TediRouter implements RouterCore.Router {
+@Injectable()
+export class TediRouter implements Router {
 
     constructor(
-        @tedi.inject("Logger") private logger: Logger,
-        @tedi.inject("RouteActionsBuilder") private _routeActionsBuilder: RouterCore.RouteActionsBuilder
+        @Inject("Logger") private logger: Logger,
+        @Inject("RouteActionsBuilder") private _routeActionsBuilder: RouteActionsBuilder
     ) { }
 
-    public getRootRoute(jsonRoutes: any, module: Module): RouterCore.Route {
+    public getRootRoute(jsonRoutes: any, module: Module): Route {
         return this._parseJsonRoute("/", jsonRoutes, module);
     }
 
-    private _parseJsonRoute(path: string, jsonRoute: any, module: Module): RouterCore.Route {
-        let route: RouterCore.Route = new TediRoute(path);
+    private _parseJsonRoute(path: string, jsonRoute: any, module: Module): Route {
+        let route: Route = new TediRoute(path);
 
         route.filters = this._parseRouteFilters(route, jsonRoute[ROUTER_WORDS.FILTERS], module);
         route.errorHandlers = this._parseRouteErrorHandlers(route, jsonRoute[ROUTER_WORDS.ERROR_HANDLERS], module);
@@ -41,52 +46,56 @@ export class TediRouter implements RouterCore.Router {
         return route;
     }
 
-    private _parseRouteFilters(route: RouterCore.Route, filterNames: string[], module: Module): RouterCore.RouteFilter[] {
+    private _parseRouteFilters(route: Route, filterNames: string[], module: Module): RouteFilter[] {
 
         if (!_.isArray(filterNames)) {
             return [];
         }
 
-        return filterNames.map<RouterCore.RouteFilter>((name: string) => {
+        return filterNames.map<RouteFilter>((name: string) => {
             let filter = module.getDependency<Filter<any>>(name);
             try {
-                FILTER_HELPER.validateInstance(filter);
+                validateFilter(filter);
             } catch (error) {
-                throw new RouterCore.RouteError(route, `Invalid filter: "${name}"`, error);
+                throw new RouteError(route, `Invalid filter: "${name}"`, error);
             }
-            return <RouterCore.RouteFilter> {
+            return <RouteFilter> {
                 filter: filter,
                 name: name,
             };
         });
     }
 
-    private _parseRouteErrorHandlers(route: RouterCore.Route, errorHandlersNames: string[], module: Module): RouterCore.RouteErrorHandler[] {
+    private _parseRouteErrorHandlers(
+        route: Route,
+        errorHandlersNames: string[],
+        module: Module
+    ): RouteErrorHandler[] {
 
         if (!_.isArray(errorHandlersNames)) {
             return [];
         }
 
-        return errorHandlersNames.map<RouterCore.RouteErrorHandler>((name: string) => {
+        return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
             let errorHandler = module.getDependency<ErrorHandler>(name);
             try {
-                ERROR_HANDLER_HELPER.validateInstance(errorHandler);
+                validateErrorHandler(errorHandler);
             } catch (error) {
-                throw new RouterCore.RouteError(route, `Could not validate errorHandler "${name}"`, error);
+                throw new RouteError(route, `Could not validate errorHandler "${name}"`, error);
             }
-            return <RouterCore.RouteErrorHandler>{
+            return <RouteErrorHandler> {
                 errorHandler: errorHandler,
                 name: name,
             };
         });
     }
 
-    private _parseModuleRoute(route: RouterCore.Route, path: string, module: Module): RouterCore.Route {
+    private _parseModuleRoute(route: Route, path: string, module: Module): Route {
 
         try {
-            MODULE_HELPER.validateInstance(module);
+            validateModule(module);
         } catch (error) {
-            throw new RouterCore.RouteError(route, `Could not validate module "${name}"`, error);
+            throw new RouteError(route, `Invalid module "${getClassName(module)}"`, error);
         }
 
         return this._parseJsonRoute(path, module.getJsonRoutes(), module);
@@ -96,17 +105,18 @@ export class TediRouter implements RouterCore.Router {
         return _.isString(jsonRouteValue);
     }
 
-    private _parseChildrenRoutes(jsonRoute: any, route: RouterCore.Route, module: Module): RouterCore.Route[] {
-        let childrenRoutes: RouterCore.Route[] = [];
+    private _parseChildrenRoutes(jsonRoute: any, route: Route, module: Module): Route[] {
+        let childrenRoutes: Route[] = [];
         Object.keys(jsonRoute).forEach((key: string) => {
             // all endpoints definitions begin with a slash
             if (key.indexOf("/") === 0) {
                 let childJsonRouteValue = jsonRoute[key];
                 let childRoutePath = normalizePath(route.path + key);
-                let childRoute: RouterCore.Route;
+                let childRoute: Route;
                 // if we"re deling with a module (string value)
                 if (this._isModule(childJsonRouteValue)) {
-                    childRoute = this._parseModuleRoute(route, childRoutePath, module.getDependency<Module>(childJsonRouteValue));
+                    let childModule = module.getDependency<Module>(childJsonRouteValue);
+                    childRoute = this._parseModuleRoute(route, childRoutePath, childModule);
                 } else {
                     childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
                 }

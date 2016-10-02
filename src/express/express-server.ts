@@ -1,49 +1,38 @@
 import * as express from "express";
 import * as http from "http";
 
-import {
-    tedi,
-    Logger,
-    Module,
-    dependency,
-    Config,
-    Promise,
-} from "../core";
+import * as core from "../core";
+import { Injectable } from "../decorators";
 
 import { WinstonLoggerFactory } from "../logger/winston-logger";
 import { TediRouter, TediRouteActionsBuilder } from "../router";
 import { ExpressAppBuilder } from "./express-app-builder";
 
-@tedi.service()
-export class ExpressServer extends Module {
+@Injectable()
+export class ExpressServer extends core.Module {
 
     private _server: http.Server;
     private _app: express.Application;
 
     constructor() {
         super();
+        this.dependencies(
+            core.dependency("Server", { value: this }),
+            core.dependency("ExpressAppBuilder", { class: ExpressAppBuilder }),
+            core.dependency("Router", { class: TediRouter }),
+            core.dependency("RouteActionsBuilder", { class: TediRouteActionsBuilder }),
+            core.dependency("Logger", { class: WinstonLoggerFactory() }),
+            core.dependency("Config", { value: { port: 8080 } })
+        );
     }
 
-    public init(): void {
-        // set dependencies
-        this
-            .dependencies(
-                dependency("Server", { value: this }),
-                dependency("ExpressAppBuilder", { class: ExpressAppBuilder }),
-                dependency("Router", { class: TediRouter }),
-                dependency("RouteActionsBuilder", { class: TediRouteActionsBuilder }),
-                dependency("Logger", { class: WinstonLoggerFactory() }),
-                dependency("Config", { value: { port: 8080 } })
-            );
-    }
-
-    public setConfig(config: Config): ExpressServer {
-        this.setDependency(dependency("Config", { value: config }));
+    public setConfig(config: core.Config): ExpressServer {
+        this.setDependency(core.dependency("Config", { value: config }));
         return this;
     }
 
-    public getConfig(): Config {
-        return this.getDependency<Config>("Config");
+    public getConfig(): core.Config {
+        return this.getDependency<core.Config>("Config");
     }
 
     public getApp(): express.Application {
@@ -56,8 +45,8 @@ export class ExpressServer extends Module {
     }
 
     public run(): Promise<http.Server> {
-        let config = this.getDependency<Config>("Config");
-        let logger = this.getDependency<Logger>("Logger");
+        let config = this.getDependency<core.Config>("Config");
+        let logger = this.getDependency<core.Logger>("Logger");
         return new Promise<http.Server>((resolve, reject) => {
             this._server = this.getApp().listen(config.port, (error) => {
                 return error ? reject(error) : resolve(this._server);
@@ -69,7 +58,7 @@ export class ExpressServer extends Module {
     }
 
     public stop(): Promise<any> {
-        let logger = this.getDependency<Logger>("Logger");
+        let logger = this.getDependency<core.Logger>("Logger");
         return new Promise((resolve, reject) => {
             if (!this._server) {
                 logger.debug("#stop called but no running server exists");

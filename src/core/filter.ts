@@ -1,10 +1,17 @@
+import { isFunction } from "lodash";
 import * as express from "express";
-import { TediError } from "../errors";
-import { getClassName } from "../utils";
+import { TediError } from "./tedi-error";
+import { getClassName } from "./utils";
 
 export interface Filter<T> {
     apply(req: express.Request, res: express.Response): any;
     getDataFromRequest(req: express.Request): T;
+}
+
+export function validateFilter(instance: Filter<any>): void {
+    if (!isFunction(instance.apply) || !isFunction(instance.getDataFromRequest)) {
+        throw new FilterError(instance, "invalid: must implement Filter");
+    }
 }
 
 export class FilterError extends TediError {

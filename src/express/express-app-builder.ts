@@ -2,21 +2,26 @@ import * as _ from "lodash";
 import * as express from "express";
 
 import {
-    tedi,
-    Router, Route, RouteAction, RouteFilter, RouteErrorHandler,
+    Router,
+    Route,
+    RouteAction,
+    RouteFilter,
+    RouteErrorHandler,
     Logger,
     Module,
     FilterError,
     ActionError,
-    HTTP_METHODS_NAMES,
 } from "../core";
 
-@tedi.service()
+import { HTTP_METHODS_NAMES } from "../core/utils";
+import { Injectable, Inject } from "../decorators";
+
+@Injectable()
 export class ExpressAppBuilder {
 
     constructor(
-        @tedi.inject("Logger") private _logger: Logger,
-        @tedi.inject("Router") private _router: Router
+        @Inject("Logger") private _logger: Logger,
+        @Inject("Router") private _router: Router
     ) {
     }
 

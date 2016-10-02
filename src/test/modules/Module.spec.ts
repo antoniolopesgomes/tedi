@@ -1,46 +1,41 @@
 
 import * as express from "express";
 import * as request from "supertest-as-promised";
-import {ExpressServer} from "../../express";
-import {
-    Filter,
-    Module,
-    tedi,
-    dependency,
-    Logger,
-} from "../../core";
+import * as core from "../../core";
+import { Injectable } from "../../decorators";
+import { ExpressServer } from "../../express";
 
 describe("Modules", () => {
 
     let server: ExpressServer;
 
-    @tedi.controller()
+    @Injectable()
     class AuthController {
         get(req, res): void {
             res.status(200).end();
         };
     }
 
-    @tedi.filter()
-    class CustomFilter2 implements Filter<any> {
+    @Injectable()
+    class CustomFilter2 implements core.Filter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
 
-    @tedi.module()
-    class AuthModule extends Module {
-        init(): void {
-            this
-                .setJsonRoutes({
-                    "/login": {
-                        "$filters": ["RootFilter"],
-                        "get": ["AuthController", "get"],
-                    },
-                })
-                .dependencies(
-                    dependency("AuthController", { class: AuthController}),
-                    dependency("RootFilter", { class: CustomFilter2})
-                );
+    @Injectable()
+    class AuthModule extends core.Module {
+        constructor() {
+            super();
+            this.setJsonRoutes({
+                "/login": {
+                    "$filters": ["RootFilter"],
+                    "get": ["AuthController", "get"],
+                },
+            });
+            this.dependencies(
+                core.dependency("AuthController", { class: AuthController }),
+                core.dependency("RootFilter", { class: CustomFilter2 })
+            );
         }
     }
 
@@ -51,7 +46,7 @@ describe("Modules", () => {
     describe("When we got an app with a child module", () => {
         let results: any[] = [];
         let app: express.Application;
-        let authModule: Module;
+        let authModule: core.Module;
 
         beforeEach(() => {
             results.push("_here");
@@ -59,10 +54,10 @@ describe("Modules", () => {
                 .setJsonRoutes({
                     "/auth": "AuthModule",
                 })
-                .setModule("AuthModule", AuthModule);
+                .setModule("AuthModule", new AuthModule());
             // server.component<Logger>("Logger").setLevel(LoggerLevels.DEBUG);
             app = server.getApp();
-            authModule = server.getDependency<Module>("AuthModule");
+            authModule = server.getDependency<core.Module>("AuthModule");
         });
 
         describe("/auth/login", () => {
@@ -82,7 +77,7 @@ describe("Modules", () => {
             });
 
             it("should have called the module auth.RootFilter", () => {
-                expect(authModule.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(authModule.getDependency<core.Filter<any>>("RootFilter").apply).toHaveBeenCalled();
             });
         });
 
@@ -91,11 +86,11 @@ describe("Modules", () => {
                 expect(authModule).toEqual(jasmine.any(AuthModule));
             });
             it("childModule should have access to root module dependencies", () => {
-                expect(authModule.getDependency<Logger>("Logger")).not.toBeNull();
+                expect(authModule.getDependency<core.Logger>("Logger")).not.toBeNull();
             });
 
             describe("and override an internal component", () => {
-                @tedi.controller()
+                @Injectable()
                 class CustomAuthController {
                     get(req, res): void {
                         res.status(200).end();
@@ -103,7 +98,7 @@ describe("Modules", () => {
                 }
                 beforeEach(() => {
                     authModule.dependencies(
-                        dependency("AuthController", { class: CustomAuthController})
+                        core.dependency("AuthController", { class: CustomAuthController })
                     );
                 });
                 it("should have overrided AuthController", () => {

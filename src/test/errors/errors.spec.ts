@@ -1,5 +1,6 @@
 
-import {TediError} from "../../core";
+import { TediError } from "../../core";
+import { getClassName } from "../../core/utils";
 
 class TestError extends TediError {
     constructor(msg: string, error: any) {
@@ -8,21 +9,44 @@ class TestError extends TediError {
 }
 
 describe("CustomError", () => {
-
-    it("should work", (done: DoneFn) => {
+    let customError: TediError;
+    let plainError: Error;
+    let plainErrorMessage = "plain error message";
+    let customErrorMessage = "custom error message";
+    beforeEach((done: DoneFn) => {
         try {
             try {
-                throw new Error("Test!");
+                plainError = new Error(plainErrorMessage);
+                throw plainError;
             } catch (err) {
-                throw new TestError("Custom Error", err);
+                throw new TestError(customErrorMessage, err);
             }
         } catch (err) {
-            expect(err).toEqual(jasmine.any(TestError));
-            let errorStack = (<Error> err).stack;
-            expect(errorStack).toContain("TestError: Custom Error");
-            expect(errorStack).toContain("Caused By: Error: Test!");
+            customError = err;
             done();
         }
+    });
+
+    it("should be the expected type", () => {
+        expect(customError).toEqual(jasmine.any(TestError));
+    });
+    it("stack should be valid", () => {
+        let errorStack = customError.stack;
+        expect(errorStack).toContain(`TestError: ${customErrorMessage}`);
+        expect(errorStack).toContain(`Caused By: Error: ${plainErrorMessage}`);
+    });
+    it("message stack should be valid", () => {
+        expect(customError.messageStack).toEqual([
+            `${getClassName(TestError)}: ${customErrorMessage}`,
+            `${getClassName(Error)}: ${plainErrorMessage}`,
+        ].join(" -> "));
+    });
+    it("getRootCause should work", () => {
+        expect(customError.getRootCause()).toEqual(plainError);
+    });
+    it("search should work", () => {
+        expect(customError.search(Error)).toEqual(plainError);
+        expect(customError.search(TestError)).toEqual(customError);
     });
 
 });

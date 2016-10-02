@@ -1,23 +1,24 @@
 import * as _ from "lodash";
 
 import {
-    tedi,
-    RouteAction, RouteActions, RouteActionsBuilder,
+    RouteAction,
+    RouteActions,
+    RouteActionsBuilder,
     Module,
-    HTTP_METHODS_NAMES,
-    ControllerHelper,
 } from "../core";
+
+import { HTTP_METHODS_NAMES } from "../core/utils";
+import { Injectable, web } from "../decorators";
 
 const JSON_HTTP_METHOD_KEYS = HTTP_METHODS_NAMES;
 const JSON_CONTROLLER_KEY = "$controller";
-const CONTROL_HELPER = new ControllerHelper();
 
 // TODO test this stuff
-@tedi.service()
+@Injectable()
 export class TediRouteActionsBuilder implements RouteActionsBuilder {
 
     public build(jsonRoute: any, module: Module): RouteActions {
-        let routeActions = <RouteActions>{};
+        let routeActions = <RouteActions> {};
         Object.keys(JSON_HTTP_METHOD_KEYS).forEach(httpMethodName => {
             routeActions[httpMethodName] = this._parseRouteAction(httpMethodName, jsonRoute, module);
         });
@@ -30,7 +31,7 @@ export class TediRouteActionsBuilder implements RouteActionsBuilder {
     }
 
     private _parseRouteActionFromArray(httpMethodName: string, jsonRoute: any, module: Module): RouteAction {
-        let routeAction = <string[]>jsonRoute[httpMethodName];
+        let routeAction = <string[]> jsonRoute[httpMethodName];
 
         if (!routeAction) {
             return undefined;
@@ -62,15 +63,15 @@ export class TediRouteActionsBuilder implements RouteActionsBuilder {
         }
 
         let controller = module.getDependency(controllerToken);
-        let actionMetadata = CONTROL_HELPER.getActionMetadata(httpMethodName, controller);
+        let webMetadata = web.$getMetadata(httpMethodName, controller);
 
-        if (!actionMetadata) {
+        if (!webMetadata) {
             return undefined;
         }
 
         return {
             controller: controller,
-            controllerMethod: actionMetadata.methodName,
+            controllerMethod: webMetadata.methodName,
         };
     }
 

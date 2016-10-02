@@ -1,32 +1,31 @@
-import {tedi, Module, Logger} from "../../core";
-import {ExpressServer} from "../../express";
+import { Module, Logger } from "../../core";
+import { Injectable, Inject, web } from "../../decorators";
+import { ExpressServer } from "../../express";
 
 describe("inject decorator", () => {
 
     const WARN_MSG = "This is a warning message";
 
-    @tedi.controller()
+    @Injectable()
     class DummyController {
         constructor(
-            @tedi.inject("Logger") private _logger: Logger
+            @Inject("Logger") private _logger: Logger
         ) { }
-        @tedi.controller.get()
+        @web.get()
         get(): void {
             this._logger.warn(WARN_MSG);
         }
     }
 
     class DummyModule extends Module {
-        init() {
-            this
-                .setJsonRoutes({
-                    "/dummy": {
-                        "$controller": DummyController,
-                    },
-                })
-                .dependencies(
-                    DummyController
-                );
+        constructor() {
+            super();
+            this.setJsonRoutes({
+                "/dummy": {
+                    "$controller": DummyController,
+                },
+            });
+            this.dependencies(DummyController);
         }
     }
 
@@ -38,7 +37,7 @@ describe("inject decorator", () => {
             .setJsonRoutes({
                 "/api": "DummyModule",
             })
-            .setModule("DummyModule", DummyModule);
+            .setModule("DummyModule", new DummyModule());
     });
 
     describe("when we request the DummyController dependency", () => {

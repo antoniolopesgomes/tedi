@@ -1,21 +1,28 @@
-import {DIModuleError} from "./shared";
-import {Constructor} from "../interfaces";
-import {DependencyInfo} from "./dependency";
+import { TediError } from "../tedi-error";
+import { Constructor } from "../utils";
+import { DependencyInfo } from "./dependency";
 import * as inversify from "inversify";
+
+export class DIModuleError extends TediError {
+    constructor(msg: string, error?: any) {
+        super(`${msg}`, error);
+    }
+}
 
 export class DIModule {
 
-    private _kernel: inversify.interfaces.Kernel;
+    private _kernel: inversify.interfaces.Kernel = new inversify.Kernel();
 
-    constructor(parentDIModule: DIModule) {
-        this._kernel = new inversify.Kernel();
-        if (parentDIModule instanceof DIModule) {
-            (<any> this._kernel).parent = parentDIModule._kernel;
-        }
+    public __setParent(diModule: DIModule): void {
+        (<any> this._kernel).parent = diModule._kernel;
     }
 
     public getDependency<T>(token: any): T {
-        return this._kernel.get<T>(token);
+        try {
+            return this._kernel.get<T>(token);
+        } catch (error) {
+            throw new DIModuleError(error.message);
+        }
     }
 
     public hasDependency(token: any): boolean {
@@ -24,7 +31,7 @@ export class DIModule {
 
     public hasOwnDependency(token: any): boolean {
         // TODO check this!!! 
-        return (<any> this._kernel)._bindingDictionary.hasKey(token);
+        return (<any>this._kernel)._bindingDictionary.hasKey(token);
     }
 
     public removeDependency(token: any): void {
@@ -57,7 +64,7 @@ export class DIModule {
     private _bindDependency<T>(dep: DependencyInfo): void {
 
         if (dep.properties.class) {
-            let concretion = <Constructor<T>> dep.properties.class;
+            let concretion = <Constructor<T>>dep.properties.class;
             // DependencyValidator.validate(concretion);
             let binding = this._kernel.bind(dep.token).to(concretion);
             if (!dep.properties.classIsTransient) {

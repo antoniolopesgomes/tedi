@@ -1,7 +1,8 @@
 import * as request from "supertest-as-promised";
 import * as express from "express";
-import {tedi, dependency} from "../../core";
-import {ExpressServer} from "../../express";
+import * as core from "../../core";
+import { Injectable } from "../../decorators";
+import { ExpressServer } from "../../express";
 
 describe("ExpressServer params", () => {
 
@@ -12,7 +13,7 @@ describe("ExpressServer params", () => {
     });
 
     describe("given a route tree with parameters", () => {
-        @tedi.controller()
+        @Injectable()
         class TestController {
             get(): void { return; }
         }
@@ -30,7 +31,7 @@ describe("ExpressServer params", () => {
                     },
                 })
                 .dependencies(
-                    dependency("TestController", { class: TestController })
+                core.dependency("TestController", { class: TestController })
                 );
         });
 

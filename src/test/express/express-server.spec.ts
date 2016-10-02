@@ -1,22 +1,15 @@
 
 import * as request from "supertest-as-promised";
 import * as express from "express";
-import {
-    tedi,
-    dependency,
-    Filter,
-    FilterError,
-    ErrorHandler,
-    ActionError,
-    Logger, LoggerLevels,
-} from "../../core";
+import * as core from "../../core";
+import { Injectable, web } from "../../decorators";
 import {ExpressServer} from "../../express";
 
 describe("ExpressServer", () => {
 
     let server: ExpressServer;
 
-    @tedi.controller()
+    @Injectable()
     class AuthController {
         login(req, res: express.Response) {
             res.send(req.$thisFilter);
@@ -29,26 +22,26 @@ describe("ExpressServer", () => {
         }
     }
 
-    @tedi.filter()
-    class CustomFilter implements Filter<any> {
+    @Injectable()
+    class CustomFilter implements core.Filter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
 
-    @tedi.errorHandler()
-    class CustomErrorHandler implements ErrorHandler {
+    @Injectable()
+    class CustomErrorHandler implements core.ErrorHandler {
         catch(err: any) {
             throw err;
         }
     }
 
-    @tedi.controller()
+    @Injectable()
     class ControllerClass {
-        @tedi.controller.get()
+        @web.get()
         read(req: express.Request, res: express.Response): void {
             res.status(200).end();
         }
-        @tedi.controller.post()
+        @web.post()
         write(req: express.Request, res: express.Response): void {
             res.status(200).end();
         }
@@ -91,19 +84,19 @@ describe("ExpressServer", () => {
                 .dependencies(
                     AuthController,
                     ControllerClass,
-                    dependency("RootFilter", { class: CustomFilter }),
-                    dependency("LoginFilter", { class: CustomFilter }),
-                    dependency("AfterLoginFilter", { class: CustomFilter }),
-                    dependency("UserFilter", { class: CustomFilter }),
-                    dependency("AdminFilter", { class: CustomFilter }),
-                    dependency("RootErrorHandler", { class: CustomErrorHandler }),
-                    dependency("LoginErrorHandler", { class: CustomErrorHandler }),
-                    dependency("AfterLoginErrorHandler", { class: CustomErrorHandler }),
-                    dependency("AuthErrorHandler", { class: CustomErrorHandler })
+                    core.dependency("RootFilter", { class: CustomFilter }),
+                    core.dependency("LoginFilter", { class: CustomFilter }),
+                    core.dependency("AfterLoginFilter", { class: CustomFilter }),
+                    core.dependency("UserFilter", { class: CustomFilter }),
+                    core.dependency("AdminFilter", { class: CustomFilter }),
+                    core.dependency("RootErrorHandler", { class: CustomErrorHandler }),
+                    core.dependency("LoginErrorHandler", { class: CustomErrorHandler }),
+                    core.dependency("AfterLoginErrorHandler", { class: CustomErrorHandler }),
+                    core.dependency("AuthErrorHandler", { class: CustomErrorHandler })
                 );
 
             expressApp = server.getApp();
-            server.getDependency<Logger>("Logger").setLevel(LoggerLevels.EMERGENCY);
+            server.getDependency<core.Logger>("Logger").setLevel(core.LoggerLevels.EMERGENCY);
         });
 
         describe("GET /auth/login", () => {
@@ -117,7 +110,7 @@ describe("ExpressServer", () => {
                 spyOn(server.getDependency("AfterLoginFilter"), "apply").and.callThrough();
                 spyOn(server.getDependency("AdminFilter"), "apply").and.callThrough();
 
-                server.getDependency<Logger>("Logger").setLevel(LoggerLevels.DEBUG);
+                server.getDependency<core.Logger>("Logger").setLevel(core.LoggerLevels.DEBUG);
 
                 return request(expressApp).get("/auth/login")
                     .expect(200)
@@ -131,11 +124,11 @@ describe("ExpressServer", () => {
             });
 
             it("should have called the right filters", () => {
-                expect(server.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("AfterLoginFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("UserFilter").apply).not.toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("AfterLoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("UserFilter").apply).not.toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
             });
 
         });
@@ -162,10 +155,10 @@ describe("ExpressServer", () => {
             });
 
             it("should have called the right filters", () => {
-                expect(server.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("UserFilter").apply).toHaveBeenCalled();
-                expect(server.getDependency<Filter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("UserFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("AdminFilter").apply).not.toHaveBeenCalled();
             });
 
         });
@@ -245,13 +238,13 @@ describe("ExpressServer", () => {
                         .catch((error) => done.fail(error));
                 });
                 it("loginErrorHandler #catch should have been called", () => {
-                    expect(server.getDependency<ErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<core.ErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
                 });
                 it("catchedError should be an ActionError", () => {
-                    expect(catchedError).toEqual(jasmine.any(ActionError));
+                    expect(catchedError).toEqual(jasmine.any(core.ActionError));
                 });
                 it("authErrorHandler #catch should not have been called", () => {
-                    expect(server.getDependency<ErrorHandler>("AuthErrorHandler").catch).not.toHaveBeenCalled();
+                    expect(server.getDependency<core.ErrorHandler>("AuthErrorHandler").catch).not.toHaveBeenCalled();
                 });
             });
             describe("and only RootErrorHandler handles it", () => {
@@ -281,10 +274,10 @@ describe("ExpressServer", () => {
                         .catch((error) => done.fail(error));
                 });
                 it("all error handlers should be called", () => {
-                    expect(server.getDependency<ErrorHandler>("AfterLoginErrorHandler").catch).toHaveBeenCalled();
-                    expect(server.getDependency<ErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
-                    expect(server.getDependency<ErrorHandler>("AuthErrorHandler").catch).toHaveBeenCalled();
-                    expect(server.getDependency<ErrorHandler>("RootErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<core.ErrorHandler>("AfterLoginErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<core.ErrorHandler>("LoginErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<core.ErrorHandler>("AuthErrorHandler").catch).toHaveBeenCalled();
+                    expect(server.getDependency<core.ErrorHandler>("RootErrorHandler").catch).toHaveBeenCalled();
                 });
                 it("error handlers should have been called in the right order", () => {
                     expect(errorHandlers).toEqual([
@@ -313,14 +306,14 @@ describe("ExpressServer", () => {
                     .catch((error) => done.fail(error));
             });
             it("catchedError should be a FilterError", () => {
-                expect(catchedError).toEqual(jasmine.any(FilterError));
+                expect(catchedError).toEqual(jasmine.any(core.FilterError));
             });
         });
 
         describe("and a login filter responds", () => {
             let response: request.Response;
             beforeEach((done) => {
-                spyOn(server.getDependency<Logger>("Logger"), "warn").and.callThrough();
+                spyOn(server.getDependency<core.Logger>("Logger"), "warn").and.callThrough();
                 spyOn(server.getDependency(AuthController), "login");
                 spyOn(server.getDependency("LoginFilter"), "apply").and.callFake((req, res) => {
                     res.status(200).send("HIJACKED");
@@ -336,11 +329,11 @@ describe("ExpressServer", () => {
 
             });
             it("filter should have responded", () => {
-                expect(server.getDependency<Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
+                expect(server.getDependency<core.Filter<any>>("LoginFilter").apply).toHaveBeenCalled();
                 expect(response.text).toEqual("HIJACKED");
             });
             it("server logger should warn about it", () => {
-                expect(server.getDependency<Logger>("Logger").warn).toHaveBeenCalled();
+                expect(server.getDependency<core.Logger>("Logger").warn).toHaveBeenCalled();
             });
         });
     });

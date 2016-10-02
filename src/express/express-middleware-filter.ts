@@ -1,9 +1,10 @@
 import * as express from "express";
 import * as Promise from "bluebird";
 
-import {Filter, tedi} from "../core";
+import { Filter } from "../core";
+import { Injectable } from "../decorators";
 
-@tedi.filter()
+@Injectable()
 export class ExpressMiddlewareFilter implements Filter<any> {
 
     constructor(

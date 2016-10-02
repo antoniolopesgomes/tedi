@@ -1,4 +1,5 @@
-import {Constructor} from "../interfaces";
+import { Constructor } from "../utils";
+import { DIToken } from "./core";
 
 export interface DependencyProperties {
     value?: any;
@@ -6,7 +7,7 @@ export interface DependencyProperties {
     classIsTransient?: boolean;
 }
 
-export function dependency(token: any, properties?: DependencyProperties): DependencyInfo {
+export function dependency<T>(token: DIToken<T>, properties?: DependencyProperties): DependencyInfo {
     return new DependencyInfo(
         token,
         properties

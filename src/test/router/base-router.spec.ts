@@ -1,16 +1,10 @@
-import {
-    tedi,
-    Route, RouteError,
-    Filter, FilterError,
-    ErrorHandler, ErrorHandlerError,
-    Module,
-    dependency,
-} from "../../core";
+import * as core from "../../core";
+import { Injectable } from "../../decorators";
 import { TediRoute, TediRouter, TediRouteActionsBuilder } from "../../router";
 
 describe("BaseRouter", () => {
 
-    @tedi.controller()
+    @Injectable()
     class DummyController {
         get(): void { return; }
         post(): void { return; }
@@ -18,23 +12,21 @@ describe("BaseRouter", () => {
         delete(): void { return; }
     }
 
-    @tedi.module()
-    class SimpleModule extends Module {
-        init(): void { return; }
-    }
+    @Injectable()
+    class SimpleModule extends core.Module { }
 
-    @tedi.filter()
-    class SimpleFilter implements Filter<any> {
+    @Injectable()
+    class SimpleFilter implements core.Filter<any> {
         apply(): void { return; }
         getDataFromRequest(): any { return; }
     }
 
-    @tedi.errorHandler()
-    class SimpleErrorHandler implements ErrorHandler {
+    @Injectable()
+    class SimpleErrorHandler implements core.ErrorHandler {
         catch(): void { return; }
     }
 
-    let simpleModule: Module;
+    let simpleModule: core.Module;
     let baseRouteActionsBuilder = new TediRouteActionsBuilder();
 
     beforeEach(() => {
@@ -42,14 +34,14 @@ describe("BaseRouter", () => {
     });
 
     describe("when we have valid routes", () => {
-        let route: Route;
+        let route: core.Route;
         let router: TediRouter;
         beforeEach(() => {
             // configure module
             simpleModule.dependencies(
-                dependency("DummyController", { class: DummyController }),
-                dependency("SimpleFilter", { class: SimpleFilter }),
-                dependency("SimpleErrorHandler", { class: SimpleErrorHandler })
+                core.dependency("DummyController", { class: DummyController }),
+                core.dependency("SimpleFilter", { class: SimpleFilter }),
+                core.dependency("SimpleErrorHandler", { class: SimpleErrorHandler })
             );
             // define routes
             let jsonRoutes = {
@@ -96,7 +88,7 @@ describe("BaseRouter", () => {
         });
 
         describe("route: /one", () => {
-            let childRoute: Route;
+            let childRoute: core.Route;
             beforeEach(() => {
                 childRoute = route.children[0];
             });
@@ -133,7 +125,7 @@ describe("BaseRouter", () => {
         });
 
         describe("route /two", () => {
-            let childRoute: Route;
+            let childRoute: core.Route;
             beforeEach(() => {
                 childRoute = route.children[0].children[0];
             });
@@ -160,39 +152,17 @@ describe("BaseRouter", () => {
         });
 
         describe("when filter does not implement BaseFilter", () => {
-            @tedi.filter()
+            @Injectable()
             class InvalidFilter { }
             beforeEach(() => {
-                simpleModule.dependencies(dependency("InvalidFilter", { class: InvalidFilter }));
+                simpleModule.dependencies(core.dependency("InvalidFilter", { class: InvalidFilter }));
             });
             it("should throw a FilterError", (done: DoneFn) => {
                 try {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
-                    expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(FilterError));
-                    done();
-                }
-            });
-        });
-
-        describe("when filter is wrongly decorated", () => {
-            @tedi.service()
-            class NotDecoratedFilter implements Filter<any> {
-                apply(): any { return; }
-                getDataFromRequest(): any { return; }
-            }
-
-            beforeEach(() => {
-                simpleModule.dependencies(dependency("InvalidFilter", { class: NotDecoratedFilter }));
-            });
-
-            it("should throw a FilterError", (done: DoneFn) => {
-                try {
-                    router.getRootRoute(jsonRouter, simpleModule);
-                } catch (error) {
-                    expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(FilterError));
+                    expect(error).toEqual(jasmine.any(core.RouteError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(core.FilterError));
                     done();
                 }
             });
@@ -202,7 +172,6 @@ describe("BaseRouter", () => {
     describe("with invalid errorHandlers", () => {
         let jsonRouter: any;
         let router: TediRouter;
-
         beforeEach(() => {
             jsonRouter = {
                 "/dummy": {
@@ -211,14 +180,13 @@ describe("BaseRouter", () => {
             };
             router = new TediRouter(null, baseRouteActionsBuilder);
         });
-
-        describe("when error handler doest not implement BaseErrorHandler interface", () => {
-            @tedi.errorHandler()
+        describe("when errorHandler doest not implement BaseErrorHandler", () => {
+            @Injectable()
             class InvalidErrorHandler { }
 
             beforeEach(() => {
                 simpleModule.dependencies(
-                    dependency("InvalidErrorHandler", { class: InvalidErrorHandler })
+                    core.dependency("InvalidErrorHandler", { class: InvalidErrorHandler })
                 );
             });
 
@@ -226,29 +194,8 @@ describe("BaseRouter", () => {
                 try {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
-                    expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerError));
-                    done();
-                }
-            });
-        });
-
-        describe("when errorHandler is wrongly decorated", () => {
-            @tedi.service()
-            class NotDecoratedErrorHandler {
-                catch(): void { return; }
-            }
-
-            beforeEach(() => {
-                simpleModule.dependencies(dependency("InvalidErrorHandler", { class: NotDecoratedErrorHandler }));
-            });
-
-            it("should throw an ErrorHandlerError", (done: DoneFn) => {
-                try {
-                    router.getRootRoute(jsonRouter, simpleModule);
-                } catch (error) {
-                    expect(error).toEqual(jasmine.any(RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(ErrorHandlerError));
+                    expect(error).toEqual(jasmine.any(core.RouteError));
+                    expect(error.getRootCause()).toEqual(jasmine.any(core.ErrorHandlerError));
                     done();
                 }
             });

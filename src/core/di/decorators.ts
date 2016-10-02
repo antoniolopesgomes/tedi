@@ -1,7 +1,7 @@
 import * as inversify from "inversify";
-import { DIToken } from "./shared";
+import { DIToken } from "./core";
 
-export function InjectDecorator(token: DIToken): ParameterDecorator {
+export function InjectDecorator<T>(token: DIToken<T>): ParameterDecorator {
     return inversify.inject(token);
 }
 

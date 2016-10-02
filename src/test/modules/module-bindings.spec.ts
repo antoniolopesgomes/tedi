@@ -1,18 +1,15 @@
-import {Module, tedi} from "../../core";
+import * as core from "../../core";
+import { Injectable } from "../../decorators";
 
 describe("Module bindings", () => {
 
-    class SimpleModule extends Module {
-        init() { return; }
-    }
-
     describe("when we have a module", () => {
-        let module: Module;
+        let module: core.Module;
         beforeEach(() => {
-            module = new SimpleModule();
+            module = new core.Module();
         });
         describe("and we register a dependency", () => {
-            @tedi.service()
+            @Injectable()
             class SimpleService { }
             let service: any;
             beforeEach(() => {

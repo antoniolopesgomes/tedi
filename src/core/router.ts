@@ -2,8 +2,8 @@
 import { Filter } from "./filter";
 import { ErrorHandler } from "./error-handler";
 import { Module } from "./module";
-import { TediError } from "../core";
-import { HttpMethods } from "../core/http";
+import { TediError } from "./tedi-error";
+import { HttpMethods } from "./utils";
 
 export interface RouteAction {
     controller: Object;
@@ -34,14 +34,14 @@ export interface Route {
     children: Route[];
 }
 
+export interface Router {
+    getRootRoute(jsonRoutes: any, module: Module): Route;
+}
+
 export class RouteError extends TediError {
     constructor(route: Route, msg: string, error?: any) {
         super(`"${route.path}": ${msg}`, error);
     }
-}
-
-export interface Router {
-    getRootRoute(jsonRoutes: any, module: Module): Route;
 }
 
 export class RouterError extends TediError {
