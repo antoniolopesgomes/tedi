@@ -1,6 +1,6 @@
 {
   "name": "tedi",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Express wrappper written in typescript with dependency injection capabilities",
   "keywords": [
     "tedi",
@@ -28,10 +28,8 @@
     "gulp-sequence": "^0.4.5",
     "gulp-typescript": "^2.13.6",
     "jasmine": "^2.4.1",
-    "jasmine-promises": "^0.4.1",
     "jasmine-spec-reporter": "^2.5.0",
     "merge2": "^1.0.2",
-    "request-promise": "^3.0.0",
     "supertest": "^1.2.0",
     "supertest-as-promised": "^3.1.0",
     "typescript": "^2.0.0"

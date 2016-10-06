@@ -108,6 +108,24 @@ describe("Module:", () => {
                     });
                 });
             });
+            describe("using a mixed notation", () => {
+                beforeEach(() => {
+                    module.dependencies(
+                        Dependency,
+                        [
+                            dependency("1", { class: Dependency }),
+                            dependency("2", { class: Dependency }),
+                        ],
+                        dependency("3", { class: Dependency }),
+                    );
+                });
+                it("should have registered all the dependencies", () => {
+                    expect(module.getDependency(Dependency)).toEqual(jasmine.any(Dependency));
+                    expect(module.getDependency("1")).toEqual(jasmine.any(Dependency));
+                    expect(module.getDependency("2")).toEqual(jasmine.any(Dependency));
+                    expect(module.getDependency("3")).toEqual(jasmine.any(Dependency));
+                });
+            });
         });
         describe("and we register a child module", () => {
             let childModule: Module;

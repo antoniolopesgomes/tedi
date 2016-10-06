@@ -7,6 +7,9 @@
       "member-access": false,
       "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
       "object-literal-sort-keys": false,
-      "no-require-imports": false
+      "no-require-imports": false,
+      "one-line": [
+        "check-else"        
+      ]
   }
 }

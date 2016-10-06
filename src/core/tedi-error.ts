@@ -14,7 +14,7 @@ export class TediError extends NestedError {
         let messages: string[] = [];
         let error = this;
         while (error) {
-            messages.push(`${getClassName(error)}: ${error.message}`);
+            messages.push(error.toString());
             error = (<any> error).nested;
         }
         return messages.join(" -> ");
@@ -34,6 +34,10 @@ export class TediError extends NestedError {
             error = error.nested;
         }
         return error;
+    }
+
+    public toString(): string {
+        return `${getClassName(this)}: ${this.message}`;
     }
 
 }

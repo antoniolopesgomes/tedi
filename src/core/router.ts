@@ -12,6 +12,8 @@ export interface RouteAction {
 
 export interface RouteActions extends HttpMethods<RouteAction> { }
 
+export const ROUTE_ACTIONS_BUILDER = "ROUTE_ACTIONS_BUILDER";
+
 export interface RouteActionsBuilder {
     build(jsonRoute: any, module: Module): RouteActions;
 }
@@ -33,6 +35,8 @@ export interface Route {
     actions: RouteActions;
     children: Route[];
 }
+
+export const ROUTER = "ROUTER";
 
 export interface Router {
     getRootRoute(jsonRoutes: any, module: Module): Route;

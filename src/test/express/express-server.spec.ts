@@ -96,7 +96,7 @@ describe("ExpressServer", () => {
                 );
 
             expressApp = server.getApp();
-            server.getDependency<core.Logger>("Logger").setLevel(core.LoggerLevels.EMERGENCY);
+            server.getLogger().setLevel(core.LoggerLevels.EMERGENCY);
         });
 
         describe("GET /auth/login", () => {
@@ -110,7 +110,7 @@ describe("ExpressServer", () => {
                 spyOn(server.getDependency("AfterLoginFilter"), "apply").and.callThrough();
                 spyOn(server.getDependency("AdminFilter"), "apply").and.callThrough();
 
-                server.getDependency<core.Logger>("Logger").setLevel(core.LoggerLevels.DEBUG);
+                server.getLogger().setLevel(core.LoggerLevels.DEBUG);
 
                 return request(expressApp).get("/auth/login")
                     .expect(200)
@@ -313,7 +313,7 @@ describe("ExpressServer", () => {
         describe("and a login filter responds", () => {
             let response: request.Response;
             beforeEach((done) => {
-                spyOn(server.getDependency<core.Logger>("Logger"), "warn").and.callThrough();
+                spyOn(server.getLogger(), "warn").and.callThrough();
                 spyOn(server.getDependency(AuthController), "login");
                 spyOn(server.getDependency("LoginFilter"), "apply").and.callFake((req, res) => {
                     res.status(200).send("HIJACKED");
@@ -333,7 +333,7 @@ describe("ExpressServer", () => {
                 expect(response.text).toEqual("HIJACKED");
             });
             it("server logger should warn about it", () => {
-                expect(server.getDependency<core.Logger>("Logger").warn).toHaveBeenCalled();
+                expect(server.getLogger().warn).toHaveBeenCalled();
             });
         });
     });

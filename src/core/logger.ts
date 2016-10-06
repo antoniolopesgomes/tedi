@@ -18,3 +18,5 @@ export interface Logger {
     debug(msg: any): void;
     setLevel(leven: LoggerLevels): Logger;
 }
+
+export const LOGGER_TOKEN = "LOGGER_TOKEN";

@@ -9,12 +9,12 @@ export interface ErrorHandler {
 
 export function validateErrorHandler(instance: ErrorHandler): void {
     if (!isFunction(instance.catch)) {
-        throw new ErrorHandlerError(instance, "invalid: must implement catch method");
+        throw new ErrorHandlerError(instance, "invalid ErrorHandler instance");
     }
 }
 
 export class ErrorHandlerError extends TediError {
-    constructor(target: Object, msg: string, error?: any) {
-        super(`${getClassName(target)}": ${msg}`, error);
+    constructor(target: Object, error?: any) {
+        super(`${getClassName(target)}`, error);
     }
 }

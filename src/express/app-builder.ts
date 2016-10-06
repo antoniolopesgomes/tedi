@@ -2,12 +2,12 @@ import * as _ from "lodash";
 import * as express from "express";
 
 import {
-    Router,
+    Router, ROUTER
     Route,
     RouteAction,
     RouteFilter,
     RouteErrorHandler,
-    Logger,
+    Logger, LOGGER_TOKEN,
     Module,
     FilterError,
     ActionError,
@@ -16,12 +16,14 @@ import {
 import { HTTP_METHODS_NAMES } from "../core/utils";
 import { Injectable, Inject } from "../decorators";
 
+export const EXPRESS_APP_BUILDER = "EXPRESS_APP_BUILDER";
+
 @Injectable()
 export class ExpressAppBuilder {
 
     constructor(
-        @Inject("Logger") private _logger: Logger,
-        @Inject("Router") private _router: Router
+        @Inject(LOGGER_TOKEN) private _logger: Logger,
+        @Inject(ROUTER) private _router: Router
     ) {
     }
 

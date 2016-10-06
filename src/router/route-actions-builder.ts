@@ -15,7 +15,7 @@ const JSON_CONTROLLER_KEY = "$controller";
 
 // TODO test this stuff
 @Injectable()
-export class TediRouteActionsBuilder implements RouteActionsBuilder {
+export class DefaultRouteActionsBuilder implements RouteActionsBuilder {
 
     public build(jsonRoute: any, module: Module): RouteActions {
         let routeActions = <RouteActions> {};

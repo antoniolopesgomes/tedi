@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 
 import {
-    Logger,
+    Logger, LOGGER_TOKEN,
     Router,
-    RouteActionsBuilder,
+    RouteActionsBuilder, ROUTE_ACTIONS_BUILDER,
     Module,
     Route,
     RouteFilter,
@@ -27,8 +27,8 @@ const ROUTER_WORDS: any = {
 export class TediRouter implements Router {
 
     constructor(
-        @Inject("Logger") private logger: Logger,
-        @Inject("RouteActionsBuilder") private _routeActionsBuilder: RouteActionsBuilder
+        @Inject(LOGGER_TOKEN) private logger: Logger,
+        @Inject(ROUTE_ACTIONS_BUILDER) private _routeActionsBuilder: RouteActionsBuilder
     ) { }
 
     public getRootRoute(jsonRoutes: any, module: Module): Route {

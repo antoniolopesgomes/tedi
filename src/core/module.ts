@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import * as _ from "lodash";
+import { isArray, isUndefined, isNull } from "lodash";
 import { DIModule, dependency, DependencyInfo, DIToken, getTokenDescription } from "./di";
 import { TediError } from "./tedi-error";
 import { getClassName } from "./utils";
@@ -33,20 +33,25 @@ export class Module {
 
     public dependencies(...args: any[]): Module {
         // normalize dependecies and iterate
-        (_.isArray(args) ? args : []).forEach((dep: any) => {
+        (isArray(args) ? args : []).forEach((dep: any) => {
             this.setDependency(dep);
         });
         return this;
     }
 
     public setDependency(dep: any): Module {
-        if (_.isUndefined(dep) || _.isNull(dep)) {
+        if (isUndefined(dep) || isNull(dep)) {
             return this;
         }
-        if (!(dep instanceof DependencyInfo)) {
-            dep = dependency(dep);
+        else if (isArray(dep)) {
+            (<any[]> dep).forEach(aDep => this.setDependency(aDep));
         }
-        this._di.setDependency(dep);
+        else if (!(dep instanceof DependencyInfo)) {
+            this._di.setDependency(dependency(dep));
+        }
+        else {
+            this._di.setDependency(dep);
+        }
         return this;
     }
 

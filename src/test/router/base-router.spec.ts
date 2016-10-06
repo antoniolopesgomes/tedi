@@ -1,6 +1,6 @@
 import * as core from "../../core";
 import { Injectable } from "../../decorators";
-import { TediRoute, TediRouter, TediRouteActionsBuilder } from "../../router";
+import { TediRoute, TediRouter, DefaultRouteActionsBuilder } from "../../router";
 
 describe("BaseRouter", () => {
 
@@ -27,7 +27,7 @@ describe("BaseRouter", () => {
     }
 
     let simpleModule: core.Module;
-    let baseRouteActionsBuilder = new TediRouteActionsBuilder();
+    let baseRouteActionsBuilder = new DefaultRouteActionsBuilder();
 
     beforeEach(() => {
         simpleModule = new SimpleModule();
@@ -162,7 +162,8 @@ describe("BaseRouter", () => {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
                     expect(error).toEqual(jasmine.any(core.RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(core.FilterError));
+                    expect(error.search(core.FilterError)).toEqual(jasmine.any(core.FilterError));
+                    expect(error.getRootCause()).toEqual("invalid Filter instance");
                     done();
                 }
             });
@@ -195,7 +196,8 @@ describe("BaseRouter", () => {
                     router.getRootRoute(jsonRouter, simpleModule);
                 } catch (error) {
                     expect(error).toEqual(jasmine.any(core.RouteError));
-                    expect(error.getRootCause()).toEqual(jasmine.any(core.ErrorHandlerError));
+                    expect(error.search(core.ErrorHandlerError)).toEqual(jasmine.any(core.ErrorHandlerError));
+                    expect(error.getRootCause()).toEqual("invalid ErrorHandler instance");
                     done();
                 }
             });

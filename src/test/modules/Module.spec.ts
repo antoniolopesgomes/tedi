@@ -1,7 +1,7 @@
 
 import * as express from "express";
 import * as request from "supertest-as-promised";
-import * as core from "../../core";
+import { Filter, Module, dependency, Logger, LOGGER_TOKEN } from "../../core";
 import { Injectable } from "../../decorators";
 import { ExpressServer } from "../../express";
 
@@ -17,13 +17,13 @@ describe("Modules", () => {
     }
 
     @Injectable()
-    class CustomFilter2 implements core.Filter<any> {
+    class CustomFilter2 implements Filter<any> {
         apply(req: express.Request, res: express.Response): any { return; }
         getDataFromRequest(req: express.Request): any { return; }
     }
 
     @Injectable()
-    class AuthModule extends core.Module {
+    class AuthModule extends Module {
         constructor() {
             super();
             this.setJsonRoutes({
@@ -33,8 +33,8 @@ describe("Modules", () => {
                 },
             });
             this.dependencies(
-                core.dependency("AuthController", { class: AuthController }),
-                core.dependency("RootFilter", { class: CustomFilter2 })
+                dependency("AuthController", { class: AuthController }),
+                dependency("RootFilter", { class: CustomFilter2 })
             );
         }
     }
@@ -46,7 +46,7 @@ describe("Modules", () => {
     describe("When we got an app with a child module", () => {
         let results: any[] = [];
         let app: express.Application;
-        let authModule: core.Module;
+        let authModule: Module;
 
         beforeEach(() => {
             results.push("_here");
@@ -55,9 +55,8 @@ describe("Modules", () => {
                     "/auth": "AuthModule",
                 })
                 .setModule("AuthModule", new AuthModule());
-            // server.component<Logger>("Logger").setLevel(LoggerLevels.DEBUG);
             app = server.getApp();
-            authModule = server.getDependency<core.Module>("AuthModule");
+            authModule = server.getDependency<Module>("AuthModule");
         });
 
         describe("/auth/login", () => {
@@ -77,7 +76,7 @@ describe("Modules", () => {
             });
 
             it("should have called the module auth.RootFilter", () => {
-                expect(authModule.getDependency<core.Filter<any>>("RootFilter").apply).toHaveBeenCalled();
+                expect(authModule.getDependency<Filter<any>>("RootFilter").apply).toHaveBeenCalled();
             });
         });
 
@@ -86,7 +85,7 @@ describe("Modules", () => {
                 expect(authModule).toEqual(jasmine.any(AuthModule));
             });
             it("childModule should have access to root module dependencies", () => {
-                expect(authModule.getDependency<core.Logger>("Logger")).not.toBeNull();
+                expect(authModule.getDependency<Logger>(LOGGER_TOKEN)).not.toBeNull();
             });
 
             describe("and override an internal component", () => {
@@ -98,7 +97,7 @@ describe("Modules", () => {
                 }
                 beforeEach(() => {
                     authModule.dependencies(
-                        core.dependency("AuthController", { class: CustomAuthController })
+                        dependency("AuthController", { class: CustomAuthController })
                     );
                 });
                 it("should have overrided AuthController", () => {

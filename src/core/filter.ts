@@ -10,12 +10,12 @@ export interface Filter<T> {
 
 export function validateFilter(instance: Filter<any>): void {
     if (!isFunction(instance.apply) || !isFunction(instance.getDataFromRequest)) {
-        throw new FilterError(instance, "invalid: must implement Filter");
+        throw new FilterError(instance, "invalid Filter instance");
     }
 }
 
 export class FilterError extends TediError {
-    constructor(target: Object, msg: string, error?: any) {
-        super(`${getClassName(target)}": ${msg}`, error);
+    constructor(target: Object, error?: any) {
+        super(`${getClassName(target)}`, error);
     }
 }
