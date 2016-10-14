@@ -1,7 +1,7 @@
 
 import * as express from "express";
 import * as request from "supertest-as-promised";
-import { Filter, Module, dependency, Logger, LOGGER_TOKEN } from "../../core";
+import { Filter, Module, dependency, Logger, LOGGER } from "../../core";
 import { Injectable } from "../../decorators";
 import { ExpressServer } from "../../express";
 
@@ -85,7 +85,7 @@ describe("Modules", () => {
                 expect(authModule).toEqual(jasmine.any(AuthModule));
             });
             it("childModule should have access to root module dependencies", () => {
-                expect(authModule.getDependency<Logger>(LOGGER_TOKEN)).not.toBeNull();
+                expect(authModule.getDependency<Logger>(LOGGER)).not.toBeNull();
             });
 
             describe("and override an internal component", () => {

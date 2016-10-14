@@ -69,7 +69,7 @@ describe("BaseRouter", () => {
             });
             it("filter should be the right instance", () => {
                 expect(route.filters[0].filter).toEqual(jasmine.any(SimpleFilter));
-                expect(route.filters[0].name).toEqual("SimpleFilter");
+                expect(route.filters[0].token).toEqual("SimpleFilter");
             });
             it("should have no errorHandlers", () => {
                 expect(route.errorHandlers).toEqual(jasmine.any(Array));
@@ -120,7 +120,7 @@ describe("BaseRouter", () => {
             });
             it("errorHandler should be the right instance", () => {
                 expect(childRoute.errorHandlers[0].errorHandler).toEqual(jasmine.any(SimpleErrorHandler));
-                expect(childRoute.errorHandlers[0].name).toEqual("SimpleErrorHandler");
+                expect(childRoute.errorHandlers[0].token).toEqual("SimpleErrorHandler");
             });
         });
 

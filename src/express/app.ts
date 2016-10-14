@@ -2,27 +2,27 @@ import * as _ from "lodash";
 import * as express from "express";
 
 import {
-    Router, ROUTER
+    Router, ROUTER,
     Route,
     RouteAction,
     RouteFilter,
     RouteErrorHandler,
-    Logger, LOGGER_TOKEN,
+    Logger, LOGGER,
     Module,
     FilterError,
     ActionError,
 } from "../core";
-
+import { getClassName, getTokenName } from "../core/utils";
 import { HTTP_METHODS_NAMES } from "../core/utils";
 import { Injectable, Inject } from "../decorators";
 
-export const EXPRESS_APP_BUILDER = "EXPRESS_APP_BUILDER";
+export const EXPRESS_APP = "EXPRESS_APP_BUILDER";
 
 @Injectable()
-export class ExpressAppBuilder {
+export class ExpressApp {
 
     constructor(
-        @Inject(LOGGER_TOKEN) private _logger: Logger,
+        @Inject(LOGGER) private _logger: Logger,
         @Inject(ROUTER) private _router: Router
     ) {
     }
@@ -51,7 +51,7 @@ export class ExpressAppBuilder {
 
     private _addActions(app: express.Application, route: Route): void {
         // set actions
-        this._logger.debug(`Adding actions for route: ${route}`);
+        this._logger.debug(`Adding actions for ${route}`);
         _.values<string>(HTTP_METHODS_NAMES).forEach((httpMethodName) => {
             this._addAction(app, httpMethodName, route);
         });
@@ -64,11 +64,11 @@ export class ExpressAppBuilder {
             return;
         }
         let controller: any = routeAction.controller;
-        let controllerName: any = (<any> controller).constructor.name;
+        let controllerName: any = getClassName(controller);
         let methodName: string = routeAction.controllerMethod;
         let actionInfo: string = `Action: ${controllerName}#${methodName}`;
         //
-        this._logger.debug(`app.${httpMethodName}(${route.path}, action)`);
+        this._logger.debug(`app.${httpMethodName}(${route.path}, ${controllerName}.${methodName})`);
         app[httpMethodName](route.path, (req: express.Request, res: express.Response, next: express.NextFunction) => {
             let requestInfo = `(${req.originalUrl}) - ${actionInfo}`;
             Promise
@@ -82,7 +82,7 @@ export class ExpressAppBuilder {
                 })
                 .catch((error) => {
                     this._logger.error(`${requestInfo} [ERROR]`, error);
-                    next(new ActionError(controllerName, methodName, error));
+                    next(new ActionError(controller, methodName, error));
                 });
         });
     }
@@ -90,8 +90,7 @@ export class ExpressAppBuilder {
     private _addFilters(app: express.Application, route: Route): void {
         let filters  = route.filters.map<express.RequestHandler>((routeFilter: RouteFilter) => {
             let filter = routeFilter.filter;
-            let filterName = routeFilter.name;
-            let filterInfo = `Filter: ${routeFilter.name}`;
+            let filterInfo = `Filter: ${getTokenName(routeFilter.token)}`;
             return (req: express.Request, res: express.Response, next: express.NextFunction): void => {
                 let requestInfo = `(${req.originalUrl}) - ${filterInfo}`;
                 Promise
@@ -100,10 +99,11 @@ export class ExpressAppBuilder {
                         this._logger.debug(`${requestInfo} [CALLING]`);
                         return filter.apply(req, res);
                     })
+                    // TODO URGENT! test if the response is false to prevent propagation
                     .then(() => {
                         this._logger.debug(`${requestInfo} [SUCCESS]`);
                         // Middleware can, sometimes, end the request-response cycle
-                        // BIt is normal but I decided to treat it as an exception, as such a warning is logged
+                        // It is normal but I decided to treat it as an exception, as such a warning is logged
                         if (res.headersSent) {
                             this._logger.warn(`${requestInfo} [!] Filter sent headers.`);
                         }
@@ -111,20 +111,20 @@ export class ExpressAppBuilder {
                     })
                     .catch((error: any) => {
                         this._logger.error(`${requestInfo} [ERROR]`, error);
-                        next(new FilterError(filterName, error));
+                        next(new FilterError(filter, error));
                     });
             };
         });
         if (filters.length > 0) {
-            this._logger.debug(`app.use(${route.path}, ...filters)`);
+            this._logger.debug(`app.use(${route.path}, ...(${filters.length}) filters)`);
             app.use.apply(app, [route.path].concat(<any> filters));
         }
     }
 
     private _addErrorHandlers(app: express.Application, route: Route): void {
         let errorHandlers = route.errorHandlers.map<express.ErrorRequestHandler>((routeErrorHandler: RouteErrorHandler) => {
-            let errorHandlerInfo = `ErrorHandler: ${routeErrorHandler.name}`;
             let errorHandler = routeErrorHandler.errorHandler;
+            let errorHandlerInfo = `ErrorHandler: ${getTokenName(routeErrorHandler.token)}`;
             return (error: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
                 let requestInfo = `(${req.originalUrl}) - ${errorHandlerInfo}`;
                 Promise
@@ -143,7 +143,7 @@ export class ExpressAppBuilder {
             };
         });
         if (errorHandlers.length > 0) {
-            this._logger.debug(`app.use(${route.path}, ...errorHandlers)`);
+            this._logger.debug(`app.use(${route.path}, ...(${errorHandlers.length}) errorHandlers)`);
             app.use.apply(app, (<any[]> [route.path]).concat(errorHandlers));
         }
     }

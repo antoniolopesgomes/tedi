@@ -1,3 +1,3 @@
 export * from "./server";
-export * from "./app-builder";
+export * from "./app";
 export * from "./middleware-filter";

@@ -4,7 +4,7 @@ import { DIToken } from "./core";
 export interface DependencyProperties {
     value?: any;
     class?: Constructor<any>;
-    classIsTransient?: boolean;
+    transient?: boolean;
 }
 
 export function dependency<T>(token: DIToken<T>, properties?: DependencyProperties): DependencyInfo {

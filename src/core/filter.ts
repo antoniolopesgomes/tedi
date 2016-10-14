@@ -15,7 +15,7 @@ export function validateFilter(instance: Filter<any>): void {
 }
 
 export class FilterError extends TediError {
-    constructor(target: Object, error?: any) {
+    constructor(target: any, error?: any) {
         super(`${getClassName(target)}`, error);
     }
 }

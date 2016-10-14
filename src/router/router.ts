@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 import {
-    Logger, LOGGER_TOKEN,
+    Logger, LOGGER,
     Router,
     RouteActionsBuilder, ROUTE_ACTIONS_BUILDER,
     Module,
@@ -27,7 +27,7 @@ const ROUTER_WORDS: any = {
 export class TediRouter implements Router {
 
     constructor(
-        @Inject(LOGGER_TOKEN) private logger: Logger,
+        @Inject(LOGGER) private logger: Logger,
         @Inject(ROUTE_ACTIONS_BUILDER) private _routeActionsBuilder: RouteActionsBuilder
     ) { }
 
@@ -46,46 +46,42 @@ export class TediRouter implements Router {
         return route;
     }
 
-    private _parseRouteFilters(route: Route, filterNames: string[], module: Module): RouteFilter[] {
+    private _parseRouteFilters(route: Route, tokens: any[], module: Module): RouteFilter[] {
 
-        if (!_.isArray(filterNames)) {
+        if (!_.isArray(tokens)) {
             return [];
         }
 
-        return filterNames.map<RouteFilter>((name: string) => {
-            let filter = module.getDependency<Filter<any>>(name);
+        return tokens.map<RouteFilter>((token: any) => {
+            let filter = module.getDependency<Filter<any>>(token);
             try {
                 validateFilter(filter);
             } catch (error) {
-                throw new RouteError(route, `Invalid filter: "${name}"`, error);
+                throw new RouteError(route, `Invalid filter: "${token}"`, error);
             }
             return <RouteFilter> {
                 filter: filter,
-                name: name,
+                token: token,
             };
         });
     }
 
-    private _parseRouteErrorHandlers(
-        route: Route,
-        errorHandlersNames: string[],
-        module: Module
-    ): RouteErrorHandler[] {
+    private _parseRouteErrorHandlers(route: Route, tokens: any[], module: Module): RouteErrorHandler[] {
 
-        if (!_.isArray(errorHandlersNames)) {
+        if (!_.isArray(tokens)) {
             return [];
         }
 
-        return errorHandlersNames.map<RouteErrorHandler>((name: string) => {
-            let errorHandler = module.getDependency<ErrorHandler>(name);
+        return tokens.map<RouteErrorHandler>((token: string) => {
+            let errorHandler = module.getDependency<ErrorHandler>(token);
             try {
                 validateErrorHandler(errorHandler);
             } catch (error) {
-                throw new RouteError(route, `Could not validate errorHandler "${name}"`, error);
+                throw new RouteError(route, `Could not validate errorHandler "${token}"`, error);
             }
             return <RouteErrorHandler> {
                 errorHandler: errorHandler,
-                name: name,
+                token: token,
             };
         });
     }
@@ -121,8 +117,6 @@ export class TediRouter implements Router {
                     childRoute = this._parseJsonRoute(childRoutePath, childJsonRouteValue, module);
                 }
                 childrenRoutes.push(childRoute);
-            } else if ([...(_.values(ROUTER_WORDS)), "get", "post", "put", "delete"].indexOf(key) < 0) {
-                this.logger.debug(`Routing key: "${key}" of ${route.path}, will be ignored`);
             }
         });
         return childrenRoutes;

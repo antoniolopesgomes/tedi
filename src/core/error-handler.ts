@@ -3,6 +3,7 @@ import * as express from "express";
 import { TediError } from "./tedi-error";
 import { getClassName } from "./utils";
 
+// TODO change return type Promise | any
 export interface ErrorHandler {
     catch(error: any, req: express.Request, res: express.Response): void;
 }

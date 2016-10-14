@@ -73,4 +73,4 @@ Use the command to compile.
 $ npm run compile
 ```
 ___
-Next step: [Quick start](https://github.com/antoniolopesgomes/tedi/wiki/2.-Quick-start)
+Next step: [Tutorial](https://github.com/antoniolopesgomes/tedi/wiki/1.-Tutorial)

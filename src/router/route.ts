@@ -12,6 +12,6 @@ export class TediRoute implements Route {
     }
 
     public toString(): string {
-        return `route: ${this.path}`;
+        return `Route: ${this.path}`;
     }
 }

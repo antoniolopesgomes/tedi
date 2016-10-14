@@ -19,12 +19,12 @@ export interface RouteActionsBuilder {
 }
 
 export interface RouteFilter {
-    name: string;
+    token: any;
     filter: Filter<any>;
 }
 
 export interface RouteErrorHandler {
-    name: string;
+    token: any;
     errorHandler: ErrorHandler;
 }
 

@@ -71,7 +71,7 @@ describe("Module:", () => {
             describe("using the complex notation in transient mode", () => {
                 let aDependency: any;
                 beforeEach(() => {
-                    module.setDependency(dependency(Dependency, { class: Dependency, classIsTransient: true}));
+                    module.setDependency(dependency(Dependency, { class: Dependency, transient: true}));
                     aDependency = module.getDependency(Dependency);
                 });
                 it("we should get the right instance", () => {

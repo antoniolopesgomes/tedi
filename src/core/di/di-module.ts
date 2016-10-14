@@ -67,7 +67,7 @@ export class DIModule {
             let concretion = <Constructor<T>>dep.properties.class;
             // DependencyValidator.validate(concretion);
             let binding = this._kernel.bind(dep.token).to(concretion);
-            if (!dep.properties.classIsTransient) {
+            if (!dep.properties.transient) {
                 binding.inSingletonScope();
             }
         } else if (dep.properties.value) {

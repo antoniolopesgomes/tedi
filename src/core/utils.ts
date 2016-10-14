@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as BluebirdPromise from "bluebird";
 
 /* tslint:disable */
@@ -7,6 +8,13 @@ export const Promise = BluebirdPromise;
 // TODO document this stuff!!!
 export function getClassName(target: any): string {
     return target.name || target.constructor.name;
+}
+
+export function getTokenName(token: any): string {
+    if (_.isFunction(token)) {
+        return getClassName(token);
+    }
+    return token.toString();
 }
 
 export interface Constructor<T> {

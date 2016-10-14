@@ -12,15 +12,23 @@ export class ExpressMiddlewareFilter implements Filter<any> {
     ) { }
 
     public apply(req: express.Request, res: express.Response): any {
-        return new Promise((resolve, reject) => {
-            this._requestHandler(req, res, (error) => {
-                return error ? reject(error) : resolve();
-            });
-        });
+        return runExpressMiddleware(this._requestHandler, req, res);
     }
 
     public getDataFromRequest(req: express.Request): any {
         throw new Error("Filter.getData must be implemented.");
     }
 
+}
+
+export function runExpressMiddleware(middleware: express.RequestHandler, req: express.Request, res: express.Response): Promise<any> {
+    return new Promise((resolve, reject) => {
+        try {
+            middleware(req, res, (error) => {
+                return error ? reject(error) : resolve();
+            });
+        } catch (error) {
+            return reject(error);
+        }
+    });
 }

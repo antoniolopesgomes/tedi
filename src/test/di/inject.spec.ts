@@ -1,4 +1,4 @@
-import { Module, Logger, LOGGER_TOKEN } from "../../core";
+import { Module, Logger, LOGGER } from "../../core";
 import { Injectable, Inject, web } from "../../decorators";
 import { ExpressServer } from "../../express";
 
@@ -9,7 +9,7 @@ describe("inject decorator", () => {
     @Injectable()
     class DummyController {
         constructor(
-            @Inject(LOGGER_TOKEN) private _logger: Logger
+            @Inject(LOGGER) private _logger: Logger
         ) { }
         @web.get()
         get(): void {
@@ -44,14 +44,14 @@ describe("inject decorator", () => {
         let dummyController: DummyController;
         let dummyModule: Module;
         beforeEach(() => {
-            spyOn(server.getDependency<Logger>(LOGGER_TOKEN), "warn");
+            spyOn(server.getDependency<Logger>(LOGGER), "warn");
             dummyModule = server.getDependency<Module>("DummyModule");
             dummyController = dummyModule.getDependency(DummyController);
             dummyController.get();
         });
 
         it("should exist", () => {
-            expect(server.getDependency<Logger>(LOGGER_TOKEN).warn).toHaveBeenCalledWith(WARN_MSG);
+            expect(server.getDependency<Logger>(LOGGER).warn).toHaveBeenCalledWith(WARN_MSG);
         });
     });
 });

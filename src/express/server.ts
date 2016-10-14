@@ -5,14 +5,14 @@ import {
     Module,
     dependency,
     Config, CONFIG,
-    Logger, LOGGER_TOKEN,
+    Logger, LOGGER,
     Router, ROUTER,
     RouteActionsBuilder, ROUTE_ACTIONS_BUILDER } from "../core";
 import { Injectable } from "../decorators";
 
 import { WinstonLoggerFactory } from "../logger/winston-logger";
 import { TediRouter, DefaultRouteActionsBuilder } from "../router";
-import { ExpressAppBuilder, EXPRESS_APP_BUILDER } from "./app-builder";
+import { ExpressApp, EXPRESS_APP } from "./app";
 
 @Injectable()
 export class ExpressServer extends Module {
@@ -22,12 +22,15 @@ export class ExpressServer extends Module {
 
     constructor() {
         super();
+        // Define empty routing by default
+        this.setJsonRoutes({});
+        // Set default dependencies
         this.dependencies(
             dependency("Server", { value: this }),
-            dependency<ExpressAppBuilder>(EXPRESS_APP_BUILDER, { class: ExpressAppBuilder }),
+            dependency<ExpressApp>(EXPRESS_APP, { class: ExpressApp }),
             dependency<Router>(ROUTER, { class: TediRouter }),
             dependency<RouteActionsBuilder>(ROUTE_ACTIONS_BUILDER, { class: DefaultRouteActionsBuilder }),
-            dependency<Logger>(LOGGER_TOKEN, { class: WinstonLoggerFactory() }),
+            dependency<Logger>(LOGGER, { class: WinstonLoggerFactory() }),
             dependency<Config>(CONFIG, { value: { port: 8080 } })
         );
     }
@@ -42,13 +45,13 @@ export class ExpressServer extends Module {
     }
 
     public getLogger(): Logger {
-        return this.getDependency<Logger>(LOGGER_TOKEN);
+        return this.getDependency<Logger>(LOGGER);
     }
 
     public getApp(): express.Application {
         if (!this._app) {
             let jsonRoutes = this.getJsonRoutes();
-            let appBuilder = this.getDependency<ExpressAppBuilder>(EXPRESS_APP_BUILDER);
+            let appBuilder = this.getDependency<ExpressApp>(EXPRESS_APP);
             this._app = appBuilder.buildApp(jsonRoutes, this);
         }
         return this._app;

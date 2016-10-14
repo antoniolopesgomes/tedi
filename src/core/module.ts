@@ -17,6 +17,8 @@ export function validateModule(instance: Module): void {
     }
 }
 
+export const JSON_ROUTES = "JSON_ROUTES";
+
 export class Module {
 
     private _parentModule: Module = null;
@@ -84,6 +86,15 @@ export class Module {
         return this;
     }
 
+    public setJsonRoutes(value: any): Module {
+        this._di.setDependency(dependency(JSON_ROUTES, { value: value }));
+        return this;
+    }
+
+    public getJsonRoutes(): any {
+        return this._di.getDependency<any>(JSON_ROUTES);
+    }
+
     public snapshot(): Module {
         this._di.snapshot();
         return this;
@@ -92,15 +103,6 @@ export class Module {
     public restore(): Module {
         this._di.restore();
         return this;
-    }
-
-    public setJsonRoutes(value: any): Module {
-        this._di.setDependency(dependency("RoutesDefinition", { value: value }));
-        return this;
-    }
-
-    public getJsonRoutes(): any {
-        return this._di.getDependency<any>("RoutesDefinition");
     }
 
     private _getBinding<T>(token: DIToken<T>): T {
