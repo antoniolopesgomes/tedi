@@ -1,5 +1,3 @@
-##version **0.1.0** is out! It has several breaking changes regarding the previous versions.
-
 #Overview
 
 ####[Check the wiki](https://github.com/antoniolopesgomes/tedi/wiki)

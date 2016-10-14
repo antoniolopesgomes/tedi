@@ -1,6 +1,6 @@
 {
   "name": "tedi",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Express wrappper written in typescript with dependency injection capabilities",
   "keywords": [
     "tedi",
