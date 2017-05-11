@@ -104,11 +104,11 @@ describe("ExpressServer", () => {
             beforeEach((done: DoneFn) => {
                 spyOn(server.getDependency(AuthController), "saveUser").and.callThrough();
                 spyOn(server.getDependency(AuthController), "login").and.callThrough();
-                spyOn(server.getDependency("UserFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("RootFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("LoginFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("AfterLoginFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("AdminFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("UserFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("RootFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("LoginFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("AfterLoginFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("AdminFilter"), "apply").and.callThrough();
 
                 server.getLogger().setLevel(core.LoggerLevels.DEBUG);
 
@@ -138,10 +138,10 @@ describe("ExpressServer", () => {
             beforeEach((done: DoneFn) => {
                 spyOn(server.getDependency(AuthController), "saveUser").and.callThrough();
                 spyOn(server.getDependency(AuthController), "login").and.callThrough();
-                spyOn(server.getDependency("RootFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("UserFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("LoginFilter"), "apply").and.callThrough();
-                spyOn(server.getDependency("AdminFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("RootFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("UserFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("LoginFilter"), "apply").and.callThrough();
+                spyOn(server.getDependency<any>("AdminFilter"), "apply").and.callThrough();
 
                 return request(expressApp).post("/auth/login/user")
                     .expect(200)
@@ -200,13 +200,13 @@ describe("ExpressServer", () => {
             let filterQueue: string[];
             beforeEach((done: DoneFn) => {
                 filterQueue = [];
-                spyOn(server.getDependency("RootFilter"), "apply").and.callFake(() => {
+                spyOn(server.getDependency<any>("RootFilter"), "apply").and.callFake(() => {
                     filterQueue.push("RootFilter");
                 });
-                spyOn(server.getDependency("LoginFilter"), "apply").and.callFake(() => {
+                spyOn(server.getDependency<any>("LoginFilter"), "apply").and.callFake(() => {
                     filterQueue.push("LoginFilter");
                 });
-                spyOn(server.getDependency("AfterLoginFilter"), "apply").and.callFake(() => {
+                spyOn(server.getDependency<any>("AfterLoginFilter"), "apply").and.callFake(() => {
                     filterQueue.push("AfterLoginFilter");
                 });
 
@@ -227,11 +227,11 @@ describe("ExpressServer", () => {
             describe("and loginErrorHandler handles it", () => {
                 let catchedError: any;
                 beforeEach((done: DoneFn) => {
-                    spyOn(server.getDependency("LoginErrorHandler"), "catch").and.callFake((error, req, res) => {
+                    spyOn(server.getDependency<any>("LoginErrorHandler"), "catch").and.callFake((error, req, res) => {
                         catchedError = error;
                         res.status(500).send("Error");
                     });
-                    spyOn(server.getDependency("AuthErrorHandler"), "catch");
+                    spyOn(server.getDependency<any>("AuthErrorHandler"), "catch");
                     return request(expressApp).get("/auth/login")
                         .expect(500)
                         .then(() => done())
@@ -251,19 +251,19 @@ describe("ExpressServer", () => {
                 let errorHandlers: string[];
                 beforeEach((done: DoneFn) => {
                     errorHandlers = [];
-                    spyOn(server.getDependency("AfterLoginErrorHandler"), "catch").and.callFake((error, req, res) => {
+                    spyOn(server.getDependency<any>("AfterLoginErrorHandler"), "catch").and.callFake((error, req, res) => {
                         errorHandlers.push("AfterLoginErrorHandler");
                         throw error;
                     });
-                    spyOn(server.getDependency("LoginErrorHandler"), "catch").and.callFake((error, req, res) => {
+                    spyOn(server.getDependency<any>("LoginErrorHandler"), "catch").and.callFake((error, req, res) => {
                         errorHandlers.push("LoginErrorHandler");
                         throw error;
                     });
-                    spyOn(server.getDependency("AuthErrorHandler"), "catch").and.callFake((error, req, res) => {
+                    spyOn(server.getDependency<any>("AuthErrorHandler"), "catch").and.callFake((error, req, res) => {
                         errorHandlers.push("AuthErrorHandler");
                         throw error;
                     });
-                    spyOn(server.getDependency("RootErrorHandler"), "catch").and.callFake((error, req, res) => {
+                    spyOn(server.getDependency<any>("RootErrorHandler"), "catch").and.callFake((error, req, res) => {
                         errorHandlers.push("RootErrorHandler");
                         res.status(500).end();
                     });
@@ -293,10 +293,10 @@ describe("ExpressServer", () => {
         describe("and LoginFilter throws an error", () => {
             let catchedError: any;
             beforeEach((done: DoneFn) => {
-                spyOn(server.getDependency("LoginFilter"), "apply").and.callFake(() => {
+                spyOn(server.getDependency<any>("LoginFilter"), "apply").and.callFake(() => {
                     throw new Error("Filter error");
                 });
-                spyOn(server.getDependency("RootErrorHandler"), "catch").and.callFake((err: any, req, res: express.Response) => {
+                spyOn(server.getDependency<any>("RootErrorHandler"), "catch").and.callFake((err: any, req, res: express.Response) => {
                     catchedError = err;
                     res.status(500).end();
                 });
@@ -315,7 +315,7 @@ describe("ExpressServer", () => {
             beforeEach((done) => {
                 spyOn(server.getLogger(), "warn").and.callThrough();
                 spyOn(server.getDependency(AuthController), "login");
-                spyOn(server.getDependency("LoginFilter"), "apply").and.callFake((req, res) => {
+                spyOn(server.getDependency<any>("LoginFilter"), "apply").and.callFake((req, res) => {
                     res.status(200).send("HIJACKED");
                 });
                 request(expressApp)
