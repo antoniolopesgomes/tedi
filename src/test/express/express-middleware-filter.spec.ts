@@ -35,7 +35,7 @@ describe("ExpressMiddlewareFilter", () => {
     describe("When we GET a node with a filter", () => {
         let req: express.Request;
         beforeEach((done: DoneFn) => {
-            spyOn(server.getDependency("jsonBodyParser"), "apply").and.callThrough();
+            spyOn(server.getDependency<any>("jsonBodyParser"), "apply").and.callThrough();
             spyOn(server.getDependency(DummyController), "post").and.callFake((_req: express.Request, res: express.Response) => {
                 req = _req;
                 res.status(200).end();

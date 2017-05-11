@@ -62,8 +62,8 @@ describe("Modules", () => {
         describe("/auth/login", () => {
             beforeEach((done: DoneFn) => {
                 results.push("here");
-                spyOn(authModule.getDependency("AuthController"), "get").and.callThrough();
-                spyOn(authModule.getDependency("RootFilter"), "apply").and.callThrough();
+                spyOn(authModule.getDependency<any>("AuthController"), "get").and.callThrough();
+                spyOn(authModule.getDependency<any>("RootFilter"), "apply").and.callThrough();
                 request(app)
                     .get("/auth/login")
                     .expect(200)
