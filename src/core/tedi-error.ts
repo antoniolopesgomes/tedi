@@ -6,8 +6,11 @@ export const NestedError: Constructor<Error> = require("nested-error-stacks");
 export class TediError extends NestedError {
 
     constructor(msg: string, error: any) {
-        super(msg, error);
-        (<any> this).name = (<any> this.constructor).name;
+        super(msg, error)
+    }
+
+    get name(): string {
+        return (<any> this.constructor).name
     }
 
     get messageStack(): string {
