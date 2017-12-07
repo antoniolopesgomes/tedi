@@ -11,7 +11,7 @@ export class DIModuleError extends TediError {
 
 export class DIModule {
 
-    private _kernel: inversify.interfaces.Kernel = new inversify.Kernel();
+    private _kernel: inversify.Container = new inversify.Container();
 
     public __setParent(diModule: DIModule): void {
         (<any> this._kernel).parent = diModule._kernel;

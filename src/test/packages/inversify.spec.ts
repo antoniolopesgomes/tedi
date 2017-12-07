@@ -11,14 +11,14 @@ describe("inversify", () => {
         @inversify.injectable()
         class Shuriken { }
 
-        let parentKernel: inversify.interfaces.Kernel;
-        let childKernel: inversify.interfaces.Kernel;
+        let parentKernel: inversify.Container;
+        let childKernel: inversify.Container;
 
         beforeEach(() => {
-            parentKernel = new inversify.Kernel();
+            parentKernel = new inversify.Container();
             parentKernel.bind(weaponIdentifier).to(Katana);
 
-            childKernel = new inversify.Kernel();
+            childKernel = new inversify.Container();
             (<any> childKernel).parent = parentKernel;
         });
 

@@ -52,7 +52,7 @@ export class ExpressApp {
     private _addActions(app: express.Application, route: Route): void {
         // set actions
         this._logger.debug(`Adding actions for ${route}`);
-        _.values<string>(HTTP_METHODS_NAMES).forEach((httpMethodName) => {
+        _.values(HTTP_METHODS_NAMES).forEach((httpMethodName) => {
             this._addAction(app, httpMethodName, route);
         });
     }
