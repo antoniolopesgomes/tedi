@@ -29,6 +29,10 @@ export class Module {
         this._di.__setParent(module._di);
     }
 
+    public getDIContainer(): any {
+        return this._di.getDIContainer();
+    }
+
     public getParentModule(): Module {
         return this._parentModule;
     }
