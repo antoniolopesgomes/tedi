@@ -11,35 +11,39 @@ export class DIModuleError extends TediError {
 
 export class DIModule {
 
-    private _kernel: inversify.Container = new inversify.Container();
+    private _container: inversify.Container = new inversify.Container();
 
     public __setParent(diModule: DIModule): void {
-        (<any> this._kernel).parent = diModule._kernel;
+        (<any>this._container).parent = diModule._container;
+    }
+
+    public getDIContainer(): any { 
+        return this._container;
     }
 
     public getDependency<T>(token: any): T {
         try {
-            return this._kernel.get<T>(token);
+            return this._container.get<T>(token);
         } catch (error) {
             throw new DIModuleError(error.message);
         }
     }
 
     public hasDependency(token: any): boolean {
-        return this._kernel.isBound(token);
+        return this._container.isBound(token);
     }
 
     public hasOwnDependency(token: any): boolean {
         // TODO check this!!! 
-        return (<any>this._kernel)._bindingDictionary.hasKey(token);
+        return (<any>this._container)._bindingDictionary.hasKey(token);
     }
 
     public removeDependency(token: any): void {
-        this._kernel.unbind(token);
+        this._container.unbind(token);
     }
 
     public removeAll(): void {
-        this._kernel.unbindAll();
+        this._container.unbindAll();
     }
 
     public setDependency<T>(dep: DependencyInfo): void {
@@ -54,11 +58,11 @@ export class DIModule {
     }
 
     public snapshot(): void {
-        this._kernel.snapshot();
+        this._container.snapshot();
     }
 
     public restore(): void {
-        this._kernel.restore();
+        this._container.restore();
     }
 
     private _bindDependency<T>(dep: DependencyInfo): void {
@@ -66,13 +70,13 @@ export class DIModule {
         if (dep.properties.class) {
             let concretion = <Constructor<T>>dep.properties.class;
             // DependencyValidator.validate(concretion);
-            let binding = this._kernel.bind(dep.token).to(concretion);
+            let binding = this._container.bind(dep.token).to(concretion);
             if (!dep.properties.transient) {
                 binding.inSingletonScope();
             }
         } else if (dep.properties.value) {
             let concretion = dep.properties.value;
-            this._kernel.bind(dep.token).toConstantValue(concretion);
+            this._container.bind(dep.token).toConstantValue(concretion);
         } else {
             throw new DIModuleError(`Invalid dependency: ${dep}`, null);
         }
